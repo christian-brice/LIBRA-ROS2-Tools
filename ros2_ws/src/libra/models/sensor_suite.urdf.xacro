@@ -1,0 +1,185 @@
+<?xml version="1.0"?>
+<robot name="sensor_suite" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <!-- ********************[ PROPERTIES ]******************** -->
+    <!-- Common -->
+    <xacro:property name="PI" value="3.14159"/>
+
+    <!-- Mounts -->
+    <xacro:property name="mount_lidar_width" value="0.100000"/>
+    <xacro:property name="mount_lidar_height" value="0.084000"/>
+    <xacro:property name="mount_lidar_depth" value="0.012514"/>
+    <xacro:property name="mount_lidar_mass" value="0.009"/>
+    
+    <xacro:property name="mount_camera_width" value="0.135861"/>
+    <xacro:property name="mount_camera_height" value="0.059941"/>
+    <xacro:property name="mount_camera_depth" value="0.104349"/>
+    <xacro:property name="mount_camera_mass" value="0.056"/>
+
+    <!-- Spinning 2D LIDAR (SF45-B, LightWare) -->
+    <xacro:property name="lidar_width" value="0.048462"/>
+    <xacro:property name="lidar_height" value="0.043979"/>
+    <xacro:property name="lidar_depth" value="0.050587"/>
+    <xacro:property name="lidar_mass" value="0.058"/>
+    
+    <!-- RGB-D camera (RealSense D456, Intel) -->
+    <xacro:property name="camera_width" value="0.123999"/>
+    <xacro:property name="camera_height" value="0.029093"/>
+    <xacro:property name="camera_depth" value="0.026004"/>
+    <xacro:property name="camera_mass" value="0.116"/>
+
+    <!-- ********************[ MATERIALS ]******************** -->
+    <material name="black">
+        <color rgba="${10/255} ${10/255} ${10/255} 1"/>
+    </material>
+    <material name="purple">
+        <color rgba="${50/255} ${25/255} ${75/255} 1"/>
+      </material>
+    <material name="silver">
+        <color rgba="${180/255} ${180/255} ${180/255} 1"/>
+    </material>
+
+    <!-- ********************[ MACROS ]******************** -->
+    <xacro:macro name="box_inertia" params="m x y z">
+        <inertial>
+            <mass value="${m}"/>
+            <inertia ixx="${(m/12) * (y*y + z*z)}" ixy="0.0" ixz="0.0"
+                     iyy="${(m/12) * (x*x + z*z)}" iyz="0.0"
+                     izz="${(m/12) * (x*x + y*y)}"/>
+        </inertial>
+    </xacro:macro>
+
+    <xacro:macro name="cylinder_inertia" params="m r h">
+        <inertial>
+            <mass value="${m}"/>
+            <inertia ixx="${(m/12) * (3*r*r + h*h)}" ixy = "0" ixz = "0"
+                    iyy="${(m/12) * (3*r*r + h*h)}" iyz = "0"
+                    izz="${(m/2) * (r*r)}"/>
+        </inertial>
+    </xacro:macro>
+
+    <xacro:macro name="sphere_inertia" params="m r">
+        <inertial>
+            <mass value="${m}"/>
+            <inertia ixx="${(2/5) * m * (r*r)}" ixy="0.0" ixz="0.0"
+                    iyy="${(2/5) * m * (r*r)}" iyz="0.0"
+                    izz="${(2/5) * m * (r*r)}"/>
+        </inertial>
+    </xacro:macro>
+
+    <!-- ********************[ LINKS ]******************** -->
+    <!-- Base Link -->
+    <link name="base_link"/>  <!-- sensor_suite_base -->
+
+    <!-- LIDAR Mount -->
+    <link name="mount_lidar_link">
+        <visual>
+            <origin xyz="0 0 0" rpy="${PI/2} 0 ${PI/2}"/>
+            <geometry>
+                <mesh filename="package://libra/meshes/M02-1_Sensor-Mount_LIDAR_guard.stl" scale="0.001 0.001 0.001"/>
+            </geometry>
+            <material name="black"/>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="${mount_lidar_depth} ${mount_lidar_width} ${mount_lidar_height}"/>
+            </geometry>
+        </collision>
+    </link>
+
+    <!-- LIDAR -->
+    <link name="lidar_link">
+        <visual>
+            <origin xyz="0.013602 0 0.028351" rpy="0 0 -${PI/2}"/>
+            <geometry>
+                <mesh filename="package://libra/meshes/SF45-B_simplified.stl" scale="0.001 0.001 0.001"/>
+            </geometry>
+            <material name="purple"/>
+        </visual>
+        <collision>
+            <origin xyz="0 0 ${lidar_height/2}" rpy="0 0 0"/>
+            <geometry>
+                <box size="${lidar_depth} ${lidar_width} ${lidar_height}"/>
+            </geometry>
+        </collision>
+    </link>
+
+    <!-- Camera Mount -->
+    <link name="mount_camera_link">
+        <visual>
+            <origin xyz="0 0 0" rpy="-${PI/2} 0 ${PI/2}"/>
+            <geometry>
+                <mesh filename="package://libra/meshes/M02-0_Sensor-Mount_Camera_guard.stl" scale="0.001 0.001 0.001"/>
+            </geometry>
+            <material name="black"/>
+        </visual>
+        <collision>
+            <origin xyz="0.045175 0 0.009540" rpy="0 0 0"/>
+            <geometry>
+                <box size="${mount_camera_depth} ${mount_camera_width} ${mount_camera_height}"/>
+            </geometry>
+        </collision>
+    </link>
+
+    <!-- Camera -->
+    <link name="camera_link">
+        <visual>
+            <origin xyz="0.026 0 0" rpy="${PI/2} 0 ${PI/2}"/>
+            <geometry>
+                <mesh filename="package://libra/meshes/D456.stl" scale="0.001 0.001 0.001"/>
+            </geometry>
+            <material name="silver"/>
+        </visual>
+        <collision>
+            <origin xyz="${camera_depth/2} 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="${camera_depth} ${camera_width} ${camera_height}"/>
+            </geometry>
+        </collision>
+    </link>
+
+    <!-- ********************[ JOINTS ]******************** -->
+    <!-- NOTE: X = forward/red, Y = left/green, Z = upwards/blue -->
+    <joint name="base_to_mount_lidar" type="fixed">
+        <parent link="base_link"/>  <!-- sensor_suite_base -->
+        <child link="mount_lidar_link"/>
+        <origin xyz="0.001 0 0" rpy="0 0 0"/>  <!-- accounts for mounting bracket -->
+    </joint>
+
+    <joint name="mount_lidar_to_lidar" type="fixed">
+        <parent link="mount_lidar_link"/>
+        <child link="lidar_link"/>
+        <origin xyz="0.006 0 0" rpy="0 ${PI/2} 0"/>  <!-- facing downwards-->
+    </joint>
+
+    <joint name="base_to_mount_camera" type="fixed">
+        <parent link="base_link"/>  <!-- sensor_suite_base -->
+        <child link="mount_camera_link"/>
+        <origin xyz="-0.001 0 0" rpy="0 0 0"/>  <!-- accounts for mounting bracket -->
+    </joint>
+
+    <joint name="mount_camera_to_camera" type="fixed">
+        <parent link="mount_camera_link"/>
+        <child link="camera_link"/>
+        <origin xyz="0.068267 0 0" rpy="${PI} 0 0"/>  <!-- upside-down -->
+    </joint>
+
+    <!-- ********************[ GAZEBO CONFIG ]******************** -->
+    <gazebo reference="mount_lidar_link">
+        <material>Gazebo/Black</material>
+    </gazebo>
+
+    <gazebo reference="lidar_link">
+        <material>Gazebo/Purple</material>
+    </gazebo>
+
+    <gazebo reference="mount_camera_link">
+        <material>Gazebo/Black</material>
+    </gazebo>
+
+    <gazebo reference="camera_link">
+        <material>Gazebo/Grey</material>
+    </gazebo>
+
+</robot>

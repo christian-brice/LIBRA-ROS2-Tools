@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<robot name="sensor_suite">
+    <!-- A simplified, non-xacro version of sensor_suite.urdf -->
+
+    <!-- Base Link -->
+    <link name="base_link">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.08 0.015 0.08"/>  <!-- Approximate size, adjust as needed -->
+            </geometry>
+            <material name="black">
+                <color rgba="0.1 0.1 0.1 1"/>
+            </material>
+        </visual>
+    </link>
+
+    <!-- LIDAR Link (SF45-B) -->
+    <link name="lidar_link">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.048 0.0512 0.0433"/>
+            </geometry>
+            <material name="dark_purple">
+                <color rgba="0.2 0.1 0.3 1"/>
+            </material>
+        </visual>
+    </link>
+
+    <!-- LIDAR Joint -->
+    <joint name="lidar_joint" type="fixed">
+        <parent link="base_link"/>
+        <child link="lidar_link"/>
+        <origin xyz="0 0.0331 0" rpy="0 -1.5708 0"/>  <!-- facing downwards (-1.5708 rad = -90 deg) -->
+    </joint>
+
+    <!-- RGB-D Camera Link (RealSense D456) -->
+    <link name="camera_link">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.124 0.026 0.029"/>
+            </geometry>
+            <material name="silver">
+                <color rgba="0.8 0.8 0.8 1"/>
+            </material>
+        </visual>
+    </link>
+
+    <!-- RGB-D Camera Joint -->
+    <joint name="camera_joint" type="fixed">
+        <parent link="base_link"/>
+        <child link="camera_link"/>
+        <origin xyz="0 0.0887 0" rpy="0 0 3.14159"/>  <!-- upsidedown/flipped (3.14159 rad = 180 deg) -->
+    </joint>
+</robot>
