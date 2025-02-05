@@ -1,0 +1,6 @@
+[submodule "ros2_ws/src/realsense-ros"]
+	path = ros2_ws/src/realsense-ros
+	url = https://github.com/IntelRealSense/realsense-ros.git
+[submodule "ros2_ws/src/lightwarelidar2"]
+	path = ros2_ws/src/lightwarelidar2
+	url = https://github.com/LightWare-Optoelectronics/lightwarelidar2
