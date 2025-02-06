@@ -71,17 +71,27 @@ Remember to source your local ROS environment!
 
 ```bash
 # Launch the camera node (Python)
-ros2 launch realsense2_camera rs_launch.py pointcloud.enable:=true enable_gyro:=true enable_accel:=true
+ros2 launch realsense2_camera rs_launch.py pointcloud.enable:=true enable_gyro:=true enable_accel:=true depth_module.depth_profile:=848x480x60 depth_module.infra_profile:=848x480x60 rgb_camera.color_profile:=848x480x60
 
 # -or-
 
 # Start the camera node (ROS2 run)
-ros2 run realsense2_camera realsense2_camera_node --ros-args -p pointcloud.enable:=true -p enable_gyro:=true -p enable_accel:=true
+ros2 run realsense2_camera realsense2_camera_node --ros-args -p pointcloud.enable:=true -p enable_gyro:=true -p enable_accel:=true -p depth_module.depth_profile:=848x480x60 -p depth_module.infra_profile:=848x480x60 -p rgb_camera.color_profile:=848x480x60
 ```
 
 The parameters have the following effects:
 - Enable "pointcloud" post-processing filter.
 - Enable "accel" and "gyro" publishing (note: these can also be combined into an "imu" msg; see the official documentation).
+- Sets RGB and stereo cameras to the same resolution and framerate, so that the depth point cloud can be colored using the RGB stream. The options in the command above prioritize 60 FPS.
+    - Supported options (formatted as `<width>x<height>x<fps>`):
+        ```txt
+        1280x720x30
+        848x480x60 (our default)
+        640x480x60
+        640x360x90
+        480x270x90
+        424x240x90
+        ```
 
 For a full list of parameters, see the ["Parameters" section of the realsense-ros README](/ros2_ws/src/realsense-ros/README.md#parameters).
 
