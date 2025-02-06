@@ -43,7 +43,7 @@ For ROS 2 command tips, see [docs/ROS_Commands.md](/docs/ROS_COMMANDS.md).
 ### *Other Terminals*
 
 Since I'm just testing, I still haven't combined everything into a single launch file.
-In the meantime, for each of the bullet points below, source the workspace and run the provided command.
+In the meantime, for each point below, source the workspace and run the provided command.
 
 - RealSense node:
     ```bash
@@ -53,8 +53,6 @@ In the meantime, for each of the bullet points below, source the workspace and r
     ```bash
     ros2 run lightwarelidar2 sf45b --ros-args -p port:=/dev/ttyACM0 -p frameId:=lidar_link -p updateRate:=12 -p lowAngleLimit:=-160 -p highAngleLimit:=160
     ```
-
-The RViz config file is located at `src/libra/rviz/sensor_suite.rviz`.
 
 ## Troubleshooting
 
