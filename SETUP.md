@@ -21,15 +21,15 @@ Choose the version that's right for you.
     - If you are behind a proxy, at the "_Now add the ROS 2 GPG key_" step you will have to add the following command-line option: `-x [protocol://][user:password@]proxyhost[:port]` (e.g., `-x http://proxy.noc.titech.ac.jp:3128`).
 2. Install other important ROS packages.
     ```bash
-    sudo apt install ros-humble-joint-state-publisher-gui
-    sudo apt install ros-humble-xacro
+    sudo apt install ros-$ROS_DISTRO-joint-state-publisher-gui
+    sudo apt install ros-$ROS_DISTRO-xacro
     ```
 3. Add the ROS 2 source script to the end of your `.bashrc`.
     ```bash
     # In a terminal
     nano ~/.bashrc
     # In .bashrc
-    . /opt/ros/humble/setup.bash
+    . /opt/ros/$ROS_DISTRO/setup.bash
     ```
 4. Source your `.bashrc` so the setup script takes effect in your active terminal.
     ```bash
