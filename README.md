@@ -6,7 +6,7 @@ ROS2 workspace for the LIBRA project. Kept separate from the main LIBRA-App repo
 
 - [Requirements](#requirements)
 - [Usage](#usage)
-- [Tips](#tips)
+    - [*Tips*](#tips)
 - [Troubleshooting](#troubleshooting)
     - [*RViz isn't loading the model*](#rviz-isnt-loading-the-model)
 - [About Us](#about-us)
@@ -38,12 +38,9 @@ ROS2 workspace for the LIBRA project. Kept separate from the main LIBRA-App repo
     ros2 launch libra sensor_suite_test.launch.py gui:=false
     ```
 
-## Tips
+### *Tips*
 
-- Get the argument list for a launch file.
-    ```bash
-    ros2 launch -s libra [filename].launch.py
-    ```
+See [docs/ROS_Commands.md](/docs/ROS_COMMANDS.md).
 
 ## Troubleshooting
 
