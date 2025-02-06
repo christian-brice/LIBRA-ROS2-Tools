@@ -29,7 +29,7 @@ find_package(ament_cmake REQUIRED)
 
 # Define project input and output directories
 install(
-  DIRECTORY launch meshes models rviz
+  DIRECTORY config launch maps meshes models params rviz
   DESTINATION share/${PROJECT_NAME}
 )
 
