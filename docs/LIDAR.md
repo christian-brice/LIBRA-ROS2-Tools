@@ -32,13 +32,18 @@ Remember to source your local ROS environment!
 
 ```bash
 # Start the LIDAR node (ROS2 run)
-ros2 run lightwarelidar2 sf45b --ros-args -p port:=/dev/ttyACM0
+ros2 run lightwarelidar2 sf45b --ros-args -p port:=/dev/ttyACM0 -p frameId:=lidar_link -p updateRate:=12 -p lowAngleLimit:=-160 -p highAngleLimit:=160
 ```
 
 The parameters have the following effects:
 - Specify the communications port used to interface with the SF45/B.
+- Gives the node's `tf` the same name as the LIDAR link in the URDF.
+- Sets the update rate to 5000 readings per second (fastest).
+- Sets the scan angle to 320 degrees (maximum).
 
 For a full list of parameters, see the ["Parameters" section under "sf45b Node" of the lightwarelidar2 README](/ros2_ws/src/lightwarelidar2/README.md#parameters-1).
+
+> **_NOTE:_** The `frameId` parameter is incorrectly referenced in the official documentation as `frame_id`.
 
 ### *Terminal 2 (visualization)*
 
