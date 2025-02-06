@@ -12,7 +12,7 @@ def generate_launch_description():
     # Set paths to required files and dirs
     pkg_share = FindPackageShare(package='libra').find('libra')
     default_rviz_config_path = os.path.join(
-        pkg_share, 'rviz/rviz_basic_settings.rviz')
+        pkg_share, 'rviz/sensor_suite.rviz')
     default_urdf_model_path = os.path.join(
         pkg_share, 'models/sensor_suite.urdf.xacro')
 

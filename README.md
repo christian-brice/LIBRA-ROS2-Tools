@@ -6,7 +6,7 @@ ROS2 workspace for the LIBRA project. Kept separate from the main LIBRA-App repo
 
 - [Requirements](#requirements)
 - [Usage](#usage)
-    - [*Tips*](#tips)
+    - [*Other Terminals*](#other-terminals)
 - [Troubleshooting](#troubleshooting)
     - [*RViz isn't loading the model*](#rviz-isnt-loading-the-model)
 - [About Us](#about-us)
@@ -23,6 +23,8 @@ ROS2 workspace for the LIBRA project. Kept separate from the main LIBRA-App repo
 
 ## Usage
 
+For ROS 2 command tips, see [docs/ROS_Commands.md](/docs/ROS_COMMANDS.md).
+
 1. Open a terminal in the `ros2_ws` directory and build the project.
     ```bash
     cd ros2_ws/
@@ -38,9 +40,21 @@ ROS2 workspace for the LIBRA project. Kept separate from the main LIBRA-App repo
     ros2 launch libra sensor_suite_test.launch.py gui:=false
     ```
 
-### *Tips*
+### *Other Terminals*
 
-See [docs/ROS_Commands.md](/docs/ROS_COMMANDS.md).
+Since I'm just testing, I still haven't combined everything into a single launch file.
+In the meantime, for each of the bullet points below, source the workspace and run the provided command.
+
+- RealSense node:
+    ```bash
+    ros2 run realsense2_camera realsense2_camera_node --ros-args -p pointcloud.enable:=true -p enable_gyro:=true -p enable_accel:=true -p depth_module.depth_profile:=848x480x60 -p depth_module.infra_profile:=848x480x60 -p rgb_camera.color_profile:=848x480x60
+    ```
+- LIDAR node:
+    ```bash
+    ros2 run lightwarelidar2 sf45b --ros-args -p port:=/dev/ttyACM0 -p frameId:=lidar_link -p updateRate:=12 -p lowAngleLimit:=-160 -p highAngleLimit:=160
+    ```
+
+The RViz config file is located at `src/libra/rviz/sensor_suite.rviz`.
 
 ## Troubleshooting
 
