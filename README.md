@@ -37,7 +37,7 @@ For ROS 2 command tips, see [docs/ROS_Commands.md](/docs/ROS_COMMANDS.md).
 3. Run one of the provided launch files.
     ```bash
     # Sensor Suite (RGB-D camera + LIDAR)
-    ros2 launch libra sensor_suite_test.launch.py gui:=false
+    ros2 launch libra sensor_suite.launch.py gui:=false
     ```
 
 ### *Other Terminals*
