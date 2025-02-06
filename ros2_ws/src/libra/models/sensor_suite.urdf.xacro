@@ -80,12 +80,18 @@
             </geometry>
             <material name="black"/>
         </visual>
+
         <collision>
             <origin xyz="0 0 0" rpy="0 0 0"/>
             <geometry>
                 <box size="${mount_lidar_depth} ${mount_lidar_width} ${mount_lidar_height}"/>
             </geometry>
         </collision>
+
+        <xacro:box_inertia m="${mount_lidar_mass}" 
+                           x="${mount_lidar_depth}" 
+                           y="${mount_lidar_width}" 
+                           z="${mount_lidar_height}"/>
     </link>
 
     <!-- LIDAR -->
@@ -97,12 +103,18 @@
             </geometry>
             <material name="purple"/>
         </visual>
+
         <collision>
             <origin xyz="0 0 ${lidar_height/2}" rpy="0 0 0"/>
             <geometry>
                 <box size="${lidar_depth} ${lidar_width} ${lidar_height}"/>
             </geometry>
         </collision>
+
+        <xacro:box_inertia m="${lidar_mass}" 
+                           x="${lidar_depth}" 
+                           y="${lidar_width}" 
+                           z="${lidar_height}"/>
     </link>
 
     <!-- Camera Mount -->
@@ -114,12 +126,18 @@
             </geometry>
             <material name="black"/>
         </visual>
+
         <collision>
             <origin xyz="0.045175 0 0.009540" rpy="0 0 0"/>
             <geometry>
                 <box size="${mount_camera_depth} ${mount_camera_width} ${mount_camera_height}"/>
             </geometry>
         </collision>
+
+        <xacro:box_inertia m="${mount_camera_mass}" 
+                           x="${mount_camera_depth}" 
+                           y="${mount_camera_width}" 
+                           z="${mount_camera_height}"/>
     </link>
 
     <!-- Camera -->
@@ -131,12 +149,18 @@
             </geometry>
             <material name="silver"/>
         </visual>
+
         <collision>
             <origin xyz="${camera_depth/2} 0 0" rpy="0 0 0"/>
             <geometry>
                 <box size="${camera_depth} ${camera_width} ${camera_height}"/>
             </geometry>
         </collision>
+
+        <xacro:box_inertia m="${camera_mass}" 
+                           x="${camera_depth}" 
+                           y="${camera_width}" 
+                           z="${camera_height}"/>
     </link>
 
     <!-- ********************[ JOINTS ]******************** -->
