@@ -9,10 +9,10 @@
     - [*`info <filename>`*](#info-filename)
     - [*`play <filename>`*](#play-filename)
 - [Topic Metadata](#topic-metadata)
-    - [*`ros2 interface show <topic_type>`*](#ros2-interface-show-topic_type)
-    - [*`ros2 topic hz <topic_name>`*](#ros2-topic-hz-topic_name)
-    - [*`ros2 topic info <topic_name>`*](#ros2-topic-info-topic_name)
     - [*`ros2 topic list`*](#ros2-topic-list)
+    - [*`ros2 topic info <topic_name>`*](#ros2-topic-info-topic_name)
+    - [*`ros2 topic hz <topic_name>`*](#ros2-topic-hz-topic_name)
+    - [*`ros2 interface show <topic_type>`*](#ros2-interface-show-topic_type)
 - [Visualizations](#visualizations)
     - [*`rqt_graph`*](#rqt_graph)
 
@@ -58,23 +58,23 @@ Replays ROS2 data from a bag file.
 
 ## Topic Metadata
 
-### *`ros2 interface show <topic_type>`*
-
-Returns the data structure expected by the given topic type.
-
-### *`ros2 topic hz <topic_name>`*
-
-Returns statistics on the rate at which data is published to the given topic.
-
-### *`ros2 topic info <topic_name>`*
-
-Returns the topic type for the given topic, as well as the number of active publishers and subscribers.
-
 ### *`ros2 topic list`*
 
 Returns a list of all active topics.
 
 - Adding the `-t` flag appends the topic type, in brackets.
+
+### *`ros2 topic info <topic_name>`*
+
+Returns the topic type for the given topic, as well as the number of active publishers and subscribers.
+
+### *`ros2 topic hz <topic_name>`*
+
+Returns statistics on the rate at which data is published to the given topic.
+
+### *`ros2 interface show <topic_type>`*
+
+Returns the data structure expected by the given topic type.
 
 ## Visualizations
 
