@@ -47,6 +47,21 @@ For ROS 2 command tips, see [docs/ROS_Commands.md](/docs/ROS_COMMANDS.md).
 
 ### *Other Terminals*
 
+Since I'm just testing, I still haven't combined everything into a single launch file.
+In the meantime, for each point below, source the workspace and run the provided command.
+
+- RealSense node:
+
+    ```bash
+    ros2 run realsense2_camera realsense2_camera_node --ros-args -p pointcloud.enable:=true -p enable_gyro:=true -p enable_accel:=true -p depth_module.depth_profile:=848x480x60 -p depth_module.infra_profile:=848x480x60 -p rgb_camera.color_profile:=848x480x60
+    ```
+
+- LIDAR node:
+
+    ```bash
+    ros2 run lightwarelidar2 sf45b --ros-args -p port:=/dev/ttyACM0 -p frameId:=lidar_link -p updateRate:=12 -p lowAngleLimit:=-160 -p highAngleLimit:=160
+    ```
+
 - Recording a session:
 
     ```bash
