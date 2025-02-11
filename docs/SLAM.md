@@ -45,7 +45,7 @@ This document explains how to use the LIBRA's sensor suite (RGB-D camera + spinn
 
 ## Usage
 
-TODO: ***the following are in-progress notes - none of this works yet!***
+TODO: ***the following are in-progress notes - none of this really works yet!***
 
 ### *Terminal 1: LIBRA*
 
