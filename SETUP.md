@@ -56,4 +56,4 @@ Follow the instructions in the ["Before You Start" section of REALSENSE.md](/doc
 
 ### *LightWare LIDAR&copy; ROS2 Wrapper*
 
-Follow the instructions in the ["Before You Start" section of LIDAR.md](/docs/REALSENSE.md#before-you-start).
+Follow the instructions in the ["Before You Start" section of LIDAR.md](/docs/LIDAR.md#before-you-start).
