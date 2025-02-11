@@ -29,7 +29,7 @@ For ROS 2 command tips, see [docs/ROS_Commands.md](/docs/ROS_COMMANDS.md).
 
     ```bash
     cd ros2_ws/
-    colcon build --packages-select libra
+    colcon build --packages-up-to libra
     ```
 
 2. Source the workspace for the `libra` package.
