@@ -53,7 +53,11 @@ In the meantime, for each point below, source the workspace and run the provided
 - RealSense node:
 
     ```bash
-    ros2 run realsense2_camera realsense2_camera_node --ros-args -p pointcloud.enable:=true -p enable_gyro:=true -p enable_accel:=true -p depth_module.depth_profile:=848x480x60 -p depth_module.infra_profile:=848x480x60 -p rgb_camera.color_profile:=848x480x60 -p align_depth.enable:=true
+    ros2 run realsense2_camera realsense2_camera_node --ros-args \
+    -p pointcloud.enable:=true \
+    -p enable_gyro:=true -p enable_accel:=true -p unite_imu_method:=2 \
+    -p depth_module.depth_profile:=848x480x60 -p depth_module.infra_profile:=848x480x60 -p rgb_camera.color_profile:=848x480x60 \
+    -p align_depth.enable:=true
     ```
 
 - LIDAR node:
