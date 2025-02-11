@@ -50,7 +50,8 @@ For ROS 2 command tips, see [docs/ROS_Commands.md](/docs/ROS_COMMANDS.md).
 - Recording a session:
 
     ```bash
-    cd ros2_ws/bag_files/
+    cd ros2_ws
+    mkdir bag_files && cd bag_files/
     ros2 bag record -a
     # To stop recording, press Ctrl+C
     ```
