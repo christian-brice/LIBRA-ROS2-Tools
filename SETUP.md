@@ -38,8 +38,7 @@ Choose the version that's right for you.
 4. Install other important ROS packages.
 
     ```bash
-    sudo apt install ros-$ROS_DISTRO-joint-state-publisher-gui
-    sudo apt install ros-$ROS_DISTRO-xacro
+    sudo apt install -y ros-$ROS_DISTRO-imu-tools ros-$ROS_DISTRO-joint-state-publisher-gui ros-$ROS_DISTRO-xacro
     ```
 
 ## Git Submodules
