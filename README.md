@@ -42,7 +42,7 @@ For ROS 2 command tips, see [docs/ROS_Commands.md](/docs/ROS_COMMANDS.md).
 
     ```bash
     # Sensor Suite (RGB-D camera + LIDAR)
-    ros2 launch libra sensor_suite.launch.py gui:=false
+    ros2 launch libra sensor_suite.launch.py
     ```
 
 ### *Other Terminals*

@@ -20,7 +20,7 @@ def generate_launch_description():
 
     urdf_model = LaunchConfiguration('urdf_model')
     rviz_config_file = LaunchConfiguration('rviz_config_file')
-    use_gui = LaunchConfiguration('gui')
+    #use_gui = LaunchConfiguration('gui')
     use_rviz = LaunchConfiguration('use_rviz')
     use_sim_time = LaunchConfiguration('use_sim_time')
 
@@ -34,10 +34,10 @@ def generate_launch_description():
         default_value=default_rviz_config_path,
         description='Full path to RViz config file')
     
-    declare_use_joint_state_publisher_cmd = DeclareLaunchArgument(
-        name='use_gui',
-        default_value='True',
-        description='Whether to enable joint_state_publisher_gui')
+    #declare_use_joint_state_publisher_cmd = DeclareLaunchArgument(
+    #    name='use_gui',
+    #    default_value='True',
+    #    description='Whether to enable joint_state_publisher_gui')
     
     declare_use_rviz_cmd = DeclareLaunchArgument(
         name='use_rviz',
@@ -53,17 +53,17 @@ def generate_launch_description():
 
     # Publish joint state values for non-fixed joints (see URDF)
     start_joint_state_publisher_cmd = Node(
-        condition=UnlessCondition(use_gui),
+        #condition=UnlessCondition(use_gui),
         package='joint_state_publisher',
         executable='joint_state_publisher',
         name='joint_state_publisher')
     
     # Manipulate joint state values via GUI
-    start_joint_state_publisher_gui_node = Node(
-        condition=IfCondition(use_gui),
-        package='joint_state_publisher_gui',
-        executable='joint_state_publisher_gui',
-        name='joint_state_publisher_gui')
+    #start_joint_state_publisher_gui_node = Node(
+    #    condition=IfCondition(use_gui),
+    #    package='joint_state_publisher_gui',
+    #    executable='joint_state_publisher_gui',
+    #    name='joint_state_publisher_gui')
 
     # Subscribe to joint states of robot and publish 3D pose of each link
     start_robot_state_publisher_cmd = Node(
@@ -95,14 +95,14 @@ def generate_launch_description():
 
     ld.add_action(declare_urdf_model_path_cmd)
     ld.add_action(declare_rviz_config_file_cmd)
-    ld.add_action(declare_use_joint_state_publisher_cmd)
+    #ld.add_action(declare_use_joint_state_publisher_cmd)
     ld.add_action(declare_use_rviz_cmd)
     ld.add_action(declare_use_sim_time_cmd)
 
     # --- DECLARE ROS ACTIONS ---
 
     ld.add_action(start_joint_state_publisher_cmd)
-    ld.add_action(start_joint_state_publisher_gui_node)
+    #ld.add_action(start_joint_state_publisher_gui_node)
     ld.add_action(start_robot_state_publisher_cmd)
     ld.add_action(start_rviz_cmd)
 
