@@ -34,14 +34,14 @@ The ROS 2 wrapper is included in this project as a git submodule (located at `ro
 Except for "Step 1: Install the ROS2 distribution", every step of the SDK and ROS wrapper installation **is different for WSL2**.
 In a nutshell: everything must be built from source.
 
-> **_NOTE:_** (as of 2025/2/5) Do *NOT* attempt to install `librealsense2-dkms` in WSL2; this will leave the package in a broken, unmodifiable state (see [Troubleshooting](#troubleshooting)).
+> ***NOTE:*** (as of 2025/2/5) Do *NOT* attempt to install `librealsense2-dkms` in WSL2; this will leave the package in a broken, unmodifiable state (see [Troubleshooting](#troubleshooting)).
 
 #### **Step 2: Install latest Intel&reg; RealSense&trade; SDK 2.0**
 
 Rather than following the Linux Ubuntu Installation, you will have to use the [LibUVC-backend installation](https://github.com/IntelRealSense/librealsense/blob/master/doc/libuvc_installation.md) script.
 Once it's finished, you can check whether or not the installation was successful by attaching your RealSense camera's connection to WSL2 and executing `rs-enumerate-devices` in a terminal.
 
-> **_NOTE:_** If you're not sure how to "attach" a USB connection to WSL2, check out the [WSL USB Manager project on github](https://github.com/nickbeth/wsl-usb-manager).
+> ***NOTE:*** If you're not sure how to "attach" a USB connection to WSL2, check out the [WSL USB Manager project on github](https://github.com/nickbeth/wsl-usb-manager).
 
 #### **Step 3: Install Intel&reg; RealSense&trade; ROS2 wrapper**
 
@@ -80,10 +80,12 @@ ros2 run realsense2_camera realsense2_camera_node --ros-args -p pointcloud.enabl
 ```
 
 The parameters have the following effects:
+
 - Enable "pointcloud" post-processing filter.
 - Enable "accel" and "gyro" publishing (note: these can also be combined into an "imu" msg; see the official documentation).
 - Sets RGB and stereo cameras to the same resolution and framerate, so that the depth point cloud can be colored using the RGB stream. The options in the command above prioritize 60 FPS.
     - Supported options (formatted as `<width>x<height>x<fps>`):
+
         ```txt
         1280x720x30
         848x480x60 (our default)
@@ -103,7 +105,7 @@ rviz2 -d src/libra/rviz/realsense.rviz
 ```
 
 - `Image` should be subscribed to the topic: `/camera/camera/color/image_raw`.
-- `DepthCloud` shouldn't need to be configured 
+- `DepthCloud` shouldn't need to be configured.
 - `PointCloud2` should be subscribed to the topic: `/camera/camera/depth/color/points`.
 
 ## Troubleshooting

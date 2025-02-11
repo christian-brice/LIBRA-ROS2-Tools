@@ -36,6 +36,7 @@ ros2 run lightwarelidar2 sf45b --ros-args -p port:=/dev/ttyACM0 -p frameId:=lida
 ```
 
 The parameters have the following effects:
+
 - Specify the communications port used to interface with the SF45/B.
 - Gives the node's `tf` the same name as the LIDAR link in the URDF.
 - Sets the update rate to 5000 readings per second (fastest).
@@ -43,7 +44,7 @@ The parameters have the following effects:
 
 For a full list of parameters, see the ["Parameters" section under "sf45b Node" of the lightwarelidar2 README](/ros2_ws/src/lightwarelidar2/README.md#parameters-1).
 
-> **_NOTE:_** The `frameId` parameter is incorrectly referenced in the official documentation as `frame_id`.
+> ***NOTE:*** The `frameId` parameter is incorrectly referenced in the official documentation as `frame_id`.
 
 ### *Terminal 2 (visualization)*
 
@@ -59,16 +60,21 @@ rviz2 -d src/libra/rviz/lidar.rviz
 ### *`sf45b` node errors with: "Could not establish serial connection"*
 
 1. Check whether or not the device has been properly attached to WSL2. Look for: "Microchip Technology, Inc. lwnx device".
+
     ```bash
     lsusb
     ```
-2. Now, find the port name (this will give us the full address in the format: `/dev/<port_name>`). 
+
+2. Now, find the port name (this will give us the full address in the format: `/dev/<port_name>`).
     1. Disconnect the LIDAR.
     2. Reconnect it, and shortly afterwards execute the following to get a history of USB-related kernel actions.
+
         ```bash
         dmesg | grep -i usb
         ```
+
     3. Look for something similar to the following lines. In this example, the final line gives us the port name: `ttyACM0`.
+
         ```txt
         [10929.475561] usb 1-1: New USB device found ...
         ...
@@ -77,8 +83,8 @@ rviz2 -d src/libra/rviz/lidar.rviz
         ...
         [10929.477367] cdc_acm 1-1:1.0: ttyACM0: USB ACM device
         ```
-3. [Run the `sf45b` node](#terminal-1-ros-node), inputting your port name as a parameter: `port:=/dev/<port_name>`.
 
+3. [Run the `sf45b` node](#terminal-1-ros-node), inputting your port name as a parameter: `port:=/dev/<port_name>`.
 
 ## Notes
 
