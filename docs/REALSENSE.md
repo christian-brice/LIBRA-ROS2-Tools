@@ -105,6 +105,8 @@ The parameters have the following effects:
 
 - Aligns the depth image to the color image, publishing it to `/camera/camera/aligned_depth_to_color/image_raw`. Additionally, the pointcloud is now based on the aligned depth image.
 
+Additionally, **diagnostics** can be enabled by adding the parameter `diagnostics_period:=<double>` (where `double` is, e.g., `10.0`).
+
 For a full list of parameters, see the ["Parameters" section of the realsense-ros README](/ros2_ws/src/realsense-ros/README.md#parameters).
 
 ### *Terminal 2 (visualization)*
