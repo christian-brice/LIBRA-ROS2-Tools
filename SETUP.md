@@ -19,14 +19,8 @@ Choose the version that's right for you.
 
 1. Follow the official ROS 2 install guide for [Ubuntu (deb packages)](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debs.html).
     - If you are behind a proxy, at the "*Now add the ROS 2 GPG key*" step you will have to add the following command-line option: `-x [protocol://][user:password@]proxyhost[:port]` (e.g., `-x http://proxy.noc.titech.ac.jp:3128`).
-2. Install other important ROS packages.
 
-    ```bash
-    sudo apt install ros-$ROS_DISTRO-joint-state-publisher-gui
-    sudo apt install ros-$ROS_DISTRO-xacro
-    ```
-
-3. Add the ROS 2 source script to the end of your `.bashrc`.
+2. Add the ROS 2 source script to the end of your `.bashrc`.
 
     ```bash
     # In a terminal
@@ -35,10 +29,17 @@ Choose the version that's right for you.
     . /opt/ros/$ROS_DISTRO/setup.bash
     ```
 
-4. Source your `.bashrc` so the setup script takes effect in your active terminal.
+3. Source your `.bashrc` so the setup script takes effect in your active terminal.
 
     ```bash
     . ~/.bashrc
+    ```
+
+4. Install other important ROS packages.
+
+    ```bash
+    sudo apt install ros-$ROS_DISTRO-joint-state-publisher-gui
+    sudo apt install ros-$ROS_DISTRO-xacro
     ```
 
 ## Git Submodules
