@@ -71,12 +71,12 @@ Remember to source your local ROS environment!
 
 ```bash
 # Launch the camera node (Python)
-ros2 launch realsense2_camera rs_launch.py pointcloud.enable:=true enable_gyro:=true enable_accel:=true depth_module.depth_profile:=848x480x60 depth_module.infra_profile:=848x480x60 rgb_camera.color_profile:=848x480x60
+ros2 launch realsense2_camera rs_launch.py pointcloud.enable:=true enable_gyro:=true enable_accel:=true depth_module.depth_profile:=848x480x60 depth_module.infra_profile:=848x480x60 rgb_camera.color_profile:=848x480x60 align_depth.enable:=true
 
 # -or-
 
 # Start the camera node (ROS2 run)
-ros2 run realsense2_camera realsense2_camera_node --ros-args -p pointcloud.enable:=true -p enable_gyro:=true -p enable_accel:=true -p depth_module.depth_profile:=848x480x60 -p depth_module.infra_profile:=848x480x60 -p rgb_camera.color_profile:=848x480x60
+ros2 run realsense2_camera realsense2_camera_node --ros-args -p pointcloud.enable:=true -p enable_gyro:=true -p enable_accel:=true -p depth_module.depth_profile:=848x480x60 -p depth_module.infra_profile:=848x480x60 -p rgb_camera.color_profile:=848x480x60 -p align_depth.enable:=true
 ```
 
 The parameters have the following effects:
@@ -94,6 +94,8 @@ The parameters have the following effects:
         480x270x90
         424x240x90
         ```
+
+- Aligns the depth image to the color image, publishing it to `/camera/camera/aligned_depth_to_color/image_raw`. Additionally, the pointcloud is now based on the aligned depth image.
 
 For a full list of parameters, see the ["Parameters" section of the realsense-ros README](/ros2_ws/src/realsense-ros/README.md#parameters).
 
@@ -136,6 +138,20 @@ ros2 topic list
 
 ## Notes
 
+- A **latency testing tool** is provided in the `realsense-ros` repo, although it must be explicitly built.
+
+    ```bash
+    cd ros2_ws/
+    colcon build --cmake-args '-DBUILD_TOOLS=ON'
+    # Standard RealSense node
+    ros2 launch realsense2_camera rs_intra_process_demo_launch.py intra_process_comms:=false
+    # RealSense node using zero-copy communication (see "efficient intra-process communication" note below)
+    ros2 launch realsense2_camera rs_intra_process_demo_launch.py intra_process_comms:=true
+    ```
+
 - The **coordinate systems** differ between the ROS 2 (robot) and optical (camera) models. Some [tf](http://wiki.ros.org/tf) topics are automatically published which allow you to transform between them. For more information, see the [explanation in the realsense-ros README](https://github.com/IntelRealSense/realsense-ros?tab=readme-ov-file#ros2robot-vs-opticalcamera-coordination-systems).
 
 - It's possible to **enable high dynamic range (HDR) on the depth module**, although at the time of writing (2025/2/5) this disables auto-exposure, requiring you to manually find appropriate exposure and gain values for your environment. Note that using HDR with quick movements may, conversely, introduce artifacts. For instructions on how to enable and adjust HDR, see the bullet points for the `hdr_merge` and `depth_module.hdr_enabled` parameters in the ["Post-Processing Filters" section of the realsense-ros README](https://github.com/IntelRealSense/realsense-ros?tab=readme-ov-file#post-processing-filters). There is also a [whitepaper](https://dev.intelrealsense.com/docs/high-dynamic-range-with-stereoscopic-depth-cameras) on the matter.
+
+- The Realsense node is capable of outputting a *LOT* of information, putting a strain on your computer's resources. To minimize CPU load, check out the instructions for setting up **efficient intra-process communication** in the [corresponding section of the realsense-ros README](https://github.com/IntelRealSense/realsense-ros?tab=readme-ov-file#efficient-intra-process-communication).
+    - Note: compressed images are not supported.
