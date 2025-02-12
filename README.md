@@ -8,6 +8,7 @@ ROS2 workspace for the LIBRA project. Kept separate from the main LIBRA-App repo
 - [Usage](#usage)
     - [*Other Terminals*](#other-terminals)
 - [Troubleshooting](#troubleshooting)
+    - [*RViz: Wrong permissions on runtime directory*](#rviz-wrong-permissions-on-runtime-directory)
     - [*RViz isn't loading the model*](#rviz-isnt-loading-the-model)
 - [About Us](#about-us)
 - [Contributing](#contributing)
@@ -76,6 +77,16 @@ In the meantime, for each point below, source the workspace and run the provided
     ```
 
 ## Troubleshooting
+
+### *RViz: Wrong permissions on runtime directory*
+
+`QStandardPaths: wrong permissions on runtime directory /run/user/1000/ 0755 instead of 0700`.
+
+If you get the above message whenever you open RViz in WSL2, just execute the following in a terminal.
+
+```bash
+chmod 0700 /run/user/1000/
+```
 
 ### *RViz isn't loading the model*
 
