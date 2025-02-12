@@ -188,6 +188,10 @@ __pycache__/
 **/docs/html
 **/docs/latex
 
-# ROS2 Build folders
+# ROS2 build folders
 **/build/
 **/install/
+**/log/
+
+# ROS2 runtime folders
+**/bag_files/
