@@ -20,6 +20,7 @@ Then, simply build it as you would any other ROS 2 package.
 
 ```bash
 cd ros2_ws/
+. /opt/ros/humble/setup.bash
 colcon build --packages-select lightwarelidar2
 ```
 

@@ -59,6 +59,7 @@ sudo rosdep init
 rosdep update
 rosdep install -i --from-path src --rosdistro $ROS_DISTRO --skip-keys=librealsense2 -y
 # Build
+. /opt/ros/humble/setup.bash
 colcon build --packages-up-to realsense2_camera
 ```
 
