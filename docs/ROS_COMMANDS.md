@@ -12,6 +12,7 @@
     - [*`ros2 topic list`*](#ros2-topic-list)
     - [*`ros2 topic info <topic_name>`*](#ros2-topic-info-topic_name)
     - [*`ros2 topic hz <topic_name>`*](#ros2-topic-hz-topic_name)
+    - [*`ros2 topic echo <topic_name>`*](#ros2-topic-echo-topic_name)
     - [*`ros2 interface show <topic_type>`*](#ros2-interface-show-topic_type)
 - [Visualizations](#visualizations)
     - [*`rqt_graph`*](#rqt_graph)
@@ -71,6 +72,10 @@ Returns the topic type for the given topic, as well as the number of active publ
 ### *`ros2 topic hz <topic_name>`*
 
 Returns statistics on the rate at which data is published to the given topic.
+
+### *`ros2 topic echo <topic_name>`*
+
+Continuously prints a published topic's contents to the terminal.
 
 ### *`ros2 interface show <topic_type>`*
 
