@@ -21,6 +21,30 @@ As stated in the `rtabmap_ros` repo, simply installing the package via APT is en
 sudo apt install ros-$ROS_DISTRO-rtabmap-ros
 ```
 
+The communication middleware that ROS 2 uses is DDS; specifically, [Fast DDS](https://fast-dds.docs.eprosima.com/en/latest/) by default. However, [Cyclone DDS](https://cyclonedds.io/) is recommended for SLAM, particularly if RTAB-Map's GUI or topic frequency feel laggy (even if processing time looks fast enough).
+
+1. Install Cyclone DDS for ROS 2.
+    ```bash
+    sudo apt install ros-$ROS_DISTRO-rmw-cyclonedds-cpp
+    ```
+2. Add a persistent environment variable to your `.bashrc` defining Cyclone DDS as the preferred middleware
+    ```bash
+    echo 'export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp' >> ~/.bashrc
+    source ~/.bashrc
+    ```
+
+It may also be useful to make RTAB-Map's command-line logs appear synced with ROS 2's. Add the following to your `.bashrc` to do so.
+
+```bash
+cat << 'EOF' >> ~/.bashrc
+# Sync RTAB-Map and ROS 2 (RCLCPP) command-line logs
+export RCUTILS_LOGGING_USE_STDOUT=1
+export RCUTILS_LOGGING_BUFFERED_STREAM=1
+export RCUTILS_COLORIZED_OUTPUT=1
+EOF
+source ~/.bashrc
+```
+
 ## Usage
 
 ### *Terminal 1: rtabmap_viz*
@@ -30,6 +54,17 @@ cd ros2_ws/
 colcon build && . install/local_setup.bash
 ros2 launch libra rtabmap_realsense_d456_stereo.launch.py
 ```
+
+This launches the following five nodes:
+- `realsense2_camera`, in the default camera namespace and with the following options.
+    - Disables the built-in IR emitter (this reduces speckling).
+    - Enables the `gyro`, `accel`, `infra1`, and `infra2` streams.
+    - Enables `unite_imu` using linear interpolation (`=2`).
+    - Syncs frames from its various cameras under the same timestamp.
+- `stereo_odometry`, for visually estimating robot odometry using a stereo camera.
+- `rtabmap`, the main SLAM node w/ loop closure detector.
+- `rtabmap_viz`, which brings up the RTAB-Map GUI.
+- `imu_filter_madgwick`, for automatically computing the quaternion of the RealSense's angular velocity and linear acceleration data (this is necessary for generating a complete ROS 2 IMU message).
 
 ## Troubleshooting
 
