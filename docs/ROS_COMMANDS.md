@@ -32,6 +32,9 @@ The following sub-subsection headers correspond to subcommands of `ros2 bag`.
 Records active topics to a bag file until `Ctrl+C` is pressed.
 
 - `<topic1_name> [topic2_name ...]`: record only the provided topic(s).
+    ```bash
+    ros2 bag record /camera/camera/depth/image_rect_raw /tf_static /camera/camera/color/image_raw /pointcloud /camera/camera/imu /camera/camera/depth/color/points /initialpose /joint_states /scan /robot_description /tf
+    ```
 - `-a`: record ALL topics.
 - `-e <regex>`: exclude topics matching the provided regex.
 - `-d <max_duration>`: specify a maximum duration (in seconds) before the bag file is split.
