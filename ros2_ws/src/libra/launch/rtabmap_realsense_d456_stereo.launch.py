@@ -1,5 +1,5 @@
 # Requirements:
-#   A realsense D456
+#   A realsense D435i or D456
 #   Install realsense2 ros2 package (ros-$ROS_DISTRO-realsense2-camera)
 # Example:
 #   $ ros2 launch rtabmap_examples rtabmap_realsense_d456_stereo.launch.py
@@ -23,7 +23,7 @@ def generate_launch_description():
           'wait_imu_to_init':True}]
 
     remappings=[
-          ('imu', '/camera/imu'),
+          ('imu', '/imu/data'),
           ('left/image_rect', '/camera/infra1/image_rect_raw'),
           ('left/camera_info', '/camera/infra1/camera_info'),
           ('right/image_rect', '/camera/infra2/image_rect_raw'),
