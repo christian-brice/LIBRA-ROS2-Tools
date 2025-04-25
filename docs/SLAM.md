@@ -76,11 +76,13 @@ This launches the following five nodes:
 
 #### **Subscribes to**
 
-- `/imu/data`
 - `/camera/infra1/image_rect_raw`
 - `/camera/infra1/camera_info`
 - `/camera/infra2/image_rect_raw`
 - `/camera/infra2/camera_info`
+- `/imu/data`
+- `/odom`
+- `/odom_info`
 
 #### **Publishes**
 
