@@ -7,9 +7,10 @@ The official RTAB-Map repo for ROS 2 can be found [here](https://github.com/intr
 
 - [Before You Start](#before-you-start)
 - [Usage](#usage)
-    - [*Terminal 1: rtabmap_viz*](#terminal-1-rtabmap_viz)
+    - [*Terminal 1: rtabmap\_viz*](#terminal-1-rtabmap_viz)
 - [Troubleshooting](#troubleshooting)
 - [Notes](#notes)
+    - [*Tips*](#tips)
     - [*Topics used by RTAB-Map*](#topics-used-by-rtab-map)
     - [*Resources*](#resources)
 
@@ -24,10 +25,13 @@ sudo apt install ros-$ROS_DISTRO-rtabmap-ros
 The communication middleware that ROS 2 uses is DDS; specifically, [Fast DDS](https://fast-dds.docs.eprosima.com/en/latest/) by default. However, [Cyclone DDS](https://cyclonedds.io/) is recommended for SLAM, particularly if RTAB-Map's GUI or topic frequency feel laggy (even if processing time looks fast enough).
 
 1. Install Cyclone DDS for ROS 2.
+
     ```bash
     sudo apt install ros-$ROS_DISTRO-rmw-cyclonedds-cpp
     ```
-2. Add a persistent environment variable to your `.bashrc` defining Cyclone DDS as the preferred middleware
+
+2. Add a persistent environment variable to your `.bashrc` defining Cyclone DDS as the preferred middleware.
+
     ```bash
     echo 'export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp' >> ~/.bashrc
     source ~/.bashrc
@@ -56,6 +60,7 @@ ros2 launch libra rtabmap_realsense_d456_stereo.launch.py
 ```
 
 This launches the following five nodes:
+
 - `realsense2_camera`, in the default camera namespace and with the following options.
     - Disables the built-in IR emitter (this reduces speckling).
     - Enables the `gyro`, `accel`, `infra1`, and `infra2` streams.
@@ -71,6 +76,10 @@ This launches the following five nodes:
 (none)
 
 ## Notes
+
+### *Tips*
+
+- Exported point clouds (`.ply`) can be viewed using [MeshLab](https://www.meshlab.net/) or [CloudCompare](https://www.danielgm.net/cc/). The latter can also be used to combine and manipulate point clouds (auto-comparison, point filtering, etc.).
 
 ### *Topics used by RTAB-Map*
 
