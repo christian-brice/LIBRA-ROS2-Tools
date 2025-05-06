@@ -194,4 +194,6 @@ __pycache__/
 **/log/
 
 # ROS2 runtime folders
-**/bag_files/
+**/bag_files/*
+**/bags/*
+**/maps/*
