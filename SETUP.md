@@ -1,7 +1,6 @@
 # Setup
 
-The instructions in this file assume an Ubuntu 22.04 machine, so all ROS-related commands links are for Humble Hawksbill.
-Choose the version that's right for you.
+The instructions in this file assume an Ubuntu 22.04 machine, so all ROS-related commands links are for Humble Hawksbill. Choose the version that's right for you.
 
 | Ubuntu Distro | ROS 2 Version | Compatible with<br>RealSense&trade; SDK 2.0? |
 |---|---|---|

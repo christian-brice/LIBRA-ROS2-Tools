@@ -85,5 +85,4 @@ Returns the data structure expected by the given topic type.
 
 ### *`rqt_graph`*
 
-Generates node graphs for the current ROS 2 system.
-For example, you can see how `tf` (transform frame) is propagated along all links in a robot.
+Generates node graphs for the current ROS 2 system. For example, you can see how `tf` (transform frame) is propagated along all links in a robot.

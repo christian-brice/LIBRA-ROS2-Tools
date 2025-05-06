@@ -20,8 +20,7 @@ The official troubleshooting doc can be found [here](https://github.com/IntelRea
 
 ## Before You Start
 
-The instructions for a WSL2 (Windows Subsystem for Linux) instance are **vastly different** from those for a standalone/dual-boot Linux system.
-Make sure you follow the correct section below!
+The instructions for a WSL2 (Windows Subsystem for Linux) instance are **vastly different** from those for a standalone/dual-boot Linux system. Make sure you follow the correct section below!
 
 ### *Linux (non-VM)*
 
@@ -31,15 +30,13 @@ The ROS 2 wrapper is included in this project as a git submodule (located at `ro
 
 ### *WSL2 (Windows Subsystem for Linux)*
 
-Except for "Step 1: Install the ROS2 distribution", every step of the SDK and ROS wrapper installation **is different for WSL2**.
-In a nutshell: everything must be built from source.
+Except for "Step 1: Install the ROS2 distribution", every step of the SDK and ROS wrapper installation **is different for WSL2**. In a nutshell: everything must be built from source.
 
 > ***NOTE:*** (as of 2025/2/5) Do *NOT* attempt to install `librealsense2-dkms` in WSL2; this will leave the package in a broken, unmodifiable state (see [Troubleshooting](#troubleshooting)).
 
 #### **Step 2: Install latest Intel&reg; RealSense&trade; SDK 2.0**
 
-Rather than following the Linux Ubuntu Installation, you will have to use the [LibUVC-backend installation](https://github.com/IntelRealSense/librealsense/blob/master/doc/libuvc_installation.md) script.
-Once it's finished, you can check whether or not the installation was successful by attaching your RealSense camera's connection to WSL2 and executing `rs-enumerate-devices` in a terminal.
+Rather than following the Linux Ubuntu Installation, you will have to use the [LibUVC-backend installation](https://github.com/IntelRealSense/librealsense/blob/master/doc/libuvc_installation.md) script. Once it's finished, you can check whether or not the installation was successful by attaching your RealSense camera's connection to WSL2 and executing `rs-enumerate-devices` in a terminal.
 
 > ***NOTE:*** If you're not sure how to "attach" a USB connection to WSL2, check out the [WSL USB Manager project on github](https://github.com/nickbeth/wsl-usb-manager).
 
@@ -47,8 +44,7 @@ Once it's finished, you can check whether or not the installation was successful
 
 Do *NOT* attempt to install the ROS 2 wrapper via debian packages (i.e., `sudo apt install`) as this will override the LibUVC-backend installation and cause RealSense cameras to no longer be detected.
 
-Instead, compile it from source.
-Once the submodules have been checked out, the [realsense-ros](https://github.com/IntelRealSense/realsense-ros) source will be located at `ros2_ws/src/realsense-ros`.
+Instead, compile it from source. Once the submodules have been checked out, the [realsense-ros](https://github.com/IntelRealSense/realsense-ros) source will be located at `ros2_ws/src/realsense-ros`.
 
 ```bash
 # Navigate to our ROS workspace
@@ -65,8 +61,7 @@ colcon build --packages-up-to realsense2_camera
 
 ## Usage
 
-You will need two terminals: one to run the `realsense2_camera` node and another to initialize RViz.
-Remember to source your local ROS environment!
+You will need two terminals: one to run the `realsense2_camera` node and another to initialize RViz. Remember to source your local ROS environment!
 
 ### *Terminal 1 (ROS node)*
 
@@ -113,7 +108,7 @@ For a full list of parameters, see the ["Parameters" section of the realsense-ro
 ### *Terminal 2 (visualization)*
 
 ```bash
-# Run RViz with the Image, DepthCloud, and PointCloud2 displays.
+# Run RViz with the Image, DepthCloud, and PointCloud2 displays
 rviz2 -d src/libra/rviz/realsense.rviz
 ```
 
@@ -140,8 +135,7 @@ See [https://robotics.stackexchange.com/questions/47926/rosdep-initialization-er
 
 ### *RViz complains that the global frame doesn't exist*
 
-I don't know why this happens, but "poking" the ROS 2 domain with a command seems to fix it.
-In a terminal, try executing the following.
+I don't know why this happens, but "poking" the ROS 2 domain with a command seems to fix it. In a terminal, try executing the following.
 
 ```bash
 ros2 topic list

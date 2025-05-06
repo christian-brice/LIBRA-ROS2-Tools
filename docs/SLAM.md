@@ -84,8 +84,7 @@ Once RViz has initialized, check the Displays tab for the following.
 
 ### *Terminal 5: Map Generation, etc.*
 
-Nav2 only supports creation of occupancy grids (`nav_msgs/msg/OccupancyGrid`).
-The following command will generate two files: a metadata YAML file and a PGM image file where white, gray, and black pixels represent the free, occupied, and unknown spaces, respectively.
+Nav2 only supports creation of occupancy grids (`nav_msgs/msg/OccupancyGrid`). The following command will generate two files: a metadata YAML file and a PGM image file where white, gray, and black pixels represent the free, occupied, and unknown spaces, respectively.
 
 ```bash
 cd ros2_ws/

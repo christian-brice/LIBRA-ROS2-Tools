@@ -50,8 +50,7 @@ For ROS 2 command tips, see [docs/ROS_Commands.md](/docs/ROS_COMMANDS.md).
 
 ### *Other Terminals*
 
-Since I'm just testing, I still haven't combined everything into a single launch file.
-In the meantime, for each point below, source the workspace and run the provided command.
+Since I'm just testing, I still haven't combined everything into a single launch file. In the meantime, for each point below, source the workspace and run the provided command.
 
 - RealSense node:
 
@@ -82,8 +81,7 @@ In the meantime, for each point below, source the workspace and run the provided
 
 ### *ROS 2 commands/nodes are having issues communicating*
 
-If you followed `SETUP.md` and set your ROS 2 middleware to CycloneDDS, this may mean that your network environment is not playing nice with CycloneDDS.
-In that case, you can temporarily revert to using FastDDS with the following command (note: Nav2- and slam_toolbox-based actions require CycloneDDS to work).
+If you followed `SETUP.md` and set your ROS 2 middleware to CycloneDDS, this may mean that your network environment is not playing nice with CycloneDDS. In that case, you can temporarily revert to using FastDDS with the following command (note: Nav2- and slam_toolbox-based actions require CycloneDDS to work).
 
 ```bash
 export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
@@ -101,9 +99,7 @@ chmod 0700 /run/user/1000/
 
 ### *RViz (or other Qt-based app) crashes on startup*
 
-Your graphics drivers might be outdated or incompatible with the versions of the software we're using.
-Particularly, **Qt-based GUI applications will suffer from frustrating crashes if your graphics drivers aren't up to date**.
-Follow the instructions below to add the right [Mesa](https://www.mesa3d.org/) package repository (PPA) and upgrade your drivers.
+Your graphics drivers might be outdated or incompatible with the versions of the software we're using. Particularly, **Qt-based GUI applications will suffer from frustrating crashes if your graphics drivers aren't up to date**. Follow the instructions below to add the right [Mesa](https://www.mesa3d.org/) package repository (PPA) and upgrade your drivers.
 
 1. Check your current Mesa/OpenGL version using `glxinfo`. Save the output in case you have to revert the update later.
 
@@ -148,13 +144,11 @@ If you see the following in RViz...
 "No tf data. Actual error: Frame [base_link] does not exist"
 ```
 
-... this may be a timing issue with RViz opening before `robot_state_publisher` finishes parsing the URDF (since it uses Xacro).
-Provided there are no errors in your terminal, just wait for a while and the model will eventually load.
+... this may be a timing issue with RViz opening before `robot_state_publisher` finishes parsing the URDF (since it uses Xacro). Provided there are no errors in your terminal, just wait for a while and the model will eventually load.
 
 ## About Us
 
-**Christian Brice** ([email](mailto:brice.c.aa@m.titech.ac.jp)) is a doctoral student in mechanical engineering at the Institute of Science Tokyo (formerly: Tokyo Institute of Technology).
-The *LIBRA* project is the focus of his doctoral studies.
+**Christian Brice** ([email](mailto:brice.c.aa@m.titech.ac.jp)) is a doctoral student in mechanical engineering at the Institute of Science Tokyo (formerly: Tokyo Institute of Technology). The *LIBRA* project is the focus of his doctoral studies.
 
 The **[Gen Endo Laboratory](www.robotics.mech.e.titech.ac.jp/gendo/en/)** is affiliated with the Department of Mechanical Engineering at the Institute of Science Tokyo.
 

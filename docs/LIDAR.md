@@ -26,8 +26,7 @@ colcon build --packages-select lightwarelidar2
 
 ## Usage
 
-You will need two terminals: one to run the `sf45b` node and another to initialize RViz.
-Remember to source your local ROS environment!
+You will need two terminals: one to run the `sf45b` node and another to initialize RViz. Remember to source your local ROS environment!
 
 ### *Terminal 1 (ROS node)*
 
@@ -50,7 +49,7 @@ For a full list of parameters, see the ["Parameters" section under "sf45b Node" 
 ### *Terminal 2 (visualization)*
 
 ```bash
-# Run RViz with the PointCloud2 display.
+# Run RViz with the PointCloud2 display
 rviz2 -d src/libra/rviz/lidar.rviz
 ```
 
