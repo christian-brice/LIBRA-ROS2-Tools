@@ -26,13 +26,18 @@ colcon build --packages-select lightwarelidar2
 
 ## Usage
 
+Connect the LIDAR unit to the computer. The device address, which must be passed as an input to the `sf45b` node via the `port` parameter, differs depending on which of the unit's ports is used.
+
+- Micro-USB: will appear as `ttyACMx`, e.g., `/dev/ttyACM0`
+- Serial (UART): will appear as `ttyUSBx`, e.g., `/dev/ttyUSB0`
+
 You will need two terminals: one to run the `sf45b` node and another to initialize RViz. Remember to source your local ROS environment!
 
 ### *Terminal 1 (ROS node)*
 
 ```bash
 # Start the LIDAR node (ROS2 run)
-ros2 run lightwarelidar2 sf45b --ros-args -p port:=/dev/ttyACM0 -p frameId:=lidar_link -p updateRate:=12 -p lowAngleLimit:=-160 -p highAngleLimit:=160
+ros2 run lightwarelidar2 sf45b --ros-args -p port:=/dev/ttyUSB0 -p frameId:=lidar_link -p updateRate:=12 -p lowAngleLimit:=-160 -p highAngleLimit:=160
 ```
 
 The parameters have the following effects:
