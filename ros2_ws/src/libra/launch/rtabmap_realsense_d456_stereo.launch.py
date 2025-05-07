@@ -1,8 +1,8 @@
 # Requirements:
-#   A realsense D435i or D456
-#   Install realsense2 ros2 package (ros-$ROS_DISTRO-realsense2-camera)
-# Example:
-#   $ ros2 launch rtabmap_examples rtabmap_realsense_d456_stereo.launch.py
+#   An Intel RealSense D435i or D456
+#   Install the realsense2_camera ROS2 package (ros-$ROS_DISTRO-realsense2-camera)
+# Usage:
+#   $ ros2 launch libra rtabmap_realsense_d456_stereo.launch.py
 
 import os
 
@@ -71,7 +71,7 @@ def generate_launch_description():
                 
         # Compute quaternion of the IMU
         Node(
-            package='imu_filter_madgwick', executable='imu_filter_madgwick_node', output='screen',
+            package='imu_filter_madgwick', executable='imu_filter_madgwick_node',output='screen',
             parameters=[{'use_mag': False, 
                          'world_frame':'enu', 
                          'publish_tf':False}],

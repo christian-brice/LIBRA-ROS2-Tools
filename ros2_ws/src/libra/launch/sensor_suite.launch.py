@@ -1,3 +1,10 @@
+# Requirements:
+#   A LightWare SF45/B
+#   An Intel RealSense D435i or D456
+#   Install the following ROS2 packages: lightwarelidar2 (lightwarelidar2), realsense2_camera (ros-$ROS_DISTRO-realsense2-camera)
+# Usage:
+#   $ ros2 launch libra sensor_suite.launch.py
+
 import os
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
@@ -12,7 +19,7 @@ def generate_launch_description():
     # Set paths to required files and dirs
     pkg_share = FindPackageShare(package='libra').find('libra')
     default_rviz_config_path = os.path.join(
-        pkg_share, 'rviz/sensor_suite.rviz')
+        pkg_share, 'rviz', 'sensor_suite.rviz')
     default_urdf_model_path = os.path.join(
         pkg_share, 'models/sensor_suite.urdf.xacro')
 
