@@ -26,7 +26,7 @@ def generate_launch_description():
         DeclareLaunchArgument('rviz_config_file', default_value=default_rviz_config_path),
         DeclareLaunchArgument('use_rviz', default_value='True'),
 
-        # RealSense Camera
+        # RealSense camera
         Node(
             package='realsense2_camera',
             executable='realsense2_camera_node',
@@ -55,13 +55,10 @@ def generate_launch_description():
                 'world_frame': 'enu',
                 'publish_tf': False
             }],
-            remappings=[
-                ('imu/data_raw', '/camera/imu'),
-                ('imu/data', '/imu/data')
-            ]
+            remappings=[('imu/data_raw', '/camera/imu')]
         ),
 
-        # RViz
+        # RViz GUI
         Node(
             condition=IfCondition(use_rviz),
             package='rviz2',

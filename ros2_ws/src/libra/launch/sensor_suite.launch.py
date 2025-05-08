@@ -1,7 +1,9 @@
 # Requirements:
 #   A LightWare SF45/B
 #   An Intel RealSense D435i or D456
-#   Install the following ROS2 packages: lightwarelidar2 (lightwarelidar2), realsense2_camera (ros-$ROS_DISTRO-realsense2-camera)
+#   Install the following ROS2 packages:
+#     lightwarelidar2 (lightwarelidar2)
+#     realsense2_camera (ros-$ROS_DISTRO-realsense2-camera)
 # Usage:
 #   $ ros2 launch libra sensor_suite.launch.py
 

@@ -16,6 +16,7 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 
 def generate_launch_description():
+    # Configure nodes and DDS communications
     parameters=[{
           'frame_id':'camera_link',
           'subscribe_stereo':True,
@@ -30,7 +31,6 @@ def generate_launch_description():
           ('right/camera_info', '/camera/infra2/camera_info')]
 
     return LaunchDescription([
-
         # Launch arguments
         DeclareLaunchArgument(
             'unite_imu_method', default_value='2',
@@ -39,7 +39,7 @@ def generate_launch_description():
         # Hack to disable IR emitter
         SetParameter(name='depth_module.emitter_enabled', value=0),
 
-        # Launch camera driver
+        # RealSense camera
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([os.path.join(
                 get_package_share_directory('realsense2_camera'), 'launch'),
@@ -53,27 +53,30 @@ def generate_launch_description():
                                   'enable_sync': 'true'}.items(),
         ),
 
+        # Compute quaternion of the IMU
+        Node(
+            package='imu_filter_madgwick', executable='imu_filter_madgwick_node',output='screen',
+            parameters=[{'use_mag': False, 
+                         'world_frame': 'enu', 
+                         'publish_tf': False}],
+            remappings=[('imu/data_raw', '/camera/imu')]),
+
+        # Compute odometry using stereo images
         Node(
             package='rtabmap_odom', executable='stereo_odometry', output='screen',
             parameters=parameters,
             remappings=remappings),
 
+        # Primary RTAB-Map SLAM computation
         Node(
             package='rtabmap_slam', executable='rtabmap', output='screen',
             parameters=parameters,
             remappings=remappings,
             arguments=['-d']),
 
+        # RTAB-Map's custom RViz GUI
         Node(
             package='rtabmap_viz', executable='rtabmap_viz', output='screen',
             parameters=parameters,
             remappings=remappings),
-                
-        # Compute quaternion of the IMU
-        Node(
-            package='imu_filter_madgwick', executable='imu_filter_madgwick_node',output='screen',
-            parameters=[{'use_mag': False, 
-                         'world_frame':'enu', 
-                         'publish_tf':False}],
-            remappings=[('imu/data_raw', '/camera/imu')]),
     ])

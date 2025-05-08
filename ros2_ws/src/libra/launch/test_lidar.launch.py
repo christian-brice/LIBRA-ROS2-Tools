@@ -41,7 +41,7 @@ def generate_launch_description():
             }]
         ),
 
-        # RViz
+        # RViz GUI
         Node(
             condition=IfCondition(use_rviz),
             package='rviz2',
