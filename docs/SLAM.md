@@ -8,7 +8,9 @@ The official RTAB-Map repo for ROS 2 can be found [here](https://github.com/intr
 - [Before You Start](#before-you-start)
 - [Usage](#usage)
     - [*Terminal 1: rtabmap\_viz*](#terminal-1-rtabmap_viz)
+- [Post Processing](#post-processing)
 - [Troubleshooting](#troubleshooting)
+    - [*RTAB-Map (and other GUI apps) become unresponsive to mouse inputs*](#rtab-map-and-other-gui-apps-become-unresponsive-to-mouse-inputs)
 - [Notes](#notes)
     - [*Tips*](#tips)
     - [*Topics used by RTAB-Map*](#topics-used-by-rtab-map)
@@ -71,9 +73,71 @@ This launches the following five nodes:
 - `rtabmap_viz`, which brings up the RTAB-Map GUI.
 - `imu_filter_madgwick`, for automatically computing the quaternion of the RealSense's angular velocity and linear acceleration data (this is necessary for generating a complete ROS 2 IMU message).
 
+Once finished, save the database by clicking "Edit" -> "Download all clouds (update cache)". Select "Global map optimized".
+
+## Post Processing
+
+The point cloud can be refined in post via the "Tools" -> "Post-processing..." dialog. The following settings gave me good results.
+
+- Detect more loop closures (generally gives good results)
+
+    | Setting | Value |
+    |---|---|
+    | Cluster radius | 0.30 m |
+    | Cluster angle | 30 degrees |
+    | Iterations | 1 |
+    | Intra-session | Checked |
+    | Inter-session | Checked |
+
+- Refine links with ICP (requires laser scans)
+
+    | Setting | Value |
+    |---|---|
+    | Refine neighbor links | **UNTESTED** |
+    | Refine loop closure links | **UNTESTED** |
+
+- Sparse Bundle Adjustment (SBA)
+
+    | Setting | Value |
+    |---|---|
+    | Type | [g2o](https://github.com/RainerKuemmerle/g2o)<br>([Ceres](http://ceres-solver.org/) preferred, but must build from source) |
+    | Iterations | 20 |
+
+If the resulting point cloud is worse, it may be due to SBA. To revert post-processing, click "Edit" -> "Download graph only". Select "Global map optimized".
+
 ## Troubleshooting
 
-(none)
+### *RTAB-Map (and other GUI apps) become unresponsive to mouse inputs*
+
+By default, Ubuntu and other flavors of Linux use the Wayland display server. However, it can be buggy sometimes - and some applications actually prefer Xorg - so try switching your display server.
+
+1. Disable Wayland by uncommenting the relevant line in the display manager config.
+
+    ```txt
+    # Open the display manager config
+    sudo nano /etc/gdm3/custom.conf
+    ...
+    # Find and uncomment the following line
+    WaylandEnable=false
+    ```
+
+2. Add an environment variable to tell Qt which display toolkit to use.
+
+    ```bash
+    echo 'QT_QPA_PLATFORM=xcb' | sudo tee -a /etc/environment
+    ```
+
+3. Restart the machine for these changes to take effect.
+
+    ```bash
+    sudo reboot
+    ```
+
+4. Verify that the display manager is now Xorg (`x11`).
+
+    ```bash
+    echo $XDG_SESSION_TYPE
+    ```
 
 ## Notes
 
