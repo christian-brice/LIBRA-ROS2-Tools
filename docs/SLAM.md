@@ -73,7 +73,7 @@ This launches the following five nodes:
 - `rtabmap_viz`, which brings up the RTAB-Map GUI.
 - `imu_filter_madgwick`, for automatically computing the quaternion of the RealSense's angular velocity and linear acceleration data (this is necessary for generating a complete ROS 2 IMU message).
 
-Once finished, save the database by clicking "Edit" -> "Download all clouds (update cache)". Select "Global map optimized".
+Once finished, save the database by clicking "File" -> "Close database".
 
 ## Post Processing
 
