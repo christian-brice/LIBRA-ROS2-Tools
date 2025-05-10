@@ -9,6 +9,8 @@ The official RTAB-Map repo for ROS 2 can be found [here](https://github.com/intr
 - [Usage](#usage)
     - [*Terminal 1: rtabmap\_viz*](#terminal-1-rtabmap_viz)
 - [Post Processing](#post-processing)
+    - [*Cloud Filtering \& Smoothing*](#cloud-filtering--smoothing)
+    - [*Robust Graph Optimization (Loop Closure Optimization)*](#robust-graph-optimization-loop-closure-optimization)
 - [Troubleshooting](#troubleshooting)
     - [*RTAB-Map (and other GUI apps) become unresponsive to mouse inputs*](#rtab-map-and-other-gui-apps-become-unresponsive-to-mouse-inputs)
 - [Notes](#notes)
@@ -77,7 +79,38 @@ Once finished, save the database by clicking "File" -> "Close database".
 
 ## Post Processing
 
-The point cloud can be refined in post via the "Tools" -> "Post-processing..." dialog. The following settings gave me good results.
+### *Cloud Filtering & Smoothing*
+
+Click "File" -> "Update Optimized Mesh" and make sure `Dense Point Cloud` is set as the reconstruction flavor.
+
+#### **Cloud filtering**
+
+The following settings apply a statistical outlier removal filter based on spatial density.
+
+| Setting | Value | Notes |
+|---|---|---|
+| Search radius | 0.000 m | 0 = No radius-based filtering (default);<br>RealSense D456 provides dense depth data,<br>so `0.050`-`0.100` w/o an IR pattern projector |
+| Minimum neighbors | 5 ||
+| Ceiling filtering height<br>(in map frame) | 0.000 m ||
+| Floor filtering height<br>(in map frame) | 0.000 m ||
+| Footprint width | 0.000 m | Robot width (for removing "self-points") |
+| Footprint length | 0.000 m | Robot length (for removing "self-points") |
+| Footprint height | 0.000 m | Robot height (for removing "self-points") |
+
+#### **Cloud smoothing using Moving Least Squares algorithm (MLS)**
+
+The following settings smooth the cloud while retaining as many original points as possible.
+
+| Setting | Value | Notes |
+|---|---|---|
+| MLS search radius | 0.040 m | For determining k-nearest neighbors |
+| Polygonial order | 2 | More accurate modeling of curved surfaces (default) |
+| Upsampling method | NONE | NONE = Don't increase point density |
+| Output voxel size | 0 | 0 = Don't downsample |
+
+### *Robust Graph Optimization (Loop Closure Optimization)*
+
+Click "Tools" -> "Post-processing...". The following settings gave me good results.
 
 - Detect more loop closures (generally gives good results)
 
@@ -100,7 +133,7 @@ The point cloud can be refined in post via the "Tools" -> "Post-processing..." d
 
     | Setting | Value |
     |---|---|
-    | Type | [g2o](https://github.com/RainerKuemmerle/g2o)<br>([Ceres](http://ceres-solver.org/) preferred, but must build from source) |
+    | Type | [g2o](https://github.com/RainerKuemmerle/g2o)<br>(I want to try [Ceres](http://ceres-solver.org/), but need to build from source) |
     | Iterations | 20 |
 
 If the resulting point cloud is worse, it may be due to SBA. To revert post-processing, click "Edit" -> "Download graph only". Select "Global map optimized".
