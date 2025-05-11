@@ -81,7 +81,7 @@ Once finished, save the database by clicking "File" -> "Close database".
 
 ### *Cloud Filtering & Smoothing*
 
-Click "File" -> "Update Optimized Mesh" and make sure `Dense Point Cloud` is set as the reconstruction flavor.
+In RTAB-Map Database Viewer (`rtabmap-databaseViewer`), click "File" -> "Update Optimized Mesh" and make sure `Dense Point Cloud` is set as the reconstruction flavor.
 
 #### **Cloud filtering**
 
@@ -89,52 +89,52 @@ The following settings apply a statistical outlier removal filter based on spati
 
 | Setting | Value | Notes |
 |---|---|---|
-| Search radius | 0.000 m | 0 = No radius-based filtering (default);<br>RealSense D456 provides dense depth data,<br>so `0.050`-`0.100` w/o an IR pattern projector |
-| Minimum neighbors | 5 ||
-| Ceiling filtering height<br>(in map frame) | 0.000 m ||
-| Floor filtering height<br>(in map frame) | 0.000 m ||
-| Footprint width | 0.000 m | Robot width (for removing "self-points") |
-| Footprint length | 0.000 m | Robot length (for removing "self-points") |
-| Footprint height | 0.000 m | Robot height (for removing "self-points") |
+| Search radius | `0.000` m | `0` = No radius-based filtering (default);<br>RealSense D456 provides dense depth data,<br>so `0.050`-`0.100` w/o an IR pattern projector |
+| Minimum neighbors | `5` ||
+| Ceiling filtering height<br>(in map frame) | `0.000` m ||
+| Floor filtering height<br>(in map frame) | `0.000` m ||
+| Footprint width | `0.000` m | Robot width (for removing "self-points") |
+| Footprint length | `0.000` m | Robot length (for removing "self-points") |
+| Footprint height | `0.000` m | Robot height (for removing "self-points") |
 
 #### **Cloud smoothing using Moving Least Squares algorithm (MLS)**
 
-The following settings smooth the cloud while retaining as many original points as possible.
+The following settings smooth the cloud while retaining as many of the original points as possible.
 
 | Setting | Value | Notes |
 |---|---|---|
-| MLS search radius | 0.040 m | For determining k-nearest neighbors |
-| Polygonial order | 2 | More accurate modeling of curved surfaces (default) |
-| Upsampling method | NONE | NONE = Don't increase point density |
-| Output voxel size | 0 | 0 = Don't downsample |
+| MLS search radius | `0.040` m | For determining k-nearest neighbors |
+| Polygonial order | `2` | More accurate modeling of curved surfaces (default) |
+| Upsampling method | `NONE` | `NONE` = Don't increase point density |
+| Output voxel size | `0` | `0` = Don't downsample |
 
 ### *Robust Graph Optimization (Loop Closure Optimization)*
 
-Click "Tools" -> "Post-processing...". The following settings gave me good results.
+In RTAB-Map, click "Tools" -> "Post-processing..." (the functionality is also available in RTAB-Map Database Viewer, but with much less customization). The following settings gave me good results.
 
 - Detect more loop closures (generally gives good results)
 
-    | Setting | Value |
-    |---|---|
-    | Cluster radius | 0.30 m |
-    | Cluster angle | 30 degrees |
-    | Iterations | 1 |
-    | Intra-session | Checked |
-    | Inter-session | Checked |
+    | Setting | Value | Notes |
+    |---|---|---|
+    | Cluster radius | `0.30` m | Try `0.20`-`0.50` depending on environment & camera accuracy.|
+    | Cluster angle | `30` degrees | `30` = standard<br>For detecting loop closures from different angles |
+    | Iterations | `10` | Recommend `5`-`10` for noisy data or large environments |
+    | Intra-session | Checked | Within the same session (i.e., only one map) |
+    | Inter-session | Checked | Across multiple sessions |
 
 - Refine links with ICP (requires laser scans)
 
-    | Setting | Value |
-    |---|---|
-    | Refine neighbor links | **UNTESTED** |
-    | Refine loop closure links | **UNTESTED** |
+    | Setting | Value | Notes |
+    |---|---|---|
+    | Refine neighbor links | **UNTESTED** | ICP must be enabled globally |
+    | Refine loop closure links | Checked | Additionally uses 3D geometry to refine loop closures |
 
 - Sparse Bundle Adjustment (SBA)
 
-    | Setting | Value |
-    |---|---|
-    | Type | [g2o](https://github.com/RainerKuemmerle/g2o)<br>(I want to try [Ceres](http://ceres-solver.org/), but need to build from source) |
-    | Iterations | 20 |
+    | Setting | Value | Notes |
+    |---|---|---|
+    | Type | `g2o` | [g2o](https://github.com/RainerKuemmerle/g2o) = very fast & good enough for RealSense<br>([Ceres](http://ceres-solver.org/) = more robust, but need to build from source) |
+    | Iterations | `20` | Higher = better convergence on complex maps<br>(`5`-`10` = standard)|
 
 If the resulting point cloud is worse, it may be due to SBA. To revert post-processing, click "Edit" -> "Download graph only". Select "Global map optimized".
 
