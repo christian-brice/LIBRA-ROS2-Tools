@@ -99,7 +99,7 @@ The following settings apply a statistical outlier removal filter based on spati
 
 #### **Cloud smoothing using Moving Least Squares algorithm (MLS)**
 
-The following settings smooth the cloud while retaining as many of the original points as possible.
+The following settings smooth the cloud while retaining as many of the original points as possible. Essentially, upsampling and hole-filling are *NOT* carried out.
 
 | Setting | Value | Notes |
 |---|---|---|
