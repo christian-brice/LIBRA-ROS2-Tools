@@ -7,7 +7,8 @@ The official RTAB-Map repo for ROS 2 can be found [here](https://github.com/intr
 
 - [Before You Start](#before-you-start)
 - [Usage](#usage)
-    - [*Terminal 1: rtabmap\_viz*](#terminal-1-rtabmap_viz)
+    - [*Use Case 1: RGB-D only*](#use-case-1-rgb-d-only)
+    - [*Use Case 2: RGB-D and LIDAR*](#use-case-2-rgb-d-and-lidar)
 - [Post Processing](#post-processing)
     - [*Cloud Filtering \& Smoothing*](#cloud-filtering--smoothing)
     - [*Robust Graph Optimization (Loop Closure Optimization)*](#robust-graph-optimization-loop-closure-optimization)
@@ -55,7 +56,7 @@ source ~/.bashrc
 
 ## Usage
 
-### *Terminal 1: rtabmap_viz*
+### *Use Case 1: RGB-D only*
 
 ```bash
 cd ros2_ws/
@@ -75,7 +76,28 @@ This launches the following five nodes:
 - `rtabmap_viz`, which brings up the RTAB-Map GUI.
 - `imu_filter_madgwick`, for automatically computing the quaternion of the RealSense's angular velocity and linear acceleration data (this is necessary for generating a complete ROS 2 IMU message).
 
-Once finished, save the database by clicking "File" -> "Close database".
+Once finished, save the database in the RTAB-Map GUI by clicking "File" -> "Close database".
+
+### *Use Case 2: RGB-D and LIDAR*
+
+TODO
+
+```bash
+cd ros2_ws/
+colcon build && . install/local_setup.bash
+ros2 launch libra ???
+```
+
+This launches the following ??? nodes:
+
+- ...
+
+To enable usage of the LIDAR from the RTAB-Map GUI, ensure that the following options are set under "Window" -> "Preferences".
+
+- "RGB-D SLAM" -> "Local Occupancy Grid" -> select `LiDAR and Camera(s)` under "Sensor from which the local grid is created"
+- "Motion Estimation" -> select `Visual + Odometry` under the first option (motion estimation type)
+
+Once finished, save the database in the RTAB-Map GUI by clicking "File" -> "Close database".
 
 ## Post Processing
 
