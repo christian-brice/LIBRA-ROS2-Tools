@@ -4,7 +4,7 @@
   <name>libra</name>
   <version>0.0.0</version>
   <description>LIghtweight Balanced Robot Arm (LIBRA)</description>
-  <maintainer email="brice.c.aa@m.titech.ac.jp">Christian Brice</maintainer>
+  <maintainer email="brice.c.67b9@m.isct.ac.jp">Christian Brice</maintainer>
   <license>MIT</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
