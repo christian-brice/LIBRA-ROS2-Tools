@@ -1,6 +1,8 @@
 # LIBRA-ROS
 
-ROS2 workspace for the LIBRA project. Kept separate from the main LIBRA-App repo so as to reduce clutter.
+ROS2 workspace for the LIBRA project. Kept separate from the main [LIBRA-App](https://github.com/christian-brice/LIBRA-App) repo so as to reduce clutter.
+
+Project link: <https://github.com/christian-brice/LIBRA-ROS2-Tools>
 
 ## Table of Contents
 
