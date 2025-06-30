@@ -45,7 +45,7 @@ The instructions in this file assume an Ubuntu 22.04 machine, so all ROS-related
 If you did not pull the submodules when you cloned this project, you can do so by executing the following command.
 
 ```bash
-git submodule update --init
+git submodule update --init --recursive
 ```
 
 ### *Intel&reg; RealSense&trade; ROS2 Wrapper*
