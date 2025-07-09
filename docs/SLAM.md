@@ -1,7 +1,8 @@
 # Simultaneous Localization and Mapping (SLAM) in ROS 2
 
 This document explains how to use the LIBRA's sensor suite (RGB-D camera + spinning LIDAR) for SLAM using RTAB-Map.
-The official RTAB-Map repo for ROS 2 can be found [here](https://github.com/introlab/rtabmap_ros/tree/ros2).
+
+The official RTAB-Map repo for ROS 2 can be found here: [https://github.com/introlab/rtabmap_ros/tree/ros2](https://github.com/introlab/rtabmap_ros/tree/ros2)
 
 ## Table of Contents
 
