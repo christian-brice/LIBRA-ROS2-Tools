@@ -37,7 +37,7 @@ You will need two terminals: one to run the `sf45b` node and another to initiali
 
 ```bash
 # Start the LIDAR node (ROS2 run)
-ros2 run lightwarelidar2 sf45b --ros-args -p port:=/dev/ttyUSB0 -p frameId:=lidar_link -p updateRate:=12 -p lowAngleLimit:=-160 -p highAngleLimit:=160
+ros2 run lightwarelidar2 sf45b --ros-args -p port:=/dev/lidar -p frameId:=lidar_link -p updateRate:=12 -p lowAngleLimit:=-160 -p highAngleLimit:=160
 ```
 
 The parameters have the following effects:

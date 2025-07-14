@@ -13,6 +13,9 @@ The instructions in this file assume an Ubuntu 22.04 machine, so all ROS-related
 - [Git Submodules](#git-submodules)
     - [*Intel® RealSense™ ROS2 Wrapper*](#intel-realsense-ros2-wrapper)
     - [*LightWare LIDAR© ROS2 Wrapper*](#lightware-lidar-ros2-wrapper)
+- [Setting Device Aliases](#setting-device-aliases)
+    - [*Sensors*](#sensors)
+    - [*Arduinos*](#arduinos)
 
 ## ROS 2 Installation
 
@@ -55,3 +58,41 @@ Follow the instructions in the ["Before You Start" section of REALSENSE.md](/doc
 ### *LightWare LIDAR&copy; ROS2 Wrapper*
 
 Follow the instructions in the ["Before You Start" section of LIDAR.md](/docs/LIDAR.md#before-you-start).
+
+## Setting Device Aliases
+
+For consistency across runs, it's highly recommended that you set path aliases for certain devices. For example: in [rtabmap_sensor_suite.launch.py](/ros2_ws/src/libra/launch/rtabmap_sensor_suite.launch.py), the `lightwarelidar2` node must be launched with a port parameter. Since this may change across devices and dev environments, it's set to `/dev/lidar`.
+
+You can do this in a single command by running the provided script: `tools/alias-devices.bash`. It already has the necessary device information hard-coded, so no further input is required (generally).
+
+```bash
+./tools/alias-devices.bash
+```
+
+For reference, the installed rules (including indentifying information for each device) are provided below.
+
+### *Sensors*
+
+#### **RealSense**
+
+(not required)
+
+#### **LIDAR**
+
+```txt
+SUBSYSTEM=="tty", KERNEL=="ttyUSB*", ATTRS{idVendor}=="067b", ATTRS{idProduct}=="23a3", ATTRS{serial}=="CPBMb137X02", SYMLINK+="lidar"
+```
+
+### *Arduinos*
+
+#### **SerialWater ("Water")**
+
+```txt
+SUBSYSTEM=="tty", KERNEL=="ttyACM*", ATTRS{idVendor}=="2341", ATTRS{idProduct}=="0058", ATTRS{serial}=="D8537DBE515146544E4B2020FF0B3D4D", SYMLINK+="water"
+```
+
+#### **SerialServo ("Manip")**
+
+```txt
+SUBSYSTEM=="tty", KERNEL=="ttyACM*", ATTRS{idVendor}=="2886", ATTRS{idProduct}=="802f", ATTRS{serial}=="055D5A3C5055344A322E3120FF082F39", SYMLINK+="manip"
+```

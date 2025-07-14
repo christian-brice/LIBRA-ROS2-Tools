@@ -116,7 +116,7 @@ def generate_launch_description():
         # LightWare 2D LIDAR
         Node(
             package='lightwarelidar2', executable='sf45b', output='screen',
-            parameters=[{'port': '/dev/ttyUSB0',
+            parameters=[{'port': '/dev/lidar',
                          'frameId': 'lidar_link',
                          'updateRate': 12,
                          'lowAngleLimit': -160,

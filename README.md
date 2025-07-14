@@ -67,7 +67,7 @@ Since I'm just testing, I still haven't combined everything into a single launch
 - LIDAR node:
 
     ```bash
-    ros2 run lightwarelidar2 sf45b --ros-args -p port:=/dev/ttyACM0 -p frameId:=lidar_link -p updateRate:=12 -p lowAngleLimit:=-160 -p highAngleLimit:=160
+    ros2 run lightwarelidar2 sf45b --ros-args -p port:=/dev/lidar -p frameId:=lidar_link -p updateRate:=12 -p lowAngleLimit:=-160 -p highAngleLimit:=160
     ```
 
 - Recording a session:

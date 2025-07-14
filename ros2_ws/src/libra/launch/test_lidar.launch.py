@@ -33,7 +33,7 @@ def generate_launch_description():
             name='sf45b',
             output='screen',
             parameters=[{
-                'port': '/dev/ttyUSB0',
+                'port': '/dev/lidar',
                 'frameId': 'lidar_link',
                 'updateRate': 12,
                 'lowAngleLimit': -160,
