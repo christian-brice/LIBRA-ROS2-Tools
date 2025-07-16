@@ -2,7 +2,7 @@
 #   An Intel RealSense D435i or D456
 #   Install the realsense2_camera ROS2 package (ros-$ROS_DISTRO-realsense2-camera)
 # Usage:
-#   $ ros2 launch libra rtabmap_realsense_d456_stereo.launch.py
+#   $ ros2 launch libra rtabmap_rgbd.launch.py
 
 import os
 
@@ -19,16 +19,16 @@ def generate_launch_description():
     # Configure nodes and DDS communications
     parameters=[{
           'frame_id':'camera_link',
-          'subscribe_stereo':True,
+          'subscribe_rgbd':True,
           'subscribe_odom_info':True,
           'wait_imu_to_init':True}]
 
     remappings=[
           ('imu', '/imu/data'),
-          ('left/image_rect', '/camera/infra1/image_rect_raw'),
-          ('left/camera_info', '/camera/infra1/camera_info'),
-          ('right/image_rect', '/camera/infra2/image_rect_raw'),
-          ('right/camera_info', '/camera/infra2/camera_info')]
+          ('rgb/image', '/camera/color/image_raw'),
+          ('rgb/camera_info', '/camera/color/camera_info'),
+          ('depth/image', '/camera/aligned_depth_to_color/image_raw'),
+          ('rgbd_image', 'rgbd_image')]
 
     return LaunchDescription([
         # Launch arguments
@@ -44,13 +44,19 @@ def generate_launch_description():
             PythonLaunchDescriptionSource([os.path.join(
                 get_package_share_directory('realsense2_camera'), 'launch'),
                 '/rs_launch.py']),
-                launch_arguments={'camera_namespace': '',
-                                  'enable_gyro': 'true',
-                                  'enable_accel': 'true',
-                                  'unite_imu_method': LaunchConfiguration('unite_imu_method'),
-                                  'enable_infra1': 'true',
-                                  'enable_infra2': 'true',
-                                  'enable_sync': 'true'}.items()),
+                launch_arguments={
+                    'camera_namespace': '',
+                    'enable_color': 'true',
+                    'enable_depth': 'true',
+                    'enable_infra1': 'false',
+                    'enable_infra2': 'false',
+                    'enable_gyro': 'true',
+                    'enable_accel': 'true',
+                    'unite_imu_method': LaunchConfiguration('unite_imu_method'),
+                    'enable_sync': 'true',
+                    'enable_rgbd': 'true',
+                    'align_depth': 'true'
+                }.items()),
 
         # Compute quaternion of the IMU
         Node(
@@ -60,9 +66,9 @@ def generate_launch_description():
                          'publish_tf': False}],
             remappings=[('imu/data_raw', '/camera/imu')]),
 
-        # Compute odometry using stereo images
+        # Compute odometry using RGB-D images
         Node(
-            package='rtabmap_odom', executable='stereo_odometry', output='screen',
+            package='rtabmap_odom', executable='rgbd_odometry', output='screen',
             parameters=parameters,
             remappings=remappings),
 
