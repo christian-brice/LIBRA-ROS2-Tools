@@ -9,6 +9,7 @@ The instructions in this file assume an Ubuntu 22.04 machine, so all ROS-related
 
 ## Table of Contents
 
+- [Basic Packages](#basic-packages)
 - [ROS 2 Installation](#ros-2-installation)
 - [Git Submodules](#git-submodules)
     - [*Intel® RealSense™ ROS2 Wrapper*](#intel-realsense-ros2-wrapper)
@@ -16,6 +17,24 @@ The instructions in this file assume an Ubuntu 22.04 machine, so all ROS-related
 - [Setting Device Aliases](#setting-device-aliases)
     - [*Sensors*](#sensors)
     - [*Arduinos*](#arduinos)
+
+## Basic Packages
+
+Update the APT package lists and ensure your system is up to date.
+
+```bash
+sudo apt update && sudo apt upgrade
+```
+
+Install the following packages via the terminal.
+
+```bash
+sudo apt install -y build-essential git terminator
+```
+
+- `build-essential`: programs and libraries necessary for basic software development.
+- `git`: popular open-source version control system ([link](https://git-scm.com)).
+- `terminator`: useful tool for arranging terminals and saving layouts ([link](https://gnometerminator.blogspot.com/p/introduction.html)).
 
 ## ROS 2 Installation
 

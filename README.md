@@ -7,8 +7,12 @@ Project link: <https://github.com/christian-brice/LIBRA-ROS2-Tools>
 ## Table of Contents
 
 - [Requirements](#requirements)
+- [Setup](#setup)
+    - [*All-in-One*](#all-in-one)
+    - [*Manual*](#manual)
 - [Usage](#usage)
-    - [*Other Terminals*](#other-terminals)
+    - [*Launch Files*](#launch-files)
+    - [*Individual Nodes*](#individual-nodes)
 - [Troubleshooting](#troubleshooting)
     - [*ROS 2 commands/nodes are having issues communicating*](#ros-2-commandsnodes-are-having-issues-communicating)
     - [*RViz: "Wrong permissions on runtime directory"*](#rviz-wrong-permissions-on-runtime-directory)
@@ -26,74 +30,114 @@ Project link: <https://github.com/christian-brice/LIBRA-ROS2-Tools>
 | **Intel&reg; RealSense&trade;<br>Depth Camera** | Any D400-series | D456 |
 | **LightWare LIDAR&copy;<br>Device** | SF40-C | SF45-B |
 
+## Setup
+
+First, follow the instructions in [SETUP.md](/SETUP.md) to prepare your development environment.
+
+### *All-in-One*
+
+To simplify setup, a [Terminator](https://gnometerminator.blogspot.com/p/introduction.html) layout is provided which prepares the project environment for you.
+
+```bash
+terminator -l ros2_layout &
+```
+
+- Terminal 1: sources ROS2 env, colcon builds, sources project env, clears window.
+- Terminal 2: waits for colcon build, sources ROS2 and project envs, clears window.
+
+> ***NOTE:*** this layout is defined in `~/.config/terminator/config`.
+
+### *Manual*
+
+First, build the `libra` package and its dependencies.
+
+```bash
+# Source a ROS2 workspace
+. /opt/ros/humble/setup.bash
+# Navigate to the workspace and build it
+cd ros2_ws/
+colcon build --packages-up-to libra
+```
+
+Then, source the project workspace and you're ready to go!
+
+```bash
+. install/local_setup.bash
+```
+
+> ***NOTE:*** for ROS 2 command tips, see [docs/ROS_Commands.md](/docs/ROS_COMMANDS.md).
+
 ## Usage
 
-For ROS 2 command tips, see [docs/ROS_Commands.md](/docs/ROS_COMMANDS.md).
+### *Launch Files*
 
-1. Open a terminal in the `ros2_ws` directory and build the project.
+Run one of the provided configurations.
 
-    ```bash
-    cd ros2_ws/
-    colcon build --packages-up-to libra
-    ```
+- `rtabmap_rgbd_2d-lidar`: launches RTAB-Map in RGB-D mode with laser scan correction, with the full sensor suite publishing data.
+- `rtabmap_rgbd`: launches RTAB-Map in RGB-D mode with *only* RealSense publishing pre-packed RGB-D data.
+- `rtabmap_stereo`: launches RTAB-Map in stereo mode with *only* RealSense publishing infrared data.
+- `sensor_suite`: displays the sensor suite (RealSense + 2D LIDAR) model and data in RViz.
+- `test_lidar`: displays 2D LIDAR data in RViz.
+- `test_realsense`: displays RealSense data in RViz.
 
-2. Source the workspace for the `libra` package.
+```bash
+ros2 launch libra <configuration_name>.launch.py
+```
 
-    ```bash
-    . install/local_setup.bash
-    ```
+### *Individual Nodes*
 
-3. Run one of the provided launch files.
+#### **RealSense**
 
-    ```bash
-    # Sensor Suite (RGB-D camera + LIDAR)
-    ros2 launch libra sensor_suite.launch.py
-    ```
+See [docs/REALSENSE.md](./docs/REALSENSE.md) for more details.
 
-### *Other Terminals*
-
-Since I'm just testing, I still haven't combined everything into a single launch file. In the meantime, for each point below, source the workspace and run the provided command.
-
-- RealSense node:
-
-    ```bash
-    ros2 run realsense2_camera realsense2_camera_node --ros-args \
+```bash
+ros2 run realsense2_camera realsense2_camera_node --ros-args \
     -p pointcloud.enable:=true \
     -p enable_gyro:=true -p enable_accel:=true -p unite_imu_method:=2 \
-    -p depth_module.depth_profile:=848x480x60 -p depth_module.infra_profile:=848x480x60 -p rgb_camera.color_profile:=848x480x60 \
+    -p depth_module.depth_profile:=848x480x60 \
+    -p depth_module.infra_profile:=848x480x60 \
+    -p rgb_camera.color_profile:=848x480x60 \
     -p align_depth.enable:=true
-    ```
+```
 
-- LIDAR node:
+#### **2D LIDAR**
 
-    ```bash
-    ros2 run lightwarelidar2 sf45b --ros-args -p port:=/dev/lidar -p frameId:=lidar_link -p updateRate:=12 -p lowAngleLimit:=-160 -p highAngleLimit:=160
-    ```
+See [docs/LIDAR.md](./docs/LIDAR.md) for more details.
 
-- Recording a session:
+```bash
+ros2 run lightwarelidar2 sf45b --ros-args \
+    -p port:=/dev/lidar -p frameId:=lidar_link -p updateRate:=12 \
+    -p lowAngleLimit:=-160 -p highAngleLimit:=160
+```
 
-    ```bash
-    cd ros2_ws
-    mkdir bag_files && cd bag_files/
-    ros2 bag record -a
-    # To stop recording, press Ctrl+C
-    ```
+#### **Recording a Session**
+
+See [docs/ROS_COMMANDS.md "`record`"](./docs/ROS_COMMANDS.md#record) for more details.
+
+```bash
+cd ros2_ws
+mkdir bag_files && cd bag_files/
+ros2 bag record -a
+# To stop recording, press Ctrl+C
+```
 
 ## Troubleshooting
 
 ### *ROS 2 commands/nodes are having issues communicating*
 
-If you followed `SETUP.md` and set your ROS 2 middleware to CycloneDDS, this may mean that your network environment is not playing nice with CycloneDDS. In that case, you can temporarily revert to using FastDDS with the following command (note: Nav2- and slam_toolbox-based actions require CycloneDDS to work).
+If you followed `SETUP.md` and set your ROS 2 middleware to CycloneDDS, this may mean that your network environment is not playing nice with CycloneDDS. In that case, you can temporarily revert to using FastDDS with the following command.
 
 ```bash
 export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
 ```
 
+> ***NOTE:*** packages like RTAB-Map, Nav2, and slam_toolbox require CycloneDDS to work.
+
 ### *RViz: "Wrong permissions on runtime directory"*
 
 `QStandardPaths: wrong permissions on runtime directory /run/user/1000/ 0755 instead of 0700`.
 
-If you get the above message whenever you open RViz in WSL2, just execute the following in a terminal.
+If you get the above message whenever you open RViz in WSL2, just execute the following to persist the proper permissions.
 
 ```bash
 chmod 0700 /run/user/1000/
@@ -101,7 +145,7 @@ chmod 0700 /run/user/1000/
 
 ### *RViz (or other Qt-based app) crashes on startup*
 
-Your graphics drivers might be outdated or incompatible with the versions of the software we're using. Particularly, **Qt-based GUI applications will suffer from frustrating crashes if your graphics drivers aren't up to date**. Follow the instructions below to add the right [Mesa](https://www.mesa3d.org/) package repository (PPA) and upgrade your drivers.
+Your graphics drivers might be outdated or incompatible with the versions of the software used in this project. Particularly, **Qt-based GUI applications will suffer from frustrating crashes if your graphics drivers aren't up to date**. Follow the instructions below to add the appropriate [Mesa](https://www.mesa3d.org/) package repository (PPA) and upgrade your drivers.
 
 1. Check your current Mesa/OpenGL version using `glxinfo`. Save the output in case you have to revert the update later.
 
@@ -111,7 +155,7 @@ Your graphics drivers might be outdated or incompatible with the versions of the
     ```
 
 2. Add the appropriate PPA for updating your Mesa/OpenGL drivers.
-    > ***NOTE:*** If you're on Ubuntu 24.04 "Noble" you can pick either PPA (although the second one, `oibaf/graphics-drivers`, is recommended).
+    > ***NOTE:*** If you're on Ubuntu 24.04 "Noble" you can pick either of the following PPAs (although the second one, `oibaf/graphics-drivers`, is recommended).
     - For Ubuntu 18.04 "Bionic" to 24.04 "Noble":
 
         ```bash
