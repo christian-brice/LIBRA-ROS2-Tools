@@ -1,0 +1,12 @@
+# Hawrdware
+#"depth_module.emitter_enabled": 0
+# Data streams
+"enable_color": true
+"enable_depth": false
+"enable_infra1": true
+"enable_infra2": true
+"enable_gyro": true
+"enable_accel": true
+# Post-processing
+"unite_imu_method": 2
+"enable_sync": true
