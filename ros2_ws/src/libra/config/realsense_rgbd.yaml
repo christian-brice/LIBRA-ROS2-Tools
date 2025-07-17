@@ -11,4 +11,4 @@
 "unite_imu_method": 2
 "enable_sync": true
 "align_depth.enable": true
-"enable_rgbd": true
+"enable_rgbd": false  # RealSense and RTAB-Map "RGBD" types are different!
