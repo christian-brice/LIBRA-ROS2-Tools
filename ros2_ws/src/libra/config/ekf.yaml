@@ -1,4 +1,4 @@
-### ekf config file ###
+### Extended Kalman Filter config file (UNUSED) ###
 ekf_filter_node:
     ros__parameters:
         # If you're having trouble, try setting this to true, and then echo the
