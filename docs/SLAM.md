@@ -7,6 +7,8 @@ The official RTAB-Map repo for ROS 2 can be found here: [https://github.com/intr
 ## Table of Contents
 
 - [Before You Start](#before-you-start)
+    - [*Installing RTAB-Map*](#installing-rtab-map)
+    - [*Sensor Calibration*](#sensor-calibration)
 - [Usage](#usage)
     - [*Use Case 1: RGB-D only*](#use-case-1-rgb-d-only)
     - [*Use Case 2: RGB-D and LIDAR*](#use-case-2-rgb-d-and-lidar)
@@ -21,6 +23,8 @@ The official RTAB-Map repo for ROS 2 can be found here: [https://github.com/intr
     - [*Resources*](#resources)
 
 ## Before You Start
+
+### *Installing RTAB-Map*
 
 As stated in the `rtabmap_ros` repo, simply installing the package via APT is enough to prepare your system for SLAM via ROS 2.
 
@@ -55,6 +59,10 @@ EOF
 source ~/.bashrc
 ```
 
+### *Sensor Calibration*
+
+See the [REALSENSE.md "Calibration"](./REALSENSE.md#calibration) and [LIDAR.md "Calibration"](./LIDAR.md#calibration).
+
 ## Usage
 
 ### *Use Case 1: RGB-D only*
@@ -62,38 +70,50 @@ source ~/.bashrc
 ```bash
 cd ros2_ws/
 colcon build && . install/local_setup.bash
-ros2 launch libra rtabmap_realsense_d456_stereo.launch.py
+# To use infrared data
+ros2 launch libra rtabmap_stereo.launch.py
+# To use RGB + depth data
+ros2 launch libra rtabmap_rgbd.launch.py
 ```
 
-This launches the following five nodes:
+This launches the following five (5) nodes:
 
 - `realsense2_camera`, in the default camera namespace and with the following options.
-    - Disables the built-in IR emitter (this reduces speckling).
-    - Enables the `gyro`, `accel`, `infra1`, and `infra2` streams.
+    - ~~Disables the built-in IR emitter (this reduces speckling).~~
+    - Enables the `gyro`, `accel`, and `infra1`/`infra2` or aligned `color`/`depth` streams.
     - Enables `unite_imu` using linear interpolation (`=2`).
-    - Syncs frames from its various cameras under the same timestamp.
-- `stereo_odometry`, for visually estimating robot odometry using a stereo camera.
+    - Syncs data from its various sensors under the same timestamp.
+- `imu_filter_madgwick`, for automatically computing the quaternion of the RealSense's angular velocity and linear acceleration data (this is necessary for generating a complete ROS 2 IMU message).
+- `stereo_odometry` or `rgbd_odometry`, for visually estimating robot odometry using a stereo camera.
 - `rtabmap`, the main SLAM node w/ loop closure detector.
 - `rtabmap_viz`, which brings up the RTAB-Map GUI.
-- `imu_filter_madgwick`, for automatically computing the quaternion of the RealSense's angular velocity and linear acceleration data (this is necessary for generating a complete ROS 2 IMU message).
 
 Once finished, save the database in the RTAB-Map GUI by clicking "File" -> "Close database".
 
 ### *Use Case 2: RGB-D and LIDAR*
 
-TODO
-
 ```bash
 cd ros2_ws/
 colcon build && . install/local_setup.bash
-ros2 launch libra ???
+ros2 launch libra rtabmap_rgbd_2d-lidar.launch.py
 ```
 
-This launches the following ??? nodes:
+This launches the following seven (7) nodes:
 
-- ...
+- `realsense2_camera`, in the default camera namespace and with the following options.
+    - ~~Disables the built-in IR emitter (this reduces speckling).~~
+    - Enables the `gyro`, `accel`, and aligned `color`/`depth` streams.
+    - Enables `unite_imu` using linear interpolation (`=2`).
+    - Syncs data from its various sensors under the same timestamp.
+- `imu_filter_madgwick`, for automatically computing the quaternion of the RealSense's angular velocity and linear acceleration data (this is necessary for generating a complete ROS 2 IMU message).
+- `sf45b`, operating at maximum update rate (i.e., speed) and angle.
+- `rgbd_odometry`, for visually estimating robot odometry using a stereo camera.
+- `rtabmap`, the main SLAM node w/ loop closure detector.
+- `rtabmap_viz`, which brings up the RTAB-Map GUI.
+- `robot_state_publisher`, to inform RTAB-Map of the spatial relationships between sensors.
+    - The sensor suite model is defined in `models/sensor_suite.urdf.xacro`.
 
-To enable usage of the LIDAR from the RTAB-Map GUI, ensure that the following options are set under "Window" -> "Preferences".
+If the LIDAR scans aren't showing up in the RTAB-Map GUI, ensure that the following options are set under "Window" -> "Preferences".
 
 - "RGB-D SLAM" -> "Local Occupancy Grid" -> select `LiDAR and Camera(s)` under "Sensor from which the local grid is created"
 - "Motion Estimation" -> select `Visual + Odometry` under the first option (motion estimation type)
