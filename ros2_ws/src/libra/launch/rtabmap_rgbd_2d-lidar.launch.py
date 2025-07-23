@@ -159,7 +159,7 @@ def generate_launch_description():
                 'Reg/Strategy': "2"
             }],
             remappings=rtab_remaps,
-            arguments=['-d']  # delete previous database on launch (DEBUG ONLY)
+            arguments=[]
         ),
 
         # RTAB-Map's custom RViz GUI
