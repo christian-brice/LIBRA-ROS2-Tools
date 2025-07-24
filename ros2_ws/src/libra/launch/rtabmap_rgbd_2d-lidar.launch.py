@@ -90,11 +90,11 @@ def generate_launch_description():
             package='robot_state_publisher',
             executable='robot_state_publisher',
             parameters=[{
-                # Note: If ANY text in the xacro output can be interpreted as yaml,
+                # NOTE: If ANY text in the xacro output can be interpreted as yaml,
                 # the roslaunch system will try to interpret the ENTIRE text as yaml
                 # instead of passing on the string. The biggest cause of this false
                 # interpretation is commenting out xacro calls since the xacro:property
-                # or similar looks a lot like a yaml key:value pair. Comments are not
+                # convention looks a lot like a yaml key:value pair. Comments are not
                 # removed by xacro so they are included in the output.
                 # (source: https://answers.ros.org/question/417369/caught-exception-in-launch-see-debug-for-traceback-unable-to-parse-the-value-of-parameter-robot_description-as-yaml/)
                 'robot_description': ParameterValue(
