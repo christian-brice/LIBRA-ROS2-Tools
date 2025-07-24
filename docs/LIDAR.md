@@ -5,14 +5,18 @@ This document lists the necessary steps to set up and use the `sf45b` ROS 2 node
 ## Table of Contents
 
 - [Before You Start](#before-you-start)
+    - [*Installation*](#installation)
+    - [*Calibration*](#calibration)
 - [Usage](#usage)
-    - [*Terminal 1 (ROS node)*](#terminal-1-ros-node)
-    - [*Terminal 2 (visualization)*](#terminal-2-visualization)
+    - [*ROS Node*](#ros-node)
+    - [*Visualization*](#visualization)
 - [Troubleshooting](#troubleshooting)
     - [*`sf45b` node errors with: "Could not establish serial connection"*](#sf45b-node-errors-with-could-not-establish-serial-connection)
 - [Notes](#notes)
 
 ## Before You Start
+
+### *Installation*
 
 Once the submodules have been checked out, the [lightwarelidar2](https://github.com/LightWare-Optoelectronics/lightwarelidar2) source will be located at `ros2_ws/src/lightwarelidar2`.
 
@@ -24,6 +28,10 @@ cd ros2_ws/
 colcon build --packages-select lightwarelidar2
 ```
 
+### *Calibration*
+
+None required.
+
 ## Usage
 
 Connect the LIDAR unit to the computer. The device address, which must be passed as an input to the `sf45b` node via the `port` parameter, differs depending on which of the unit's ports is used.
@@ -33,7 +41,7 @@ Connect the LIDAR unit to the computer. The device address, which must be passed
 
 You will need two terminals: one to run the `sf45b` node and another to initialize RViz. Remember to source your local ROS environment!
 
-### *Terminal 1 (ROS node)*
+### *ROS Node*
 
 ```bash
 # Start the LIDAR node (ROS2 run)
@@ -43,7 +51,7 @@ ros2 run lightwarelidar2 sf45b --ros-args -p port:=/dev/lidar -p frameId:=lidar_
 The parameters have the following effects:
 
 - Specify the communications port used to interface with the SF45/B.
-- Gives the node's `tf` the same name as the LIDAR link in the URDF.
+- Gives the node's `tf` the same name as the LIDAR link in the URDF (`models/sensor_suite.urdf.xacro`).
 - Sets the update rate to 5000 readings per second (fastest).
 - Sets the scan angle to 320 degrees (maximum).
 
@@ -51,7 +59,7 @@ For a full list of parameters, see the ["Parameters" section under "sf45b Node" 
 
 > ***NOTE:*** The `frameId` parameter is incorrectly referenced in the official documentation as `frame_id`.
 
-### *Terminal 2 (visualization)*
+### *Visualization*
 
 ```bash
 # Run RViz with the PointCloud2 display
