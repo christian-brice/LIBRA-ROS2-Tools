@@ -13,9 +13,8 @@
 #     lightwarelidar2 (lightwarelidar2)
 #
 # Usage:
-#   $ ros2 launch libra rtabmap_unified.launch.py mode:=rgbd_lidar
-#   $ ros2 launch libra rtabmap_unified.launch.py mode:=rgbd
-#   $ ros2 launch libra rtabmap_unified.launch.py mode:=stereo
+#   $ ros2 launch libra rtabmap_unified.launch.py
+#   $ ros2 launch libra rtabmap_unified.launch.py mode:=rgbd realsense_config:=/home/.../ros2_ws/install/libra/share/libra/realsense_all.yaml
 
 import os
 
@@ -36,7 +35,7 @@ def generate_launch_description():
     
     declare_mode_cmd = DeclareLaunchArgument(
         'mode',
-        default_value='rgbd',
+        default_value='rgbd_lidar',
         choices=['rgbd_lidar', 'rgbd', 'stereo'],
         description='RTAB-Map mode: rgbd_lidar, rgbd, or stereo.'
     )
