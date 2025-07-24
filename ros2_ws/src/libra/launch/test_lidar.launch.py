@@ -1,6 +1,10 @@
+# Brief:
+#   Visualize the SF45/B's laser scan data.
+#
 # Requirements:
 #   A LightWare SF45/B
 #   Install the lightwarelidar2 ROS2 package (lightwarelidar2)
+#
 # Usage:
 #   $ ros2 launch libra test_lidar.launch.py
 

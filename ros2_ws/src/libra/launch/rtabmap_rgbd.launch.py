@@ -1,9 +1,11 @@
 # Brief:
 #   Runs RTAB-Map in RGB-D mode with only RealSense data as input.
 #   (no robot odometry; visual-inertial odometry is used instead)
+#
 # Requirements:
 #   An Intel RealSense D435i or D456
 #   Install the realsense2_camera ROS2 package (ros-$ROS_DISTRO-realsense2-camera)
+#
 # Usage:
 #   $ ros2 launch libra rtabmap_rgbd.launch.py
 

@@ -1,14 +1,17 @@
 # Brief:
 #   Runs RTAB-Map in RGB-D mode with RealSense and 2D LIDAR data as input.
 #   (no robot odometry; visual-inertial odometry is used instead)
+#
 # Requirements:
 #   An Intel RealSense D435i or D456
 #   A LightWare SF45/B
 #   Install the following ROS2 packages:
 #     realsense2_camera (ros-$ROS_DISTRO-realsense2-camera)
 #     lightwarelidar2 (lightwarelidar2)
+#
 # Usage:
 #   $ ros2 launch libra rtabmap_rgbd_2d-lidar.launch.py
+#
 # See:
 #   https://wiki.ros.org/rtabmap_ros/Tutorials/SetupOnYourRobot#Kinect_.2B-_Odometry_.2B-_2D_laser
 
