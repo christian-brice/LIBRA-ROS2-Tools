@@ -1,6 +1,10 @@
+# Brief:
+#   Visualize the RealSense's RGB, depth, point cloud, and IMU data.
+#
 # Requirements:
 #   An Intel RealSense D435i or D456
 #   Install the realsense2_camera ROS2 package (ros-$ROS_DISTRO-realsense2-camera)
+#
 # Usage:
 #   $ ros2 launch libra test_realsense.launch.py
 

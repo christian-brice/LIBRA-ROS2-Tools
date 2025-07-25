@@ -13,6 +13,7 @@ Project link: <https://github.com/christian-brice/LIBRA-ROS2-Tools>
 - [Usage](#usage)
     - [*Launch Files*](#launch-files)
     - [*Individual Nodes*](#individual-nodes)
+    - [*Recording a Session*](#recording-a-session)
 - [Troubleshooting](#troubleshooting)
     - [*ROS 2 commands/nodes are having issues communicating*](#ros-2-commandsnodes-are-having-issues-communicating)
     - [*RViz: "Wrong permissions on runtime directory"*](#rviz-wrong-permissions-on-runtime-directory)
@@ -110,16 +111,56 @@ ros2 run lightwarelidar2 sf45b --ros-args \
     -p lowAngleLimit:=-160 -p highAngleLimit:=160
 ```
 
-#### **Recording a Session**
-
-See [docs/ROS_COMMANDS.md "`record`"](./docs/ROS_COMMANDS.md#record) for more details.
+### *Recording a Session*
 
 ```bash
 cd ros2_ws
-mkdir bag_files && cd bag_files/
-ros2 bag record -a
+mkdir bags && cd bags/
+ros2 bag record <desired-topics>
 # To stop recording, press Ctrl+C
 ```
+
+Build a `ros2 bag record` command for your selected sensors by using the topic lists in the following subsections. Topics under "Common" should always be captured. See [docs/ROS_COMMANDS.md "`record`"](./docs/ROS_COMMANDS.md#record) for more details.
+
+When replaying data, you must launch the following nodes. See the launch files for relevant launch parameters.
+
+- `robot_state_publisher`
+- `rgbd_odometry` or `stereo_odometry`
+- `rtabmap`
+- `rtabmap_viz`
+
+#### **Common**
+
+```bash
+/tf /joint_states
+```
+
+> ***NOTE:*** `/joint_states` is not currently published by anything, but will eventually be handled by the LIBRA App.
+
+#### **Stereo Camera**
+
+Published by `realsense2_camera` and `imu_filter_madgwick_node`.
+
+```bash
+/camera/infra1/camera_info /camera/infra1/image_rect_raw /camera/infra2/camera_info /camera/infra2/image_rect_raw /imu/data
+```
+
+#### **RGB+D Camera**
+
+Published by `realsense2_camera` and `imu_filter_madgwick_node`.
+
+```bash
+/camera/color/image_raw /camera/color/camera_info /camera/aligned_depth_to_color/image_raw /imu/data
+```
+
+#### **LIDAR**
+
+Published by `sf45b`.
+
+```bash
+/pointcloud
+```
+
 
 ## Troubleshooting
 

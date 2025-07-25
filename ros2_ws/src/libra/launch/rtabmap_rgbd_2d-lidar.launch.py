@@ -1,14 +1,17 @@
 # Brief:
 #   Runs RTAB-Map in RGB-D mode with RealSense and 2D LIDAR data as input.
 #   (no robot odometry; visual-inertial odometry is used instead)
+#
 # Requirements:
 #   An Intel RealSense D435i or D456
 #   A LightWare SF45/B
 #   Install the following ROS2 packages:
 #     realsense2_camera (ros-$ROS_DISTRO-realsense2-camera)
 #     lightwarelidar2 (lightwarelidar2)
+#
 # Usage:
 #   $ ros2 launch libra rtabmap_rgbd_2d-lidar.launch.py
+#
 # See:
 #   https://wiki.ros.org/rtabmap_ros/Tutorials/SetupOnYourRobot#Kinect_.2B-_Odometry_.2B-_2D_laser
 
@@ -90,11 +93,11 @@ def generate_launch_description():
             package='robot_state_publisher',
             executable='robot_state_publisher',
             parameters=[{
-                # Note: If ANY text in the xacro output can be interpreted as yaml,
+                # NOTE: If ANY text in the xacro output can be interpreted as yaml,
                 # the roslaunch system will try to interpret the ENTIRE text as yaml
                 # instead of passing on the string. The biggest cause of this false
                 # interpretation is commenting out xacro calls since the xacro:property
-                # or similar looks a lot like a yaml key:value pair. Comments are not
+                # convention looks a lot like a yaml key:value pair. Comments are not
                 # removed by xacro so they are included in the output.
                 # (source: https://answers.ros.org/question/417369/caught-exception-in-launch-see-debug-for-traceback-unable-to-parse-the-value-of-parameter-robot_description-as-yaml/)
                 'robot_description': ParameterValue(
