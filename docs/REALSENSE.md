@@ -101,14 +101,14 @@ Now, use either of the following calibration methods.
         realsense-viewer
         ```
 
-    3. Turn on the depth stream (i.e., "Stereo Module") and change the status of the IR emitter depending on your scene.
+    3. Turn on the depth stream (i.e., "Stereo Module") and point the camera at your scene. Run the self-calibration tool by clicking on "More" -> "On-Chip Calibration". **This improves the camera's precision, or relative error.**
+        - If the Health Check Value is 0.25 or less and the FL Health Check Value is 0.15 or less, you're good to go!
+
+    4. Change the status of the IR emitter depending on your scene.
         - Flat & Textured: set "Emitter Enabled" to "Off"
         - Varying Depth & Objects: set "Emitter Enabled" to "Laser Auto"
 
-    4. Point the camera at your scene, then run the self-calibration tool by clicking on "More" -> "On-Chip Calibration". **This improves the camera's precision, or relative error.**
-        - If the Health Check Value is 0.25 or less and the FL Health Check Value is 0.15 or less, you're good to go!
-
-    5. Optionally, you can further provide a ground truth using "More" -> "Tare Calibration". **This improves the camera's accuracy, or absolute error.**
+    5. Measure the ground truth distance and provide it for calibration via "More" -> "Tare Calibration". **This improves the camera's accuracy, or absolute error.**
         1. Set the camera "Preset" to "High Accuracy"
         2. Enter the distance in "Ground Truth (mm)", then click "Calibrate".
 
@@ -125,16 +125,16 @@ Now, use either of the following calibration methods.
 
     3. Click "Tools" -> "Post-processing..." and apply any methods you see fit to increase the accuracy of the map.
 
-    4. First in "File" -> "Export 3D Clouds" and then in "File" -> "Depth calibration...", set the following values.
+    4. First in "File" -> "Export 3D Clouds" -> "Regenerate Clouds" and then in "File" -> "Depth calibration...", set the following values. Values with an asterisk (*) next to them are only required in "Depth calibration..." dialog.
 
         |||
         |---|---|
         | Decimation | 1 |
-        | Maximum depth | 3.5 m (UNTESTED) |
-        | Minimum depth | 0.0 m |
-        | Voxel size | 0.01 m |
-        | Cone radius | 0.02 m |
-        | Cone std dev threshold | 0.10 |
+        | Maximum depth | 3.50 m |
+        | Minimum depth | 0.00 m |
+        | Voxel size | 0.010 m |
+        | Cone radius* | 0.02 m |
+        | Cone std dev threshold* | 0.10 |
 
         > ***NOTE:***  To inform a model from multiple maps/databases, ensure that "Reset previous model" is unchecked before running calibration. Then, open a separate database and repeat Step 4.
 
