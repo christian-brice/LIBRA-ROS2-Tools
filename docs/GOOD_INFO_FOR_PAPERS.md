@@ -4,7 +4,6 @@ This is a collection of useful phrases, data, etc. (with their sources) that I'v
 
 ## Table of Contents
 
-- [Table of Contents](#table-of-contents)
 - [Sensors](#sensors)
     - [*Calibration*](#calibration)
 - [Mapping](#mapping)
