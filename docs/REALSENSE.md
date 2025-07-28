@@ -116,7 +116,7 @@ Now, use either of the following calibration methods.
 
 <br>
 
-- **Online Calibration using RTAB-Map and CLAMS** &ndash; [link](https://github.com/introlab/rtabmap/wiki/Depth-Calibration)
+- **(TODO: move this to SLAM) Online Calibration using RTAB-Map and CLAMS** &ndash; [link](https://github.com/introlab/rtabmap/wiki/Depth-Calibration)
 
     1. Run the necessary RealSense and RTAB-Map nodes (see [SLAM.md "Use Case 1: RGB-D only"](./SLAM.md#use-case-1-rgb-d-only)).
 
