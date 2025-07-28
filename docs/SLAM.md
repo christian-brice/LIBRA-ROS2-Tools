@@ -10,8 +10,8 @@ The official RTAB-Map repo for ROS 2 can be found here: [https://github.com/intr
     - [*Installing RTAB-Map*](#installing-rtab-map)
     - [*Sensor Calibration*](#sensor-calibration)
 - [Usage](#usage)
-    - [*Use Case 1: RGB-D only*](#use-case-1-rgb-d-only)
-    - [*Use Case 2: RGB-D and LIDAR*](#use-case-2-rgb-d-and-lidar)
+    - [*Use Case 1: Camera only*](#use-case-1-camera-only)
+    - [*Use Case 2: Camera and LIDAR*](#use-case-2-camera-and-lidar)
 - [Post Processing](#post-processing)
     - [*Cloud Filtering \& Smoothing*](#cloud-filtering--smoothing)
     - [*Robust Graph Optimization (Loop Closure Optimization)*](#robust-graph-optimization-loop-closure-optimization)
@@ -65,7 +65,7 @@ See the [REALSENSE.md "Calibration"](./REALSENSE.md#calibration) and [LIDAR.md "
 
 ## Usage
 
-### *Use Case 1: RGB-D only*
+### *Use Case 1: Camera only*
 
 ```bash
 cd ros2_ws/
@@ -90,7 +90,7 @@ This launches the following five (5) nodes:
 
 Once finished, save the database in the RTAB-Map GUI by clicking "File" -> "Close database".
 
-### *Use Case 2: RGB-D and LIDAR*
+### *Use Case 2: Camera and LIDAR*
 
 ```bash
 cd ros2_ws/
@@ -118,7 +118,7 @@ If the LIDAR scans aren't showing up in the RTAB-Map GUI, ensure that the follow
 - "RGB-D SLAM" -> "Local Occupancy Grid" -> select `LiDAR and Camera(s)` under "Sensor from which the local grid is created"
 - "Motion Estimation" -> select `Visual + Odometry` under the first option (motion estimation type)
 
-Once finished, save the database in the RTAB-Map GUI by clicking "File" -> "Close database".
+Once finished, save the database in the RTAB-Map GUI by clicking "File" -> "Close database". (TODO: this doesn't exist)
 
 ## Post Processing
 

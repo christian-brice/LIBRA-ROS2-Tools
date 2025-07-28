@@ -88,7 +88,7 @@ def generate_launch_description():
             package='rtabmap_slam', executable='rtabmap', output='screen',
             parameters=rtab_params,
             remappings=rtab_remaps,
-            arguments=['-d']  # delete previous database on launch (DEBUG ONLY)
+            arguments=[]
         ),
 
         # RTAB-Map's custom RViz GUI
