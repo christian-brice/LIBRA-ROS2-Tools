@@ -21,9 +21,11 @@ import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, OpaqueFunction
+from launch.actions import IncludeLaunchDescription
+from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node
-from launch.substitutions import Command, LaunchConfiguration
 from launch_ros.descriptions import ParameterValue
+from launch.substitutions import Command, LaunchConfiguration
 
 
 def generate_launch_description():
@@ -210,14 +212,18 @@ def generate_launch_description():
             ))
         
         # RealSense camera
-        nodes.append(Node(
-            package='realsense2_camera',
-            executable='rs_launch.py',
-            output='screen',
-            parameters=[{
+        nodes.append(IncludeLaunchDescription(
+            PythonLaunchDescriptionSource([
+                os.path.join(
+                    get_package_share_directory('realsense2_camera'),
+                    'launch',
+                    'rs_launch.py'
+                )
+            ]),
+            launch_arguments={
                 'camera_namespace': '',  # avoid nesting "/camera/camera"
                 'config_file': realsense_config
-            }]
+            }.items()
         ))
 
         # Compute quaternion of the IMU
