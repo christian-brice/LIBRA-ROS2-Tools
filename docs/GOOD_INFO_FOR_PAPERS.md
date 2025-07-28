@@ -13,11 +13,12 @@ This is a collection of useful phrases, data, etc. (with their sources) that I'v
 
 ### *Calibration*
 
-- RealSense tools
-    - [Best Known Methods for Optimal Camera Performance over Lifetime](https://realsenseai.com/news-insights/news/best-known-methods-for-optimal-camera-performance-over-lifetime/) (relative, absolute, and dynamic calibration)
+- Official RealSense guidance:
+    - [Best Known Methods for Optimal Camera Performance over Lifetime](https://realsenseai.com/news-insights/news/best-known-methods-for-optimal-camera-performance-over-lifetime/)
+        - Covers relative, absolute ("tare"), and dynamic calibrations
     - [IMU Calibration Tool for Intel&reg; RealSense&trade; Depth Camera](https://dev.realsenseai.com/docs/imu-calibration-tool-for-intel-realsense-depth-camera)
         - `rs-imu-calibration.py` can be found at [https://github.com/IntelRealSense/librealsense](https://github.com/IntelRealSense/librealsense) under `tools/rs-imu-calibration`
-        - Use of a 3-axis level is recommended
+        - Use of a 3-axis level is recommended, but not necessary
 
 - ["Visual-Inertial Sensor Calibration -- A Complete Tutorial and Discussion" on YouTube](https://www.youtube.com/watch?v=BtzmsuJemgI)
 

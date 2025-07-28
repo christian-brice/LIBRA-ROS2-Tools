@@ -81,6 +81,9 @@ def generate_launch_description():
     #--------------------------------------------------------------------------
     # !Parameters and Remappings
     #--------------------------------------------------------------------------
+
+    # NOTE: for more detailed information on RTAB-Map parameters, see
+    #       https://github.com/introlab/rtabmap/wiki/Change-parameters
     
     # Common RTAB-Map parameters
     base_rtab_params = {
