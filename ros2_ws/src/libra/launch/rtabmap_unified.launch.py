@@ -25,13 +25,21 @@ from launch_ros.actions import Node
 from launch.substitutions import Command, LaunchConfiguration
 from launch_ros.descriptions import ParameterValue
 
+# --- TABLE OF CONTENTS ---
+#  !Launch Arguments
+#  !Parameters and Remappings
+#  !Mode-based Parameters
+#  !Nodes
+#
 
 def generate_launch_description():
     pkg_share = get_package_share_directory('libra')
     config_dir = os.path.join(pkg_share, 'config')
     default_urdf_model_path = os.path.join(pkg_share, 'models', 'sensor_suite.urdf.xacro')
 
-    # --- Launch Arguments ---
+    #--------------------------------------------------------------------------
+    # !Launch Arguments
+    #--------------------------------------------------------------------------
     
     declare_mode_cmd = DeclareLaunchArgument(
         'mode',
@@ -70,7 +78,9 @@ def generate_launch_description():
         description='Path to URDF file with robot model definition. (rgbd_lidar only)'
     )
 
-    # --- Parameters and Remappings ---
+    #--------------------------------------------------------------------------
+    # !Parameters and Remappings
+    #--------------------------------------------------------------------------
     
     # Common RTAB-Map parameters
     base_rtab_params = {
@@ -97,16 +107,16 @@ def generate_launch_description():
         # Input topics
         'subscribe_scan_cloud': True,
         # Mapping config
-        'RGBD/NeighborLinkRefining': 'true',  # correct odom with laser scans
-        'RGBD/ProximityBySpace': 'true',  # find local loop closures based on robot position
+        'RGBD/NeighborLinkRefining': 'true',  # correct odom with laser scans + ICP
+        'RGBD/ProximityBySpace': 'true',  # find local loop closures based on robot position using ICP
         'RGBD/AngularUpdate': '0.01',  # only robot movement updates the map
         'RGBD/LinearUpdate': '0.01',  # only robot movement updates the map
-        'RGBD/OptimizeFromGraphEnd': 'false',  # correct all previous poses based on last pose
+        'RGBD/OptimizeFromGraphEnd': 'false',  # correct all previous poses based on latest pose (/odom and /map will always match)
         'Grid/FromDepth': 'false',  # true: depth, false: laser scans
         # Odometry and registration
-        'Reg/Force3DoF': 'true',  # roll, pitch, and Z must be explicitly provided
-        'Icp/VoxelSize': '0.05',  # filter scans to 5 cm voxel before registration
-        'Icp/MaxCorrespondenceDistance': '0.1'  # max distance between points during registration
+        'Reg/Force3DoF': 'true',  # roll, pitch, and Z must be explicitly provided (i.e., won't be estimated)
+        'Icp/VoxelSize': '0.05',  # in m; filter scans down to 5 cm voxel before registration
+        'Icp/MaxCorrespondenceDistance': '0.1'  # in m; max distance between points during registration
     }
 
     # Mode-specific RTAB-Map remappings
@@ -134,10 +144,12 @@ def generate_launch_description():
         ('scan_cloud', '/pointcloud')
     ]
 
-    # --- Launch Definitions ---
-
     def launch_nodes(context, *args, **kwargs):
         """Generates a list of nodes to be launched based on mode.
+        Supplied to the ROS2 `LaunchDescription` via `OpaqueFunction`.
+
+        Usage:
+            OpaqueFunction(function=launch_nodes)
 
         Args:
             context: Context object containing the launch configurations.
@@ -153,6 +165,10 @@ def generate_launch_description():
         frame_id_arg = context.launch_configurations['frame_id']
         realsense_config_arg = context.launch_configurations['realsense_config']
 
+        #----------------------------------------------------------------------
+        # !Mode-based Parameters
+        #----------------------------------------------------------------------
+
         # Resolve parameters based on mode
         if mode == 'rgbd_lidar':
             frame_id = frame_id_arg or 'base_link'
@@ -162,6 +178,9 @@ def generate_launch_description():
             odom_exec = 'rgbd_odometry'
             odom_extra = {
                 # Without robot odometry, only visual odometry is supported
+                # TODO: this must change after the following are complete:
+                #       - Confirmed that HebiThread outputs necessary odometry data
+                #       - LIBRA-I URDF model (currently only sensor suite is done)
                 'Reg/Strategy': '0'
             }
             slam_extra = {
@@ -186,6 +205,10 @@ def generate_launch_description():
             slam_extra = {}
 
         nodes = []
+
+        #----------------------------------------------------------------------
+        # !Nodes
+        #----------------------------------------------------------------------
 
         # Publish robot frame transforms based on URDF model
         if mode == 'rgbd_lidar':
