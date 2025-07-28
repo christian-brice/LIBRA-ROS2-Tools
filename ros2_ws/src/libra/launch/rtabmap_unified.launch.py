@@ -13,8 +13,10 @@
 #     lightwarelidar2 (lightwarelidar2)
 #
 # Usage:
-#   $ ros2 launch libra rtabmap_unified.launch.py
-#   $ ros2 launch libra rtabmap_unified.launch.py mode:=rgbd realsense_config:=/home/.../ros2_ws/install/libra/share/libra/realsense_all.yaml
+#   Use defaults:
+#     $ ros2 launch libra rtabmap_unified.launch.py
+#   RGB+D-only mode with all RealSense streams enabled:
+#     $ ros2 launch libra rtabmap_unified.launch.py mode:=rgbd realsense_config:=/home/.../ros2_ws/install/libra/share/libra/realsense_all.yaml
 
 import os
 
