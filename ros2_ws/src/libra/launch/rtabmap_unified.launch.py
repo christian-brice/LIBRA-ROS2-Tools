@@ -16,7 +16,7 @@
 #   Use defaults:
 #     $ ros2 launch libra rtabmap_unified.launch.py
 #   RGB+D-only mode with all RealSense streams enabled:
-#     $ ros2 launch libra rtabmap_unified.launch.py mode:=rgbd realsense_config:=/home/.../ros2_ws/install/libra/share/libra/realsense_all.yaml
+#     $ ros2 launch libra rtabmap_unified.launch.py mode:=rgbd realsense_config:=/home/.../ros2_ws/install/libra/share/libra/config/realsense_all.yaml
 
 import os
 
@@ -279,6 +279,7 @@ def generate_launch_description():
                 parameters=[{
                     'port': lidar_port,
                     'frameId': 'lidar_link',
+                    'baudrate': 115200,
                     'updateRate': 12,
                     'lowAngleLimit': -160,
                     'highAngleLimit': 160
