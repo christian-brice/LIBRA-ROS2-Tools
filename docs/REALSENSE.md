@@ -89,7 +89,7 @@ To measure the effectiveness of calibration, collect depth metrics using the Dep
 
     > ***NOTE:*** If you apply the offline calibration below and the accuracy still does not meet the above specifications, follow the instructions for Dynamic Calibration in [the same article](https://realsenseai.com/news-insights/news/best-known-methods-for-optimal-camera-performance-over-lifetime/#3.5).
 
-Calibration can be done via RealSense Viewer. The following is a summary of the necessary steps; more information can be found in the [official documentation](https://dev.realsenseai.com/docs/self-calibration-for-depth-cameras).
+Calibration can be done via RealSense Viewer.
 
 1. Prepare a textured scene. Ideally, this is the pattern provided in Appendix A of the [Self-Calibration documentation](https://dev.realsenseai.com/docs/self-calibration-for-depth-cameras), but can be anything from a textured carpet to a cluttered desk.
 
@@ -113,11 +113,44 @@ Calibration can be done via RealSense Viewer. The following is a summary of the 
 
 6. Save the calibration parameters via "More" -> "Calibration Data" -> "Save As..." at the top.
 
+For more information, see the official documentation: [Intel&reg; RealSense&trade; Self-Calibration for D400 Series Depth Cameras](https://dev.realsenseai.com/docs/self-calibration-for-depth-cameras).
+
 #### **IMU**
 
-TODO
+1. First, make sure you've installed the Python wrapper for Intel Realsense SDK 2.0.
 
-For more details, see the official documentation: ["IMU Calibration Tool for Intel&reg; RealSense&trade; Depth Camera"](https://dev.realsenseai.com/docs/imu-calibration-tool-for-intel-realsense-depth-camera).
+    ```bash
+    sudo pip install pyrealsense2 
+    ```
+
+2. Next, clone the repo and navigate to the IMU calibration tool directory.
+
+    ```bash
+    cd ~/Downloads
+    git clone --depth 1 https://github.com/IntelRealSense/librealsense.git && cd librealsense/tools/rs-imu-calibration
+    ```
+
+3. Run the IMU calibration tool with sudo (the script needs admin privileges to write the resulting calibrations). Note that there are six data collection steps, each lasting approx. 2 minutes, so find a video to watch in the meantime! You *CANNOT MOVE* while the tool is collecting data, or else it will restart the current step!!
+
+    ```bash
+    sudo python3 rs-imu-calibration.py
+    ```
+
+    - For picture guidance on how to orient the camera, see the the [official documentation](https://dev.realsenseai.com/docs/imu-calibration-tool-for-intel-realsense-depth-camera): Section 4.3.2 "Capturing IMU data from 6 positions".
+
+    > ***NOTE:*** once data collection is finished, **you will be prompted to save calibration files** for the accelerometer and gyroscope. **It is highly recommended you do so!** (e.g., with the footer "calibration")
+
+4. Once the results have been written to the camera, you can delete the repo. If you saved calibration files, remember to move those somewhere safe first.
+
+    ```bash
+    # If you saved calibration files
+    mv accel_calibration.txt ~/
+    mv gyro_calibration.txt ~/
+    # Return to base directory and clean up
+    cd ~/Downloads && rm -rf librealsense
+    ```
+
+For more details, see the official documentation: [IMU Calibration Tool for Intel&reg; RealSense&trade; Depth Camera](https://dev.realsenseai.com/docs/imu-calibration-tool-for-intel-realsense-depth-camera).
 
 ## Usage
 
