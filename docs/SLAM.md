@@ -61,7 +61,42 @@ source ~/.bashrc
 
 ### *Sensor Calibration*
 
-See the [REALSENSE.md "Calibration"](./REALSENSE.md#calibration) and [LIDAR.md "Calibration"](./LIDAR.md#calibration).
+#### **Online Calibration**
+
+The following is a summary of real-time calibration in RTAB-Map. For more information, see the [RTAB-Map wiki](https://github.com/introlab/rtabmap/wiki/Depth-Calibration).
+
+1. Run the necessary RealSense and RTAB-Map nodes (see [SLAM.md "Use Case 1: RGB-D only"](./SLAM.md#use-case-1-rgb-d-only)).
+
+2. Start a new map and follow the instructions in the ["Recording" section of the CLAMS wiki](https://www.alexteichman.com/octo/clams/#recording) to record the necessary training data.
+    - RTAB-Map calibrates RGB-D sensors using the CLAMS approach, which stands for "calibrating, localizing, and mapping, simultaneously".
+
+3. Click "Tools" -> "Post-processing..." and apply any methods you see fit to increase map accuracy, remove outliers/excess points, etc.
+
+4. Click "File" -> "Depth calibration..." and set the following values. Note that most of these values are also used when exporting 3D clouds, so an asterisk (*) denotes those which are only used in the "Depth calibration..." dialog.
+
+    |||
+    |---|---|
+    | Decimation | 1 |
+    | Maximum depth | 3.50 m |
+    | Minimum depth | 0.00 m |
+    | Voxel size | 0.010 m |
+    | \*Cone radius | 0.02 m |
+    | \*Cone std dev threshold | 0.10 |
+
+    > ***NOTE:***  To inform a model from multiple maps/databases, ensure that "Reset previous model" is unchecked before running calibration. Then, open a separate database and repeat Step 4.
+
+5. Click "Calibrate" to generate a binary file (`.bin`) of the distortion model; samples of the model at 2, 4, 6, 8, and 10 meters will be shown.
+    - White pixels = sufficient training samples
+    - Black pixels = insufficient training samples
+
+6. The model can be applied both online and offline:
+    - **Online** &ndash; "Window" -> "Preferences" -> "Source" -> "RGB-D"
+        - TODO: idk how to apply this via command-line
+    - **Offline** &ndash; "File" -> "Export 3D Clouds" -> "Regenerate Clouds" (use the same values from Step 4)
+
+#### **Offline Calibration**
+
+See [REALSENSE.md "Calibration"](./REALSENSE.md#calibration) and [LIDAR.md "Calibration"](./LIDAR.md#calibration).
 
 ## Usage
 

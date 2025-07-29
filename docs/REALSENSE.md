@@ -89,63 +89,29 @@ To measure the effectiveness of calibration, collect depth metrics using the Dep
 
     > ***NOTE:*** If you apply the offline calibration below and the accuracy still does not meet the above specifications, follow the instructions for Dynamic Calibration in [the same article](https://realsenseai.com/news-insights/news/best-known-methods-for-optimal-camera-performance-over-lifetime/#3.5).
 
-Now, use either of the following calibration methods.
+Calibration can be done via RealSense Viewer. The following is a summary of the necessary steps; more information can be found in the [official documentation](https://dev.realsenseai.com/docs/self-calibration-for-depth-cameras).
 
-- **Offline Calibration using RealSense Viewer** &ndash; [link](https://dev.realsenseai.com/docs/self-calibration-for-depth-cameras)
+1. Prepare a textured scene. Ideally, this is the pattern provided in Appendix A of the [Self-Calibration documentation](https://dev.realsenseai.com/docs/self-calibration-for-depth-cameras), but can be anything from a textured carpet to a cluttered desk.
 
-    1. Prepare a textured scene. Ideally, this is the pattern provided in Appendix A of the [Self-Calibration documentation](https://dev.realsenseai.com/docs/self-calibration-for-depth-cameras), but can be anything from a textured carpet to a cluttered desk.
+2. In a terminal, run the RealSense Viewer application.
 
-    2. In a terminal, run the RealSense Viewer.
+    ```bash
+    realsense-viewer
+    ```
 
-        ```bash
-        realsense-viewer
-        ```
+3. Turn on the depth stream (i.e., "Stereo Module") and point the camera at your scene. Run the self-calibration tool by clicking on "More" -> "On-Chip Calibration". **This improves the camera's precision, or relative error.**
+    - If the Health Check Value is 0.25 or less and the FL Health Check Value is 0.15 or less, you're good to go!
 
-    3. Turn on the depth stream (i.e., "Stereo Module") and point the camera at your scene. Run the self-calibration tool by clicking on "More" -> "On-Chip Calibration". **This improves the camera's precision, or relative error.**
-        - If the Health Check Value is 0.25 or less and the FL Health Check Value is 0.15 or less, you're good to go!
-
-    4. Change the status of the IR emitter depending on your scene.
+4. Next, prepare for "Tare" calibration by doing the following:
+    1. Change the status of the IR emitter depending on your scene.
         - Flat & Textured: set "Emitter Enabled" to "Off"
         - Varying Depth & Objects: set "Emitter Enabled" to "Laser Auto"
+    2. Set the camera preset to "High Accuracy"
+    3. Measure the ground truth distance by placing a laser range finder directly on the front glass of the camera.
 
-    5. Measure the ground truth distance and provide it for calibration via "More" -> "Tare Calibration". **This improves the camera's accuracy, or absolute error.**
-        1. Set the camera "Preset" to "High Accuracy"
-        2. Enter the distance in "Ground Truth (mm)", then click "Calibrate".
+5. Open the Tare calibration window via "More" -> "Tare Calibration". Input the ground truth distance in "Ground Truth (mm)", then click "Calibrate". **This improves the camera's accuracy, or absolute error.**
 
-    6. Save the calibration parameters via "More" -> "Calibration Data" -> "Save As..." at the top.
-
-<br>
-
-- **(TODO: move this to SLAM) Online Calibration using RTAB-Map and CLAMS** &ndash; [link](https://github.com/introlab/rtabmap/wiki/Depth-Calibration)
-
-    1. Run the necessary RealSense and RTAB-Map nodes (see [SLAM.md "Use Case 1: RGB-D only"](./SLAM.md#use-case-1-rgb-d-only)).
-
-    2. Start a new map and follow the instructions in the ["Recording" section of the CLAMS wiki](https://www.alexteichman.com/octo/clams/#recording) to record the necessary training data.
-        - RTAB-Map calibrates RGB-D sensors using the CLAMS approach, which stands for "calibrating, localizing, and mapping, simultaneously".
-
-    3. Click "Tools" -> "Post-processing..." and apply any methods you see fit to increase the accuracy of the map.
-
-    4. First in "File" -> "Export 3D Clouds" -> "Regenerate Clouds" and then in "File" -> "Depth calibration...", set the following values. Values with an asterisk (*) next to them are only required in "Depth calibration..." dialog.
-
-        |||
-        |---|---|
-        | Decimation | 1 |
-        | Maximum depth | 3.50 m |
-        | Minimum depth | 0.00 m |
-        | Voxel size | 0.010 m |
-        | Cone radius* | 0.02 m |
-        | Cone std dev threshold* | 0.10 |
-
-        > ***NOTE:***  To inform a model from multiple maps/databases, ensure that "Reset previous model" is unchecked before running calibration. Then, open a separate database and repeat Step 4.
-
-    5. Click "Calibrate" to generate a binary file (`.bin`) of the distortion model; samples of the model at 2, 4, 6, 8, and 10 meters will be shown.
-        - White pixels = sufficient training samples
-        - Black pixels = insufficient training samples
-
-    6. The model can be applied both online and offline:
-        - **Online** &ndash; "Window" -> "Preferences" -> "Source" -> "RGB-D"
-            - TODO: idk how to apply this via command-line
-        - **Offline** &ndash; "File" -> "Export 3D Clouds" -> "Regenerate Clouds"
+6. Save the calibration parameters via "More" -> "Calibration Data" -> "Save As..." at the top.
 
 #### **IMU**
 
