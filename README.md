@@ -46,7 +46,7 @@ terminator -l ros2_layout &
 - Terminal 1: sources ROS2 env, colcon builds, sources project env, clears window.
 - Terminal 2: waits for colcon build, sources ROS2 and project envs, clears window.
 
-> ***NOTE:*** this layout is defined in `~/.config/terminator/config`.
+> ***NOTE:*** this layout is defined in the file `~/.config/terminator/config`. If the layout is missing or you'd like to use it on your own machine, there is a backup provided in this repo at `tools/terminator/config`.
 
 ### *Manual*
 
