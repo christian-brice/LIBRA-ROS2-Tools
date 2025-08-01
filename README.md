@@ -86,6 +86,7 @@ ros2 launch libra <configuration_name>.launch.py
 #### **Archived**
 
 The following have been superseded by `rtabmap_unified` and are kept in `launch/archive`.
+
 - `rtabmap_rgbd_2d-lidar`: launches RTAB-Map in RGB-D mode with laser scan correction, with the full sensor suite publishing data.
 - `rtabmap_rgbd`: launches RTAB-Map in RGB-D mode with *only* RealSense publishing pre-packed RGB-D data.
 - `rtabmap_stereo`: launches RTAB-Map in stereo mode with *only* RealSense publishing infrared data.
@@ -165,7 +166,6 @@ Published by `sf45b`.
 ```bash
 /pointcloud
 ```
-
 
 ## Troubleshooting
 
