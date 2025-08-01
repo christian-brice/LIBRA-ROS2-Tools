@@ -80,7 +80,15 @@ Run one of the provided configurations.
 - `test_realsense`: displays RealSense data in RViz.
 
 ```bash
+# Template
 ros2 launch libra <configuration_name>.launch.py
+```
+
+For example, to run RTAB-Map in RGB+D mode with the RealSense as the main sensor and the 2D LIDAR as a corrective sensor, execute the following.
+
+```bash
+# Example
+ros2 launch libra rtabmap_unified.launch.py mode:=rgbd realsense_config:=/home/.../ros2_ws/install/libra/share/libra/config/realsense_all.yaml
 ```
 
 #### **Archived**
