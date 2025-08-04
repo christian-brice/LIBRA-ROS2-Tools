@@ -91,6 +91,8 @@ For example, to run RTAB-Map in RGB+D mode with the RealSense as the main sensor
 ros2 launch libra rtabmap_unified.launch.py mode:=rgbd_lidar realsense_config:=/home/brice/repos/LIBRA-ROS/ros2_ws/install/libra/share/libra/config/realsense_all.yaml
 ```
 
+> ***NOTE:*** it is recommended that you also set the parameter `working_dir:=<PATH>` on every launch so as to not get your databases mixed up. For example: `working_dir:=/home/brice/experiments/<YYYY-MM-DD>_<Title>`.
+
 #### **Archived**
 
 The following have been superseded by `rtabmap_unified` and are kept in `launch/archive`.
