@@ -119,6 +119,9 @@ def generate_launch_description():
         'RGBD/AngularUpdate': '0.01',  # only robot movement updates the map
         'RGBD/LinearUpdate': '0.01',  # only robot movement updates the map
         'RGBD/OptimizeFromGraphEnd': 'false',  # correct all previous poses based on latest pose (/odom and /map will always match)
+        'RGBD/OptimizeStrategy': '2',  # 1 = g2o, 2 = GTSAM
+        'RGBD/OptimizeRobust': 'true',  # use Vertigo to reduce the influence of "weak" (outlier) loop closures
+        'RGBD/OptimizeMaxError': '0',  # must be 0 if RGBD/OptimizeRobust is true
         'Grid/FromDepth': 'false',  # true: depth, false: laser scans
         # Odometry and registration
         'Reg/Force3DoF': 'true',  # roll, pitch, and Z must be explicitly provided (i.e., won't be estimated)
