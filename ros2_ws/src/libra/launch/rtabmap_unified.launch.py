@@ -313,7 +313,7 @@ def generate_launch_description():
             parameters=[ rtab_params | odom_extra | {
                 'Rtabmap\WorkingDirectory': working_dir,
                 'frame_id': frame_id
-            } ],
+            }],
             remappings=remaps
         ))
 
@@ -325,7 +325,7 @@ def generate_launch_description():
             parameters=[ rtab_params | slam_extra | {
                 'Rtabmap\WorkingDirectory': working_dir,
                 'frame_id': frame_id
-            } ],
+            }],
             remappings=remaps,
             arguments=['-d'] if delete_db == 'true' else []
         ))
