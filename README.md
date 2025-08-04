@@ -88,7 +88,7 @@ For example, to run RTAB-Map in RGB+D mode with the RealSense as the main sensor
 
 ```bash
 # Example
-ros2 launch libra rtabmap_unified.launch.py mode:=rgbd realsense_config:=/home/.../ros2_ws/install/libra/share/libra/config/realsense_all.yaml
+ros2 launch libra rtabmap_unified.launch.py mode:=rgbd_lidar realsense_config:=/home/brice/repos/LIBRA-ROS/ros2_ws/install/libra/share/libra/config/realsense_all.yaml
 ```
 
 #### **Archived**

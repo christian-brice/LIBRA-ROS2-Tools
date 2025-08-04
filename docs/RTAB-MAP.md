@@ -65,7 +65,7 @@ source ~/.bashrc
 
 The following is a summary of real-time calibration in RTAB-Map. For more information, see the [RTAB-Map wiki](https://github.com/introlab/rtabmap/wiki/Depth-Calibration).
 
-1. Run the necessary RealSense and RTAB-Map nodes (see [SLAM.md "Use Case 1: RGB-D only"](./SLAM.md#use-case-1-rgb-d-only)).
+1. Run the necessary RealSense and RTAB-Map nodes (see [RTAB-MAP.md "Use Case 1: RGB-D only"](./RTAB-MAP.md#use-case-1-rgb-d-only)).
 
 2. Start a new map and follow the instructions in the ["Recording" section of the CLAMS wiki](https://www.alexteichman.com/octo/clams/#recording) to record the necessary training data.
     - RTAB-Map calibrates RGB-D sensors using the CLAMS approach, which stands for "calibrating, localizing, and mapping, simultaneously".
