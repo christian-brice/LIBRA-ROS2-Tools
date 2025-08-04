@@ -15,8 +15,11 @@
 # Usage:
 #   Use defaults:
 #     $ ros2 launch libra rtabmap_unified.launch.py
-#   RGB+D-only mode with all RealSense streams enabled:
-#     $ ros2 launch libra rtabmap_unified.launch.py mode:=rgbd realsense_config:=/home/.../ros2_ws/install/libra/share/libra/config/realsense_all.yaml
+#   RGB+D-only mode with all RealSense streams enabled and unique working directory:
+#     $ ros2 launch libra rtabmap_unified.launch.py \
+#           mode:=rgbd \
+#           working_dir:=/home/brice/repos/LIBRA-ROS/ros2_ws/maps \
+#           realsense_config:=/home/brice/repos/LIBRA-ROS/ros2_ws/install/libra/share/libra/config/realsense_all.yaml
 
 import os
 
