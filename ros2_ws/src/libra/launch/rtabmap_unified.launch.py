@@ -37,6 +37,10 @@ from launch.substitutions import Command, LaunchConfiguration
 #
 
 def generate_launch_description():
+    # Get general paths
+    default_working_dir = os.path.join(os.path.expanduser("~"), '.rtabmap')
+    
+    # Get package-specific paths
     pkg_share = get_package_share_directory('libra')
     config_dir = os.path.join(pkg_share, 'config')
     default_urdf_model_path = os.path.join(pkg_share, 'models', 'sensor_suite.urdf.xacro')
@@ -52,34 +56,40 @@ def generate_launch_description():
         description='RTAB-Map mode: rgbd_lidar, rgbd, or stereo.'
     )
 
+    declare_working_dir_cmd = DeclareLaunchArgument(
+        'working_dir',
+        default_value=default_working_dir,
+        description='Path to RTAB-Map working directory. If empty, defaults to .rtabmap/ in your user home.'
+    )
+
     declare_delete_db_cmd = DeclareLaunchArgument(
         'delete_db',
         default_value='false',
         description='Delete previous RTAB-Map database on launch.'
     )
 
+    declare_urdf_model_cmd = DeclareLaunchArgument(
+        'urdf_model',
+        default_value=default_urdf_model_path,
+        description='Path to URDF file with robot model definition. (rgbd_lidar only)'
+    )
+
     declare_frame_id_cmd = DeclareLaunchArgument(
         'frame_id',
         default_value='',  # set conditionally based on mode
-        description='Robot model base frame ID. If empty, defaults based on mode.'
-    )
-    
-    declare_lidar_port_cmd = DeclareLaunchArgument(
-        'lidar_port',
-        default_value='/dev/lidar',
-        description='Serial port for LightWare LIDAR. (rgbd_lidar only)'
+        description='Robot model base frame ID. If empty, value determined by mode.'
     )
 
     declare_realsense_config_cmd = DeclareLaunchArgument(
         'realsense_config',
         default_value='',  # set conditionally based on mode
-        description='Path to YAML file with RealSense camera parameters. If empty, defaults based on mode.'
+        description='Path to YAML file with RealSense camera parameters. If empty, value determined by mode.'
     )
-
-    declare_urdf_model_cmd = DeclareLaunchArgument(
-        'urdf_model',
-        default_value=default_urdf_model_path,
-        description='Path to URDF file with robot model definition. (rgbd_lidar only)'
+    
+    declare_lidar_port_cmd = DeclareLaunchArgument(
+        'lidar_port',
+        default_value='/dev/lidar',
+        description='Serial port for LightWare LIDAR. If empty, defaults to /dev/lidar. (rgbd_lidar only)'
     )
 
     #--------------------------------------------------------------------------
@@ -167,11 +177,14 @@ def generate_launch_description():
             **kwargs: Additional keyword arguments (unused).
         """
         
+        # Get constant parameters
         mode = context.launch_configurations['mode']
+        working_dir = context.launch_configurations['working_dir']  # has default
         delete_db = context.launch_configurations['delete_db']
-        lidar_port = context.launch_configurations['lidar_port']
-        urdf_model = context.launch_configurations['urdf_model']
+        urdf_model = context.launch_configurations['urdf_model']  # has default
+        lidar_port = context.launch_configurations['lidar_port']  # has default
 
+        # Get variable parameters
         frame_id_arg = context.launch_configurations['frame_id']
         realsense_config_arg = context.launch_configurations['realsense_config']
 
@@ -294,7 +307,10 @@ def generate_launch_description():
             package='rtabmap_odom',
             executable=odom_exec,
             output='screen',
-            parameters=[ rtab_params | odom_extra | {'frame_id': frame_id} ],
+            parameters=[ rtab_params | odom_extra | {
+                'Rtabmap\WorkingDirectory': working_dir,
+                'frame_id': frame_id
+            } ],
             remappings=remaps
         ))
 
@@ -303,7 +319,10 @@ def generate_launch_description():
             package='rtabmap_slam',
             executable='rtabmap',
             output='screen',
-            parameters=[ rtab_params | slam_extra | {'frame_id': frame_id} ],
+            parameters=[ rtab_params | slam_extra | {
+                'Rtabmap\WorkingDirectory': working_dir,
+                'frame_id': frame_id
+            } ],
             remappings=remaps,
             arguments=['-d'] if delete_db == 'true' else []
         ))
@@ -322,11 +341,12 @@ def generate_launch_description():
     return LaunchDescription([
         # Launch arguments
         declare_mode_cmd,
-        declare_realsense_config_cmd,
-        declare_urdf_model_cmd,
+        declare_working_dir_cmd,
         declare_delete_db_cmd,
-        declare_lidar_port_cmd,
+        declare_urdf_model_cmd,
         declare_frame_id_cmd,
+        declare_realsense_config_cmd,
+        declare_lidar_port_cmd,
         # Nodes
         OpaqueFunction(function=launch_nodes)
     ])
