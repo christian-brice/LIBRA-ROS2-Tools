@@ -151,15 +151,7 @@ When replaying data, you must launch the following nodes. See the launch files f
 /tf /joint_states
 ```
 
-> ***NOTE:*** `/joint_states` is not currently published by anything, but will eventually be handled by the LIBRA App.
-
-#### **Stereo Camera**
-
-Published by `realsense2_camera` and `imu_filter_madgwick_node`.
-
-```bash
-/camera/infra1/camera_info /camera/infra1/image_rect_raw /camera/infra2/camera_info /camera/infra2/image_rect_raw /imu/data
-```
+> ***NOTE:*** (TODO) `/joint_states` is not currently published by anything, but will eventually be handled by the LIBRA App.
 
 #### **RGB+D Camera**
 
@@ -167,6 +159,14 @@ Published by `realsense2_camera` and `imu_filter_madgwick_node`.
 
 ```bash
 /camera/color/image_raw /camera/color/camera_info /camera/aligned_depth_to_color/image_raw /imu/data
+```
+
+#### **Stereo Camera**
+
+Published by `realsense2_camera` and `imu_filter_madgwick_node`.
+
+```bash
+/camera/infra1/camera_info /camera/infra1/image_rect_raw /camera/infra2/camera_info /camera/infra2/image_rect_raw /imu/data
 ```
 
 #### **LIDAR**
