@@ -12,6 +12,7 @@ The official RTAB-Map repo for ROS 2 can be found here: [https://github.com/intr
 - [Usage](#usage)
     - [*Use Case 1: Camera only*](#use-case-1-camera-only)
     - [*Use Case 2: Camera and LIDAR*](#use-case-2-camera-and-lidar)
+- [Plotting Statistics](#plotting-statistics)
 - [Post Processing](#post-processing)
     - [*Cloud Filtering \& Smoothing*](#cloud-filtering--smoothing)
     - [*Robust Graph Optimization (Loop Closure Optimization)*](#robust-graph-optimization-loop-closure-optimization)
@@ -65,7 +66,7 @@ source ~/.bashrc
 
 The following is a summary of real-time calibration in RTAB-Map. For more information, see the [RTAB-Map wiki](https://github.com/introlab/rtabmap/wiki/Depth-Calibration).
 
-1. Run the necessary RealSense and RTAB-Map nodes (see [SLAM.md "Use Case 1: RGB-D only"](./SLAM.md#use-case-1-rgb-d-only)).
+1. Run the necessary RealSense and RTAB-Map nodes (see [RTAB-MAP.md "Use Case 1: RGB-D only"](./RTAB-MAP.md#use-case-1-rgb-d-only)).
 
 2. Start a new map and follow the instructions in the ["Recording" section of the CLAMS wiki](https://www.alexteichman.com/octo/clams/#recording) to record the necessary training data.
     - RTAB-Map calibrates RGB-D sensors using the CLAMS approach, which stands for "calibrating, localizing, and mapping, simultaneously".
@@ -115,15 +116,15 @@ This launches the following five (5) nodes:
 
 - `realsense2_camera`, in the default camera namespace and with the following options.
     - ~~Disables the built-in IR emitter (this reduces speckling).~~
-    - Enables the `gyro`, `accel`, and `infra1`/`infra2` or aligned `color`/`depth` streams.
+    - Enables the `gyro`, `accel`, and `infra1`/`infra2` *or* aligned `color`/`depth` streams.
     - Enables `unite_imu` using linear interpolation (`=2`).
     - Syncs data from its various sensors under the same timestamp.
 - `imu_filter_madgwick`, for automatically computing the quaternion of the RealSense's angular velocity and linear acceleration data (this is necessary for generating a complete ROS 2 IMU message).
-- `stereo_odometry` or `rgbd_odometry`, for visually estimating robot odometry using a stereo camera.
+- `stereo_odometry` *or* `rgbd_odometry`, for visually estimating robot odometry using a stereo camera.
 - `rtabmap`, the main SLAM node w/ loop closure detector.
 - `rtabmap_viz`, which brings up the RTAB-Map GUI.
 
-Once finished, save the database in the RTAB-Map GUI by clicking "File" -> "Close database".
+Once finished, save the database in the RTAB-Map GUI by clicking "File" -> "Close database". (TODO: this doesn't exist)
 
 ### *Use Case 2: Camera and LIDAR*
 
@@ -154,6 +155,10 @@ If the LIDAR scans aren't showing up in the RTAB-Map GUI, ensure that the follow
 - "Motion Estimation" -> select `Visual + Odometry` under the first option (motion estimation type)
 
 Once finished, save the database in the RTAB-Map GUI by clicking "File" -> "Close database". (TODO: this doesn't exist)
+
+## Plotting Statistics
+
+See the [corresponding page in the RTAB-Map Wiki](https://github.com/introlab/rtabmap/wiki/Plot-statistics#details) for instructions with pictures.
 
 ## Post Processing
 

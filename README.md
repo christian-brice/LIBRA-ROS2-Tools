@@ -46,7 +46,7 @@ terminator -l ros2_layout &
 - Terminal 1: sources ROS2 env, colcon builds, sources project env, clears window.
 - Terminal 2: waits for colcon build, sources ROS2 and project envs, clears window.
 
-> ***NOTE:*** this layout is defined in `~/.config/terminator/config`.
+> ***NOTE:*** this layout is defined in the file `~/.config/terminator/config`. If the layout is missing or you'd like to use it on your own machine, there is a backup provided in this repo at `tools/terminator/config`.
 
 ### *Manual*
 
@@ -80,12 +80,23 @@ Run one of the provided configurations.
 - `test_realsense`: displays RealSense data in RViz.
 
 ```bash
+# Template
 ros2 launch libra <configuration_name>.launch.py
 ```
+
+For example, to run RTAB-Map in RGB+D mode with the RealSense as the main sensor and the 2D LIDAR as a corrective sensor, execute the following.
+
+```bash
+# Example
+ros2 launch libra rtabmap_unified.launch.py mode:=rgbd_lidar realsense_config:=/home/brice/repos/LIBRA-ROS/ros2_ws/install/libra/share/libra/config/realsense_all.yaml
+```
+
+> ***NOTE:*** it is recommended that you also set the parameter `working_dir:=<PATH>` on every launch so as to not get your databases mixed up. For example: `working_dir:=/home/brice/experiments/<YYYY-MM-DD>_<Title>`.
 
 #### **Archived**
 
 The following have been superseded by `rtabmap_unified` and are kept in `launch/archive`.
+
 - `rtabmap_rgbd_2d-lidar`: launches RTAB-Map in RGB-D mode with laser scan correction, with the full sensor suite publishing data.
 - `rtabmap_rgbd`: launches RTAB-Map in RGB-D mode with *only* RealSense publishing pre-packed RGB-D data.
 - `rtabmap_stereo`: launches RTAB-Map in stereo mode with *only* RealSense publishing infrared data.
@@ -140,15 +151,7 @@ When replaying data, you must launch the following nodes. See the launch files f
 /tf /joint_states
 ```
 
-> ***NOTE:*** `/joint_states` is not currently published by anything, but will eventually be handled by the LIBRA App.
-
-#### **Stereo Camera**
-
-Published by `realsense2_camera` and `imu_filter_madgwick_node`.
-
-```bash
-/camera/infra1/camera_info /camera/infra1/image_rect_raw /camera/infra2/camera_info /camera/infra2/image_rect_raw /imu/data
-```
+> ***NOTE:*** (TODO) `/joint_states` is not currently published by anything, but will eventually be handled by the LIBRA App.
 
 #### **RGB+D Camera**
 
@@ -158,6 +161,14 @@ Published by `realsense2_camera` and `imu_filter_madgwick_node`.
 /camera/color/image_raw /camera/color/camera_info /camera/aligned_depth_to_color/image_raw /imu/data
 ```
 
+#### **Stereo Camera**
+
+Published by `realsense2_camera` and `imu_filter_madgwick_node`.
+
+```bash
+/camera/infra1/camera_info /camera/infra1/image_rect_raw /camera/infra2/camera_info /camera/infra2/image_rect_raw /imu/data
+```
+
 #### **LIDAR**
 
 Published by `sf45b`.
@@ -165,7 +176,6 @@ Published by `sf45b`.
 ```bash
 /pointcloud
 ```
-
 
 ## Troubleshooting
 

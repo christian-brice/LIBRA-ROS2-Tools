@@ -1,0 +1,42 @@
+[global_config]
+  inactive_color_offset = 0.6098484848484849
+  inactive_bg_color_offset = 0.8055555555555556
+  disable_mouse_paste = True
+  new_tab_after_current_tab = True
+[keybindings]
+[profiles]
+  [[default]]
+    urgent_bell = True
+    use_theme_colors = True
+    title_hide_sizetext = True
+[layouts]
+  [[default]]
+    [[[window0]]]
+      type = Window
+      parent = ""
+    [[[child1]]]
+      type = Terminal
+      parent = window0
+  [[ros2_layout]]
+    [[[child0]]]
+      parent = ""
+      type = Window
+      size = 960, 1080
+      position = 960:0
+    [[[child1]]]
+      parent = child0
+      type = VPaned
+      order = 0
+    [[[terminal2]]]
+      parent = child1
+      type = Terminal
+      order = 0
+      title = ROS2 Nodes: Sensors & RTAB-Map
+      command = "bash -c 'cd ~/repos/LIBRA-ROS/ros2_ws && . /opt/ros/humble/setup.bash && colcon build --packages-up-to libra && touch /tmp/ros2_build_complete && . install/setup.bash && clear && exec bash'"
+    [[[terminal3]]]
+      parent = child1
+      type = Terminal
+      order = 1
+      title = ROS2 Debugging
+      command = "bash -c 'while [ ! -f /tmp/ros2_build_complete ]; do sleep 0.1; done && rm /tmp/ros2_build_complete && cd ~/repos/LIBRA-ROS/ros2_ws && . /opt/ros/humble/setup.bash && . install/setup.bash && clear && exec bash'"
+[plugins]
