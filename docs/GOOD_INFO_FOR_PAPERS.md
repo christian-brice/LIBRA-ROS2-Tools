@@ -6,6 +6,7 @@ This is a collection of useful phrases, data, etc. (with their sources) that I'v
 
 - [Sensors](#sensors)
     - [*Calibration*](#calibration)
+    - [*Positioning*](#positioning)
 - [Mapping](#mapping)
     - [*RTAB-Map*](#rtab-map)
 
@@ -21,6 +22,11 @@ This is a collection of useful phrases, data, etc. (with their sources) that I'v
         - Use of a 3-axis level is recommended, but not necessary
 
 - ["Visual-Inertial Sensor Calibration -- A Complete Tutorial and Discussion" on YouTube](https://www.youtube.com/watch?v=BtzmsuJemgI)
+
+### *Positioning*
+
+- It is not a good idea to scan the same area with both a LIDAR and depth (stereo) camera. Lasers can cause "speckle" in stereo imaging, leading to temporal instability in the data. The laser tracks can show up as dots in the RGB-D data (even when using IR light), and since stereo cameras are intentionally set at different angles, the dots will appear at different locations relative to each camera. Therefore, an IR pattern projector is used to improve the reliability of the camera's depth data.
+    - An Intel team has investigated various methods to improve depth data accuracy in their cameras in a whitepaper published to their developer’s website ([https://dev.intelrealsense.com/docs/projectors](https://dev.intelrealsense.com/docs/projectors)). Although the RealSense cameras have pattern projectors, the compact size of the camera limits the impact of the projector; by using a more powerful third-party projector, results can be vastly improved. In the Intel whitepaper, experiments show that a projector pattern with around 3 times higher density texture (than the RealSense camera’s integrated projector) improves the RMS error of the depth data by a factor of 3.
 
 ## Mapping
 
