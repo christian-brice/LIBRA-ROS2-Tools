@@ -138,7 +138,7 @@ ros2 bag record <desired-topics>
 
 Build a `ros2 bag record` command for your selected sensors by using the topic lists in the following subsections. Topics under ["Common"](#common) should always be captured. See [docs/ROS_COMMANDS.md "`record`"](./docs/ROS_COMMANDS.md#record) for more details.
 
-When replaying data, you must launch the following nodes. See the launch files for relevant launch parameters.
+When replaying data, you must launch the following nodes. See `rtabmap_unified.launch.py` for relevant launch parameters.
 
 - `robot_state_publisher`
 - `rgbd_odometry` or `stereo_odometry`
