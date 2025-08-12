@@ -21,8 +21,8 @@
     <!-- 2-DoF-to-Arm Connector -->
     <xacro:property name="d_conn_L" value="0.076"/>
     <xacro:property name="d_conn_W" value="0.076"/>
-    <xacro:property name="d_conn_H" value="0.076"/>
-    <xacro:property name="m_conn" value="0.187"/>
+    <xacro:property name="d_conn_H" value="0.0985"/>
+    <xacro:property name="m_conn" value="0.326"/>
 
     <!-- Arm Links -->
     <xacro:property name="d_L_len" value="0.900"/>
@@ -140,9 +140,9 @@
     <!-- 2-DoF Joint (passive part) -->
     <link name="2d_passive_link">
         <visual>
-            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <origin xyz="-0.029 0 -0.042" rpy="${PI/2} 0 ${PI/2}"/>
             <geometry>
-                <box size="${d_2djnt_p_L} ${d_2djnt_p_W} ${d_2djnt_p_H}"/>
+                <mesh filename="package://libra/meshes/2d-passive.stl" scale="0.001 0.001 0.001"/>
             </geometry>
             <material name="black"/>
         </visual>
@@ -176,9 +176,9 @@
 
     <link name="2d_active_roll_link">
         <visual>
-            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <origin xyz="0 0 0.0050" rpy="-${PI/2} ${PI} -${PI/2}"/>
             <geometry>
-                <box size="${d_2djnt_a_L} ${d_2djnt_a_W} ${d_2djnt_a_H}"/>
+                <mesh filename="package://libra/meshes/2d-active.stl" scale="0.001 0.001 0.001"/>
             </geometry>
             <material name="red"/>
         </visual>
@@ -204,9 +204,9 @@
     <!-- 2-DoF-to-Arm Connector -->
     <link name="2d_arm_connector_link">
         <visual>
-            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <origin xyz="0.0030 0 0.0267" rpy="${PI} 0 0"/>
             <geometry>
-                <box size="${d_conn_L} ${d_conn_W} ${d_conn_H}"/>
+                <mesh filename="package://libra/meshes/2d-arm_connector.stl" scale="0.001 0.001 0.001"/>
             </geometry>
             <material name="black"/>
         </visual>
@@ -222,7 +222,7 @@
     <joint name="2d_passive_to_2d_arm_connector" type="fixed">
         <parent link="2d_active_roll_link"/>
         <child link="2d_arm_connector_link"/>
-        <origin xyz="${(d_2djnt_a_L/2 - 0.022) + d_conn_L/2} 0 ${d_2djnt_a_H/2 - 0.0225 - d_conn_H/2}" rpy="0 0 0"/>
+        <origin xyz="${(d_2djnt_a_L/2 - 0.022) + d_conn_L/2} 0 ${d_2djnt_a_H/2 - 0.020 - d_conn_H/2}" rpy="0 0 0"/>
     </joint>
 
     ---
@@ -232,7 +232,7 @@
     <joint name="2d_arm_connector_to_L1" type="fixed">
         <parent link="2d_arm_connector_link"/>
         <child link="L1_link"/>
-        <origin xyz="${d_conn_L/2 + d_L_len/2} 0 0" rpy="0 0 0"/>
+        <origin xyz="${d_conn_L/2 + d_L_len/2} 0 -${d_conn_H/2 - 0.038}" rpy="0 0 0"/>
     </joint>
 
     <xacro:arm_joint_macro name="J1_link" L="${d_J12_L}" W="${d_J12_W}" H="${d_J12_H}" mass="${m_J12}"/>
