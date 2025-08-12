@@ -76,7 +76,7 @@
         <visual>
             <origin xyz="0 0 0" rpy="${PI/2} 0 ${PI/2}"/>
             <geometry>
-                <mesh filename="package://libra/meshes/M02-1_Sensor-Mount_LIDAR_guard.stl" scale="0.001 0.001 0.001"/>
+                <mesh filename="package://libra/meshes/mount_g-lidar.stl" scale="0.001 0.001 0.001"/>
             </geometry>
             <material name="black"/>
         </visual>
@@ -99,7 +99,7 @@
         <visual>
             <origin xyz="0.013602 0 0.028351" rpy="0 0 -${PI/2}"/>
             <geometry>
-                <mesh filename="package://libra/meshes/SF45-B_simplified.stl" scale="0.001 0.001 0.001"/>
+                <mesh filename="package://libra/meshes/lidar_sf45b-simplified.stl" scale="0.001 0.001 0.001"/>
             </geometry>
             <material name="purple"/>
         </visual>
@@ -122,7 +122,7 @@
         <visual>
             <origin xyz="0 0 0" rpy="-${PI/2} 0 ${PI/2}"/>
             <geometry>
-                <mesh filename="package://libra/meshes/M02-0_Sensor-Mount_Camera_guard.stl" scale="0.001 0.001 0.001"/>
+                <mesh filename="package://libra/meshes/mount_g-realsense.stl" scale="0.001 0.001 0.001"/>
             </geometry>
             <material name="black"/>
         </visual>
@@ -145,7 +145,7 @@
         <visual>
             <origin xyz="0.026 0 0" rpy="${PI/2} 0 ${PI/2}"/>
             <geometry>
-                <mesh filename="package://libra/meshes/D456.stl" scale="0.001 0.001 0.001"/>
+                <mesh filename="package://libra/meshes/realsense_d456.stl" scale="0.001 0.001 0.001"/>
             </geometry>
             <material name="silver"/>
         </visual>
