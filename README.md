@@ -74,7 +74,8 @@ Then, source the project workspace and you're ready to go!
 
 Run one of the provided configurations.
 
-- `rtabmap_unified`: primary launch file; can launch a variety of RTAB-Map/sensor suite configurations.
+- `rtabmap_unified`: **primary launch file**; can launch a variety of RTAB-Map/sensor suite configurations.
+- `model_only`: displays a model in RViz.
 - `sensor_suite`: displays the sensor suite (RealSense + 2D LIDAR) model and data in RViz.
 - `test_lidar`: displays 2D LIDAR data in RViz.
 - `test_realsense`: displays RealSense data in RViz.
