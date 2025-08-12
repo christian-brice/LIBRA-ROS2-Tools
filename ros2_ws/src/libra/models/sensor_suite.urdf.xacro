@@ -2,33 +2,35 @@
 <robot name="sensor_suite" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
     <!-- ********************[ PROPERTIES ]******************** -->
+
     <!-- Common -->
-    <xacro:property name="PI" value="3.14159"/>
+    <xacro:property name="PI" value="3.14159265359"/>
 
     <!-- Mounts -->
-    <xacro:property name="mount_lidar_width" value="0.100000"/>
-    <xacro:property name="mount_lidar_height" value="0.084000"/>
-    <xacro:property name="mount_lidar_depth" value="0.012514"/>
-    <xacro:property name="mount_lidar_mass" value="0.009"/>
+    <xacro:property name="m_lidar_L" value="0.012514"/>
+    <xacro:property name="m_lidar_W" value="0.100000"/>
+    <xacro:property name="m_lidar_H" value="0.084000"/>
+    <xacro:property name="m_lidar_m" value="0.009"/>
     
-    <xacro:property name="mount_camera_width" value="0.135861"/>
-    <xacro:property name="mount_camera_height" value="0.059941"/>
-    <xacro:property name="mount_camera_depth" value="0.104349"/>
-    <xacro:property name="mount_camera_mass" value="0.056"/>
+    <xacro:property name="m_camera_L" value="0.104349"/>
+    <xacro:property name="m_camera_W" value="0.135861"/>
+    <xacro:property name="m_camera_H" value="0.059941"/>
+    <xacro:property name="m_camera_m" value="0.056"/>
 
     <!-- Spinning 2D LIDAR (SF45-B, LightWare) -->
-    <xacro:property name="lidar_width" value="0.048462"/>
-    <xacro:property name="lidar_height" value="0.043979"/>
-    <xacro:property name="lidar_depth" value="0.050587"/>
-    <xacro:property name="lidar_mass" value="0.058"/>
+    <xacro:property name="lidar_W" value="0.048462"/>
+    <xacro:property name="lidar_H" value="0.043979"/>
+    <xacro:property name="lidar_L" value="0.050587"/>
+    <xacro:property name="lidar_m" value="0.058"/>
     
     <!-- RGB-D camera (RealSense D456, Intel) -->
-    <xacro:property name="camera_width" value="0.123999"/>
-    <xacro:property name="camera_height" value="0.029093"/>
-    <xacro:property name="camera_depth" value="0.026004"/>
-    <xacro:property name="camera_mass" value="0.116"/>
+    <xacro:property name="camera_W" value="0.123999"/>
+    <xacro:property name="camera_H" value="0.029093"/>
+    <xacro:property name="camera_L" value="0.026004"/>
+    <xacro:property name="camera_m" value="0.116"/>
 
     <!-- ********************[ MATERIALS ]******************** -->
+
     <material name="black">
         <color rgba="${10/255} ${10/255} ${10/255} 1"/>
     </material>
@@ -40,6 +42,7 @@
     </material>
 
     <!-- ********************[ MACROS ]******************** -->
+
     <xacro:macro name="box_inertia" params="m x y z">
         <inertial>
             <mass value="${m}"/>
@@ -68,6 +71,7 @@
     </xacro:macro>
 
     <!-- ********************[ LINKS ]******************** -->
+
     <!-- Base Link -->
     <link name="base_link"/>  <!-- sensor_suite_base -->
 
@@ -84,14 +88,14 @@
         <collision>
             <origin xyz="0 0 0" rpy="0 0 0"/>
             <geometry>
-                <box size="${mount_lidar_depth} ${mount_lidar_width} ${mount_lidar_height}"/>
+                <box size="${m_lidar_L} ${m_lidar_W} ${m_lidar_H}"/>
             </geometry>
         </collision>
 
-        <xacro:box_inertia m="${mount_lidar_mass}" 
-                           x="${mount_lidar_depth}" 
-                           y="${mount_lidar_width}" 
-                           z="${mount_lidar_height}"/>
+        <xacro:box_inertia m="${m_lidar_m}" 
+                           x="${m_lidar_L}" 
+                           y="${m_lidar_W}" 
+                           z="${m_lidar_H}"/>
     </link>
 
     <!-- LIDAR -->
@@ -105,16 +109,16 @@
         </visual>
 
         <collision>
-            <origin xyz="0 0 ${lidar_height/2}" rpy="0 0 0"/>
+            <origin xyz="0 0 ${lidar_H/2}" rpy="0 0 0"/>
             <geometry>
-                <box size="${lidar_depth} ${lidar_width} ${lidar_height}"/>
+                <box size="${lidar_L} ${lidar_W} ${lidar_H}"/>
             </geometry>
         </collision>
 
-        <xacro:box_inertia m="${lidar_mass}" 
-                           x="${lidar_depth}" 
-                           y="${lidar_width}" 
-                           z="${lidar_height}"/>
+        <xacro:box_inertia m="${lidar_m}" 
+                           x="${lidar_L}" 
+                           y="${lidar_W}" 
+                           z="${lidar_H}"/>
     </link>
 
     <!-- Camera Mount -->
@@ -130,14 +134,14 @@
         <collision>
             <origin xyz="0.045175 0 0.009540" rpy="0 0 0"/>
             <geometry>
-                <box size="${mount_camera_depth} ${mount_camera_width} ${mount_camera_height}"/>
+                <box size="${m_camera_L} ${m_camera_W} ${m_camera_H}"/>
             </geometry>
         </collision>
 
-        <xacro:box_inertia m="${mount_camera_mass}" 
-                           x="${mount_camera_depth}" 
-                           y="${mount_camera_width}" 
-                           z="${mount_camera_height}"/>
+        <xacro:box_inertia m="${m_camera_m}" 
+                           x="${m_camera_L}" 
+                           y="${m_camera_W}" 
+                           z="${m_camera_H}"/>
     </link>
 
     <!-- Camera -->
@@ -151,20 +155,21 @@
         </visual>
 
         <collision>
-            <origin xyz="${camera_depth/2} 0 0" rpy="0 0 0"/>
+            <origin xyz="${camera_L/2} 0 0" rpy="0 0 0"/>
             <geometry>
-                <box size="${camera_depth} ${camera_width} ${camera_height}"/>
+                <box size="${camera_L} ${camera_W} ${camera_H}"/>
             </geometry>
         </collision>
 
-        <xacro:box_inertia m="${camera_mass}" 
-                           x="${camera_depth}" 
-                           y="${camera_width}" 
-                           z="${camera_height}"/>
+        <xacro:box_inertia m="${camera_m}" 
+                           x="${camera_L}" 
+                           y="${camera_W}" 
+                           z="${camera_H}"/>
     </link>
 
     <!-- ********************[ JOINTS ]******************** -->
     <!-- NOTE: X = forward/red, Y = left/green, Z = upwards/blue -->
+
     <joint name="base_to_mount_lidar" type="fixed">
         <parent link="base_link"/>  <!-- sensor_suite_base -->
         <child link="mount_lidar_link"/>
@@ -190,6 +195,7 @@
     </joint>
 
     <!-- ********************[ GAZEBO CONFIG ]******************** -->
+
     <gazebo reference="mount_lidar_link">
         <material>Gazebo/Black</material>
     </gazebo>
