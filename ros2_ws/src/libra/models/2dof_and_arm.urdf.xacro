@@ -1,46 +1,63 @@
 <?xml version="1.0"?>
 <robot name="robot_arm" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
+    <!-- ********************[ PROPERTIES ]******************** -->
+
+    <!-- Common -->
     <xacro:property name="PI" value="3.14159265359"/>
 
-    <!-- 2-DoF Joint (active part) -->
-    <xacro:property name="d_2djnt_a_L" value="0.143"/>
-    <xacro:property name="d_2djnt_a_W" value="0.165"/>
-    <xacro:property name="d_2djnt_a_H" value="0.1565"/>
-    <!-- 2-DoF Joint (passive part) -->
-    <xacro:property name="d_2djnt_p_L" value="0.204"/>
-    <xacro:property name="d_2djnt_p_W" value="0.145"/>
-    <xacro:property name="d_2djnt_p_H" value="0.090"/>
+    <!-- 2-DoF Joint (static part - "passive") -->
+    <xacro:property name="d_2djnt_p_L" value="0.143"/>
+    <xacro:property name="d_2djnt_p_W" value="0.165"/>
+    <xacro:property name="d_2djnt_p_H" value="0.1565"/>
+    <xacro:property name="m_2djnt_p" value="2.056"/>
+
+    <!-- 2-DoF Joint (moved part - "active") -->
+    <xacro:property name="d_2djnt_a_L" value="0.204"/>
+    <xacro:property name="d_2djnt_a_W" value="0.145"/>
+    <xacro:property name="d_2djnt_a_H" value="0.090"/>
+    <xacro:property name="m_2djnt_a" value="1.317"/>
+
     <!-- 2-DoF-to-Arm Connector -->
     <xacro:property name="d_conn_L" value="0.076"/>
     <xacro:property name="d_conn_W" value="0.076"/>
     <xacro:property name="d_conn_H" value="0.076"/>
+    <xacro:property name="m_conn" value="0.187"/>
+
     <!-- Arm Links -->
     <xacro:property name="d_L_len" value="0.900"/>
     <xacro:property name="d_L_rad" value="0.030"/>
+    <xacro:property name="m_L" value="0.395"/>
+
     <!-- Arm Joints -->
     <xacro:property name="d_J12_L" value="0.12914"/>
     <xacro:property name="d_J12_W" value="0.076"/>
     <xacro:property name="d_J12_H" value="0.15705"/>
+    <xacro:property name="m_J12" value="0.851"/>
+
     <xacro:property name="d_J3_L" value="0.14614"/>
     <xacro:property name="d_J3_W" value="0.15705"/>
     <xacro:property name="d_J3_H" value="0.076"/>
+    <xacro:property name="m_J3" value="0.982"/>
+
     <!-- Arm Tip / Manipulator Mount -->
     <xacro:property name="d_arm_tip_L" value="0.100"/>
     <xacro:property name="d_arm_tip_W" value="0.070"/>
     <xacro:property name="d_arm_tip_H" value="0.0935"/>
-    <!-- Manipulator Joints -->
-    <xacro:property name="d_mj1_L" value="0.0405"/>
-    <xacro:property name="d_mj1_W" value="0.0405"/>
-    <xacro:property name="d_mj1_H" value="0.020"/>
-    <xacro:property name="d_mj23_L" value="0.058"/>
-    <xacro:property name="d_mj23_W" value="0.0307"/>
-    <xacro:property name="d_mj23_H" value="0.0436"/>
+    <xacro:property name="m_arm_tip" value="0.170"/>
 
-    <xacro:property name="m_L" value="0.395"/>
-    <xacro:property name="m_J12" value="0.851"/>
-    <xacro:property name="m_J3" value="0.982"/> <xacro:property name="m_conn" value="0.155"/>
-    <xacro:property name="m_2djnt_a" value="1.780"/> <xacro:property name="m_2djnt" value="1.780"/> <xacro:property name="m_mj" value="0.039"/> <xacro:property name="m_manip_mount" value="0.170"/>
+    <!-- Manipulator Joints -->
+    <xacro:property name="d_MJ1_L" value="0.0405"/>
+    <xacro:property name="d_MJ1_W" value="0.0405"/>
+    <xacro:property name="d_MJ1_H" value="0.020"/>
+
+    <xacro:property name="d_MJ23_L" value="0.058"/>
+    <xacro:property name="d_MJ23_W" value="0.0307"/>
+    <xacro:property name="d_MJ23_H" value="0.0436"/>
+
+    <xacro:property name="m_MJ" value="0.039"/>
+
+    <!-- ********************[ MATERIALS ]******************** -->
 
     <material name="red">
         <color rgba="${200/255} ${30/255} ${30/255} 1"/>
@@ -54,6 +71,8 @@
     <material name="purple">
         <color rgba="${150/255} ${50/255} ${200/255} 1"/>
     </material>
+
+    <!-- ********************[ MACROS ]******************** -->
 
     <xacro:macro name="box_inertia" params="m x y z">
         <inertial>
@@ -111,17 +130,57 @@
         </link>
     </xacro:macro>
 
+    <!-- ********************[ LINKS ]******************** -->
+
+    <!-- Base Link -->
     <link name="base_link"/>
 
     ---
 
-    <link name="2d_active_link">
+    <!-- 2-DoF Joint (passive part) -->
+    <link name="2d_passive_link">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="${d_2djnt_p_L} ${d_2djnt_p_W} ${d_2djnt_p_H}"/>
+            </geometry>
+            <material name="black"/>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="${d_2djnt_p_L} ${d_2djnt_p_W} ${d_2djnt_p_H}"/>
+            </geometry>
+        </collision>
+        <xacro:box_inertia m="${m_2djnt_p}" x="${d_2djnt_p_L}" y="${d_2djnt_p_W}" z="${d_2djnt_p_H}"/>
+    </link>
+
+    <joint name="base_to_2d" type="fixed">
+        <parent link="base_link"/>
+        <child link="2d_passive_link"/>
+        <origin xyz="0 0 -${d_2djnt_p_H/2}" rpy="0 0 0"/>
+    </joint>
+
+    ---
+
+    <!-- 2-DoF Joint (active part) -->
+    <link name="2d_active_pitch_link"/>
+
+    <joint name="2d_pitch_joint" type="revolute">
+        <parent link="2d_passive_link"/>
+        <child link="2d_active_pitch_link"/>
+        <origin xyz="${-d_2djnt_p_L/2 - 0.059 + d_2djnt_a_L/2} 0 ${d_2djnt_p_H/2 - 0.080 - d_2djnt_a_H/2}" rpy="0 0 0"/>
+        <axis xyz="0 1 0"/>
+        <limit lower="-${PI/2}" upper="${PI/2}" effort="100" velocity="1.0"/>
+    </joint>
+
+    <link name="2d_active_roll_link">
         <visual>
             <origin xyz="0 0 0" rpy="0 0 0"/>
             <geometry>
                 <box size="${d_2djnt_a_L} ${d_2djnt_a_W} ${d_2djnt_a_H}"/>
             </geometry>
-            <material name="black"/>
+            <material name="red"/>
         </visual>
         <collision>
             <origin xyz="0 0 0" rpy="0 0 0"/>
@@ -132,44 +191,9 @@
         <xacro:box_inertia m="${m_2djnt_a}" x="${d_2djnt_a_L}" y="${d_2djnt_a_W}" z="${d_2djnt_a_H}"/>
     </link>
 
-    <joint name="base_to_2d_active" type="fixed">
-        <parent link="base_link"/>
-        <child link="2d_active_link"/>
-        <origin xyz="0 0 -${d_2djnt_a_H/2}" rpy="0 0 0"/>
-    </joint>
-
-    ---
-
-    <link name="2d_passive_pitch_link"/>
-
-    <joint name="2d_pitch_joint" type="revolute">
-        <parent link="2d_active_link"/>
-        <child link="2d_passive_pitch_link"/>
-        <origin xyz="${-d_2djnt_a_L/2 - 0.059 + d_2djnt_p_L/2} 0 ${d_2djnt_a_H/2 - 0.080 - d_2djnt_p_H/2}" rpy="0 0 0"/>
-        <axis xyz="0 1 0"/>
-        <limit lower="-${PI/2}" upper="${PI/2}" effort="100" velocity="1.0"/>
-    </joint>
-
-    <link name="2d_passive_link">
-        <visual>
-            <origin xyz="0 0 0" rpy="0 0 0"/>
-            <geometry>
-                <box size="${d_2djnt_p_L} ${d_2djnt_p_W} ${d_2djnt_p_H}"/>
-            </geometry>
-            <material name="red"/>
-        </visual>
-        <collision>
-            <origin xyz="0 0 0" rpy="0 0 0"/>
-            <geometry>
-                <box size="${d_2djnt_p_L} ${d_2djnt_p_W} ${d_2djnt_p_H}"/>
-            </geometry>
-        </collision>
-        <xacro:box_inertia m="${m_2djnt}" x="${d_2djnt_p_L}" y="${d_2djnt_p_W}" z="${d_2djnt_p_H}"/>
-    </link>
-
     <joint name="2d_roll_joint" type="revolute">
-        <parent link="2d_passive_pitch_link"/>
-        <child link="2d_passive_link"/>
+        <parent link="2d_active_pitch_link"/>
+        <child link="2d_active_roll_link"/>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <axis xyz="1 0 0"/>
         <limit lower="-${PI/2}" upper="${PI/2}" effort="100" velocity="1.0"/>
@@ -177,6 +201,7 @@
 
     ---
 
+    <!-- 2-DoF-to-Arm Connector -->
     <link name="2d_arm_connector_link">
         <visual>
             <origin xyz="0 0 0" rpy="0 0 0"/>
@@ -195,13 +220,14 @@
     </link>
 
     <joint name="2d_passive_to_2d_arm_connector" type="fixed">
-        <parent link="2d_passive_link"/>
+        <parent link="2d_active_roll_link"/>
         <child link="2d_arm_connector_link"/>
-        <origin xyz="${(d_2djnt_p_L/2 - 0.022) + d_conn_L/2} 0 ${d_2djnt_p_H/2 - 0.0225 - d_conn_H/2}" rpy="0 0 0"/>
+        <origin xyz="${(d_2djnt_a_L/2 - 0.022) + d_conn_L/2} 0 ${d_2djnt_a_H/2 - 0.0225 - d_conn_H/2}" rpy="0 0 0"/>
     </joint>
 
     ---
 
+    <!-- Arm Segment #1 -->
     <xacro:arm_link_macro name="L1_link"/>
     <joint name="2d_arm_connector_to_L1" type="fixed">
         <parent link="2d_arm_connector_link"/>
@@ -220,6 +246,7 @@
 
     ---
 
+    <!-- Arm Segment #2 -->
     <xacro:arm_link_macro name="L2_link"/>
     <joint name="J1_to_L2" type="fixed">
         <parent link="J1_link"/>
@@ -238,6 +265,7 @@
 
     ---
 
+    <!-- Arm Segment #3 -->
     <xacro:arm_link_macro name="L3_link"/>
     <joint name="J2_to_L3" type="fixed">
         <parent link="J2_link"/>
@@ -256,6 +284,7 @@
 
     ---
 
+    <!-- Arm Segment #4 -->
     <xacro:arm_link_macro name="L4_link"/>
     <joint name="J3_to_L4" type="fixed">
         <parent link="J3_link"/>
@@ -277,7 +306,7 @@
                 <box size="${d_arm_tip_L} ${d_arm_tip_W} ${d_arm_tip_H}"/>
             </geometry>
         </collision>
-        <xacro:box_inertia m="${m_manip_mount}" x="${d_arm_tip_L}" y="${d_arm_tip_W}" z="${d_arm_tip_H}"/>
+        <xacro:box_inertia m="${m_arm_tip}" x="${d_arm_tip_L}" y="${d_arm_tip_W}" z="${d_arm_tip_H}"/>
     </link>
 
     <joint name="L4_to_arm_tip" type="fixed">
@@ -288,20 +317,21 @@
 
     ---
 
+    <!-- Manipulator Joints -->
     <link name="mj1_link">
         <visual>
             <geometry>
-                <box size="${d_mj1_L} ${d_mj1_W} ${d_mj1_H}"/>
+                <box size="${d_MJ1_L} ${d_MJ1_W} ${d_MJ1_H}"/>
             </geometry>
             <material name="purple"/>
         </visual>
-        <collision><geometry><box size="${d_mj1_L} ${d_mj1_W} ${d_mj1_H}"/></geometry></collision>
-        <xacro:box_inertia m="${m_mj}" x="${d_mj1_L}" y="${d_mj1_W}" z="${d_mj1_H}"/>
+        <collision><geometry><box size="${d_MJ1_L} ${d_MJ1_W} ${d_MJ1_H}"/></geometry></collision>
+        <xacro:box_inertia m="${m_MJ}" x="${d_MJ1_L}" y="${d_MJ1_W}" z="${d_MJ1_H}"/>
     </link>
-    <joint name="arm_tip_to_mj1" type="revolute">
+    <joint name="arm_tip_to_MJ1" type="revolute">
         <parent link="arm_tip_link"/>
         <child link="mj1_link"/>
-        <origin xyz="${(d_arm_tip_L/2 - 0.00875) - d_mj1_L/2} ${-d_arm_tip_W/2 - 0.0121 + d_mj1_W/2} ${(d_arm_tip_H/2 - 0.006) - d_mj1_H/2}" rpy="0 0 0"/>
+        <origin xyz="${(d_arm_tip_L/2 - 0.00875) - d_MJ1_L/2} ${-d_arm_tip_W/2 - 0.0121 + d_MJ1_W/2} ${(d_arm_tip_H/2 - 0.006) - d_MJ1_H/2}" rpy="0 0 0"/>
         <axis xyz="0 1 0"/>
         <limit lower="-${PI/2}" upper="${PI/2}" effort="50" velocity="1.5"/>
     </joint>
@@ -309,17 +339,17 @@
     <link name="mj2_link">
         <visual>
             <geometry>
-                <box size="${d_mj23_L} ${d_mj23_W} ${d_mj23_H}"/>
+                <box size="${d_MJ23_L} ${d_MJ23_W} ${d_MJ23_H}"/>
             </geometry>
             <material name="purple"/>
         </visual>
-        <collision><geometry><box size="${d_mj23_L} ${d_mj23_W} ${d_mj23_H}"/></geometry></collision>
-        <xacro:box_inertia m="${m_mj}" x="${d_mj23_L}" y="${d_mj23_W}" z="${d_mj23_H}"/>
+        <collision><geometry><box size="${d_MJ23_L} ${d_MJ23_W} ${d_MJ23_H}"/></geometry></collision>
+        <xacro:box_inertia m="${m_MJ}" x="${d_MJ23_L}" y="${d_MJ23_W}" z="${d_MJ23_H}"/>
     </link>
-    <joint name="mj1_to_mj2" type="revolute">
+    <joint name="mj1_to_MJ2" type="revolute">
         <parent link="mj1_link"/>
         <child link="mj2_link"/>
-        <origin xyz="${(d_mj1_L/2 + 0.0295) - d_mj23_L/2} ${-d_mj1_W/2 - d_mj23_W/2} ${(d_mj1_H/2 + 0.0091) - d_mj23_H/2}" rpy="0 0 0"/>
+        <origin xyz="${(d_MJ1_L/2 + 0.0295) - d_MJ23_L/2} ${-d_MJ1_W/2 - d_MJ23_W/2} ${(d_MJ1_H/2 + 0.0091) - d_MJ23_H/2}" rpy="0 0 0"/>
         <axis xyz="0 0 1"/>
         <limit lower="-${PI/2}" upper="${PI/2}" effort="50" velocity="1.5"/>
     </joint>
@@ -327,23 +357,25 @@
     <link name="mj3_link">
         <visual>
             <geometry>
-                <box size="${d_mj23_L} ${d_mj23_H} ${d_mj23_W}"/>
+                <box size="${d_MJ23_L} ${d_MJ23_H} ${d_MJ23_W}"/>
             </geometry>
             <material name="purple"/>
         </visual>
-        <collision><geometry><box size="${d_mj23_L} ${d_mj23_H} ${d_mj23_W}"/></geometry></collision>
-        <xacro:box_inertia m="${m_mj}" x="${d_mj23_L}" y="${d_mj23_H}" z="${d_mj23_W}"/>
+        <collision><geometry><box size="${d_MJ23_L} ${d_MJ23_H} ${d_MJ23_W}"/></geometry></collision>
+        <xacro:box_inertia m="${m_MJ}" x="${d_MJ23_L}" y="${d_MJ23_H}" z="${d_MJ23_W}"/>
     </link>
-    <joint name="mj2_to_mj3" type="revolute">
+    <joint name="mj2_to_MJ3" type="revolute">
         <parent link="mj2_link"/>
         <child link="mj3_link"/>
-        <origin xyz="${(-d_mj23_L/2 + 0.00025) + d_mj23_L/2} ${d_mj23_W/2 + 0.0053 - d_mj23_H/2} ${d_mj23_H/2 + d_mj23_W/2}" rpy="0 0 0"/>
+        <origin xyz="${(-d_MJ23_L/2 + 0.00025) + d_MJ23_L/2} ${d_MJ23_W/2 + 0.0053 - d_MJ23_H/2} ${d_MJ23_H/2 + d_MJ23_W/2}" rpy="0 0 0"/>
         <axis xyz="0 1 0"/>
         <limit lower="-${PI/2}" upper="${PI/2}" effort="50" velocity="1.5"/>
     </joint>
     
-    <gazebo reference="2d_active_link"><material>Gazebo/Black</material></gazebo>
-    <gazebo reference="2d_passive_link"><material>Gazebo/Red</material></gazebo>
+    <!-- ********************[ GAZEBO CONFIG ]******************** -->
+
+    <gazebo reference="2d_passive_link"><material>Gazebo/Black</material></gazebo>
+    <gazebo reference="2d_active_roll_link"><material>Gazebo/Red</material></gazebo>
     <gazebo reference="2d_arm_connector_link"><material>Gazebo/Black</material></gazebo>
     <gazebo reference="L1_link"><material>Gazebo/Gray</material></gazebo>
     <gazebo reference="J1_link"><material>Gazebo/Red</material></gazebo>
