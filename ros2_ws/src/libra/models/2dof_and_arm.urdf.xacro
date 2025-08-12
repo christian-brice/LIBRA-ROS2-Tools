@@ -98,6 +98,9 @@
                 <origin xyz="0 0 0" rpy="0 ${PI/2} 0"/>
                 <geometry>
                     <cylinder length="${d_L_len}" radius="${d_L_rad}"/>
+                    <!-- TODO
+                    <mesh filename="package://libra/meshes/arm-link.stl" scale="0.001 0.001 0.001"/>
+                    -->
                 </geometry>
                 <material name="gray"/>
             </visual>
@@ -117,6 +120,10 @@
                 <origin xyz="0 0 0" rpy="0 0 0"/>
                 <geometry>
                     <box size="${L} ${W} ${H}"/>
+                    <!-- TODO
+                    <mesh filename="package://libra/meshes/arm-j1_2.stl" scale="0.001 0.001 0.001"/>
+                    <mesh filename="package://libra/meshes/arm-j3.stl" scale="0.001 0.001 0.001"/>
+                    -->
                 </geometry>
                 <material name="red"/>
             </visual>
@@ -297,6 +304,9 @@
             <origin xyz="0 0 0" rpy="0 0 0"/>
             <geometry>
                 <box size="${d_arm_tip_L} ${d_arm_tip_W} ${d_arm_tip_H}"/>
+                <!-- TODO
+                <mesh filename="package://libra/meshes/arm-tip.stl" scale="0.001 0.001 0.001"/>
+                -->
             </geometry>
             <material name="black"/>
         </visual>
@@ -320,8 +330,12 @@
     <!-- Manipulator Joints -->
     <link name="mj1_link">
         <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
             <geometry>
                 <box size="${d_MJ1_L} ${d_MJ1_W} ${d_MJ1_H}"/>
+                <!-- TODO
+                <mesh filename="package://libra/meshes/manip-j1.stl" scale="0.001 0.001 0.001"/>
+                -->
             </geometry>
             <material name="purple"/>
         </visual>
@@ -338,8 +352,12 @@
 
     <link name="mj2_link">
         <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
             <geometry>
                 <box size="${d_MJ23_L} ${d_MJ23_W} ${d_MJ23_H}"/>
+                <!-- TODO
+                <mesh filename="package://libra/meshes/manip-j2_3.stl" scale="0.001 0.001 0.001"/>
+                -->
             </geometry>
             <material name="purple"/>
         </visual>
@@ -356,8 +374,12 @@
 
     <link name="mj3_link">
         <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
             <geometry>
                 <box size="${d_MJ23_L} ${d_MJ23_H} ${d_MJ23_W}"/>
+                <!-- TODO
+                <mesh filename="package://libra/meshes/manip-j2_3.stl" scale="0.001 0.001 0.001"/>
+                -->
             </geometry>
             <material name="purple"/>
         </visual>
