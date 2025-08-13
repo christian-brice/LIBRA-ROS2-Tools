@@ -6,17 +6,17 @@
     <!-- Common -->
     <xacro:property name="PI" value="3.14159265359"/>
 
-    <!-- 2-DoF Joint (static part - "passive") -->
-    <xacro:property name="d_2djnt_p_L" value="0.143"/>
-    <xacro:property name="d_2djnt_p_W" value="0.165"/>
-    <xacro:property name="d_2djnt_p_H" value="0.1565"/>
-    <xacro:property name="m_2djnt_p" value="2.056"/>
+    <!-- 2-DoF Joint (static part - "stator") -->
+    <xacro:property name="d_2djnt_s_L" value="0.143"/>
+    <xacro:property name="d_2djnt_s_W" value="0.165"/>
+    <xacro:property name="d_2djnt_s_H" value="0.1565"/>
+    <xacro:property name="m_2djnt_s" value="2.056"/>
 
-    <!-- 2-DoF Joint (moved part - "active") -->
-    <xacro:property name="d_2djnt_a_L" value="0.204"/>
-    <xacro:property name="d_2djnt_a_W" value="0.145"/>
-    <xacro:property name="d_2djnt_a_H" value="0.090"/>
-    <xacro:property name="m_2djnt_a" value="1.317"/>
+    <!-- 2-DoF Joint (moved part - "rotor") -->
+    <xacro:property name="d_2djnt_r_L" value="0.204"/>
+    <xacro:property name="d_2djnt_r_W" value="0.145"/>
+    <xacro:property name="d_2djnt_r_H" value="0.090"/>
+    <xacro:property name="m_2djnt_r" value="1.317"/>
 
     <!-- 2-DoF-to-Arm Connector -->
     <xacro:property name="d_conn_L" value="0.076"/>
@@ -144,61 +144,61 @@
 
     ---
 
-    <!-- 2-DoF Joint (passive part) -->
-    <link name="2d_passive_link">
+    <!-- 2-DoF Joint (stator half) -->
+    <link name="2d_stator_link">
         <visual>
             <origin xyz="-0.029 0 -0.042" rpy="${PI/2} 0 ${PI/2}"/>
             <geometry>
-                <mesh filename="package://libra/meshes/2d-passive.stl" scale="0.001 0.001 0.001"/>
+                <mesh filename="package://libra/meshes/2d-stator.stl" scale="0.001 0.001 0.001"/>
             </geometry>
             <material name="black"/>
         </visual>
         <collision>
             <origin xyz="0 0 0" rpy="0 0 0"/>
             <geometry>
-                <box size="${d_2djnt_p_L} ${d_2djnt_p_W} ${d_2djnt_p_H}"/>
+                <box size="${d_2djnt_s_L} ${d_2djnt_s_W} ${d_2djnt_s_H}"/>
             </geometry>
         </collision>
-        <xacro:box_inertia m="${m_2djnt_p}" x="${d_2djnt_p_L}" y="${d_2djnt_p_W}" z="${d_2djnt_p_H}"/>
+        <xacro:box_inertia m="${m_2djnt_s}" x="${d_2djnt_s_L}" y="${d_2djnt_s_W}" z="${d_2djnt_s_H}"/>
     </link>
 
     <joint name="base_to_2d" type="fixed">
         <parent link="base_link"/>
-        <child link="2d_passive_link"/>
-        <origin xyz="0 0 -${d_2djnt_p_H/2}" rpy="0 0 0"/>
+        <child link="2d_stator_link"/>
+        <origin xyz="0 0 -${d_2djnt_s_H/2}" rpy="0 0 0"/>
     </joint>
 
     ---
 
-    <!-- 2-DoF Joint (active part) -->
-    <link name="2d_active_pitch_link"/>
+    <!-- 2-DoF Joint (rotor half) -->
+    <link name="2d_rotor_pitch_link"/>
     <joint name="2d_pitch_joint" type="revolute">
-        <parent link="2d_passive_link"/>
-        <child link="2d_active_pitch_link"/>
-        <origin xyz="${-d_2djnt_p_L/2 - 0.059 + d_2djnt_a_L/2} 0 ${d_2djnt_p_H/2 - 0.080 - d_2djnt_a_H/2}" rpy="0 0 0"/>
+        <parent link="2d_stator_link"/>
+        <child link="2d_rotor_pitch_link"/>
+        <origin xyz="${-d_2djnt_s_L/2 - 0.059 + d_2djnt_r_L/2} 0 ${d_2djnt_s_H/2 - 0.080 - d_2djnt_r_H/2}" rpy="0 0 0"/>
         <axis xyz="0 1 0"/>
         <limit lower="-${PI/2}" upper="${PI/2}" effort="100" velocity="1.0"/>
     </joint>
 
-    <link name="2d_active_roll_link">
+    <link name="2d_rotor_roll_link">
         <visual>
             <origin xyz="0 0 0.0050" rpy="-${PI/2} ${PI} -${PI/2}"/>
             <geometry>
-                <mesh filename="package://libra/meshes/2d-active.stl" scale="0.001 0.001 0.001"/>
+                <mesh filename="package://libra/meshes/2d-rotor.stl" scale="0.001 0.001 0.001"/>
             </geometry>
             <material name="red"/>
         </visual>
         <collision>
             <origin xyz="0 0 0" rpy="0 0 0"/>
             <geometry>
-                <box size="${d_2djnt_a_L} ${d_2djnt_a_W} ${d_2djnt_a_H}"/>
+                <box size="${d_2djnt_r_L} ${d_2djnt_r_W} ${d_2djnt_r_H}"/>
             </geometry>
         </collision>
-        <xacro:box_inertia m="${m_2djnt_a}" x="${d_2djnt_a_L}" y="${d_2djnt_a_W}" z="${d_2djnt_a_H}"/>
+        <xacro:box_inertia m="${m_2djnt_r}" x="${d_2djnt_r_L}" y="${d_2djnt_r_W}" z="${d_2djnt_r_H}"/>
     </link>
     <joint name="2d_roll_joint" type="revolute">
-        <parent link="2d_active_pitch_link"/>
-        <child link="2d_active_roll_link"/>
+        <parent link="2d_rotor_pitch_link"/>
+        <child link="2d_rotor_roll_link"/>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <axis xyz="1 0 0"/>
         <limit lower="-${PI/2}" upper="${PI/2}" effort="100" velocity="1.0"/>
@@ -223,10 +223,10 @@
         </collision>
         <xacro:box_inertia m="${m_conn}" x="${d_conn_L}" y="${d_conn_W}" z="${d_conn_H}"/>
     </link>
-    <joint name="2d_passive_to_2d_arm_connector" type="fixed">
-        <parent link="2d_active_roll_link"/>
+    <joint name="2d_stator_to_2d_arm_connector" type="fixed">
+        <parent link="2d_rotor_roll_link"/>
         <child link="2d_arm_connector_link"/>
-        <origin xyz="${(d_2djnt_a_L/2 - 0.022) + d_conn_L/2} 0 ${d_2djnt_a_H/2 - 0.020 - d_conn_H/2}" rpy="0 0 0"/>
+        <origin xyz="${(d_2djnt_r_L/2 - 0.022) + d_conn_L/2} 0 ${d_2djnt_r_H/2 - 0.020 - d_conn_H/2}" rpy="0 0 0"/>
     </joint>
 
     ---
@@ -407,8 +407,8 @@
     
     <!-- ********************[ GAZEBO CONFIG ]******************** -->
 
-    <gazebo reference="2d_passive_link"><material>Gazebo/Black</material></gazebo>
-    <gazebo reference="2d_active_roll_link"><material>Gazebo/Red</material></gazebo>
+    <gazebo reference="2d_stator_link"><material>Gazebo/Black</material></gazebo>
+    <gazebo reference="2d_rotor_roll_link"><material>Gazebo/Red</material></gazebo>
     <gazebo reference="2d_arm_connector_link"><material>Gazebo/Black</material></gazebo>
     <gazebo reference="L1_link"><material>Gazebo/Gray</material></gazebo>
     <gazebo reference="J1_link"><material>Gazebo/Red</material></gazebo>
