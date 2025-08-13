@@ -1,0 +1,121 @@
+<?xml version="1.0"?>
+<!--***************************************************************************
+/// @file   2djnt.urdf.xacro
+/// @brief  LIBRA-I 2DJNT (2-DoF joint) model definition.
+///
+/// @author brice.c.aa
+****************************************************************************-->
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <!-- Includes -->
+    <xacro:include filename="$(find libra)/models/common/common.urdf.xacro" />
+
+    <!-- Definition -->
+    <xacro:macro name="spawn_2djnt" params="parent">
+
+        <!-- ********************[ PROPERTIES ]******************** -->
+
+        <!-- Stator (static part) -->
+        <xacro:property name="d_2djnt_s_L" value="0.143"/>
+        <xacro:property name="d_2djnt_s_W" value="0.165"/>
+        <xacro:property name="d_2djnt_s_H" value="0.1565"/>
+        <xacro:property name="m_2djnt_s" value="2.056"/>
+
+        <!-- Rotor (moved part) -->
+        <xacro:property name="d_2djnt_r_L" value="0.204"/>
+        <xacro:property name="d_2djnt_r_W" value="0.145"/>
+        <xacro:property name="d_2djnt_r_H" value="0.090"/>
+        <xacro:property name="m_2djnt_r" value="1.317"/>
+
+        <!-- Arm Connector -->
+        <xacro:property name="d_conn_arm_L" value="0.076"/>
+        <xacro:property name="d_conn_arm_W" value="0.076"/>
+        <xacro:property name="d_conn_arm_H" value="0.0985"/>
+        <xacro:property name="m_conn_arm" value="0.326"/>
+
+        <!-- ********************[ LINKS ]******************** -->
+        <!-- NOTE
+            X = forward/red, Y = left/green, Z = upwards/blue
+        -->
+
+        <!-- Stator (static part) -->
+        <link name="2d_stator_link">
+            <visual>
+                <origin xyz="-0.029 0 -0.042" rpy="${PI/2} 0 ${PI/2}"/>
+                <geometry><mesh filename="package://libra/meshes/2d-stator.stl" scale="0.001 0.001 0.001"/></geometry>
+                <material name="black"/>
+            </visual>
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry><box size="${d_2djnt_s_L} ${d_2djnt_s_W} ${d_2djnt_s_H}"/></geometry>
+            </collision>
+            <xacro:box_inertia m="${m_2djnt_s}" x="${d_2djnt_s_L}" y="${d_2djnt_s_W}" z="${d_2djnt_s_H}"/>
+        </link>
+        <joint name="${parent}_to_stator" type="fixed">
+            <parent link="${parent}"/>
+            <child link="2d_stator_link"/>
+            <origin xyz="0 0 -${d_2djnt_s_H/2}" rpy="0 0 0"/>
+        </joint>
+
+        ---
+
+        <!-- Rotor (moved part) -->
+        <link name="2d_rotor_pitch_link"/>
+        <joint name="2d_pitch_joint" type="revolute">
+            <parent link="2d_stator_link"/>
+            <child link="2d_rotor_pitch_link"/>
+            <origin xyz="${-d_2djnt_s_L/2 - 0.059 + d_2djnt_r_L/2} 0 ${d_2djnt_s_H/2 - 0.080 - d_2djnt_r_H/2}" rpy="0 0 0"/>
+            <axis xyz="0 1 0"/>
+            <limit lower="-${PI/2}" upper="${PI/2}" effort="100" velocity="1.0"/>
+        </joint>
+
+        <link name="2d_rotor_roll_link">
+            <visual>
+                <origin xyz="0 0 0.0050" rpy="-${PI/2} ${PI} -${PI/2}"/>
+                <geometry><mesh filename="package://libra/meshes/2d-rotor.stl" scale="0.001 0.001 0.001"/></geometry>
+                <material name="red"/>
+            </visual>
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry><box size="${d_2djnt_r_L} ${d_2djnt_r_W} ${d_2djnt_r_H}"/></geometry>
+            </collision>
+            <xacro:box_inertia m="${m_2djnt_r}" x="${d_2djnt_r_L}" y="${d_2djnt_r_W}" z="${d_2djnt_r_H}"/>
+        </link>
+        <joint name="2d_roll_joint" type="revolute">
+            <parent link="2d_rotor_pitch_link"/>
+            <child link="2d_rotor_roll_link"/>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <axis xyz="1 0 0"/>
+            <limit lower="-${PI/2}" upper="${PI/2}" effort="100" velocity="1.0"/>
+        </joint>
+
+        ---
+
+        <!-- Arm Connector -->
+        <link name="2d_arm_connector_link">
+            <visual>
+                <origin xyz="0.0030 0 0.0267" rpy="${PI} 0 0"/>
+                <geometry><mesh filename="package://libra/meshes/2d-arm_connector.stl" scale="0.001 0.001 0.001"/></geometry>
+                <material name="black"/>
+            </visual>
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry><box size="${d_conn_arm_L} ${d_conn_arm_W} ${d_conn_arm_H}"/></geometry>
+            </collision>
+            <xacro:box_inertia m="${m_conn_arm}" x="${d_conn_arm_L}" y="${d_conn_arm_W}" z="${d_conn_arm_H}"/>
+        </link>
+        <joint name="rotor_to_connector" type="fixed">
+            <parent link="2d_rotor_roll_link"/>
+            <child link="2d_arm_connector_link"/>
+            <origin xyz="${(d_2djnt_r_L/2 - 0.022) + d_conn_arm_L/2} 0 ${d_2djnt_r_H/2 - 0.020 - d_conn_arm_H/2}" rpy="0 0 0"/>
+        </joint>
+
+        <!-- ********************[ GAZEBO CONFIG ]******************** -->
+        
+        <gazebo reference="2d_stator_link"><material>Gazebo/Black</material></gazebo>
+        <gazebo reference="2d_rotor_roll_link"><material>Gazebo/Red</material></gazebo>
+        <gazebo reference="2d_arm_connector_link"><material>Gazebo/Black</material></gazebo>
+
+    </xacro:macro>
+</robot>
