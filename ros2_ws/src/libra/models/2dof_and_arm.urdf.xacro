@@ -95,12 +95,9 @@
     <xacro:macro name="arm_link_macro" params="name">
         <link name="${name}">
             <visual>
-                <origin xyz="0 0 0" rpy="0 ${PI/2} 0"/>
+                <origin xyz="0 0 0" rpy="0 ${PI/2} ${PI/2}"/>
                 <geometry>
-                    <cylinder length="${d_arm_link_L}" radius="${d_arm_link_R}"/>
-                    <!-- TODO
                     <mesh filename="package://libra/meshes/arm-link.stl" scale="0.001 0.001 0.001"/>
-                    -->
                 </geometry>
                 <material name="gray"/>
             </visual>
