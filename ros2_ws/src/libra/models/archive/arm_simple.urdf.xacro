@@ -1,0 +1,297 @@
+<?xml version="1.0"?>
+<!--***************************************************************************
+/// @file   arm.urdf.xacro
+/// @brief  LIBRA-I arm model definition.
+///
+/// @author brice.c.aa
+****************************************************************************-->
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <!-- Includes -->
+    <xacro:include filename="$(find libra)/models/common/common.urdf.xacro" />
+    
+    <!-- Definition -->
+    <xacro:macro name="spawn_arm" params="parent">
+
+        <!-- ********************[ PROPERTIES ]******************** -->
+
+        <!-- 2DJNT Connector (copied from libra1_2djnt.urdf.xacro) -->
+        <xacro:property name="d_conn_arm_L" value="0.076"/>
+        <xacro:property name="d_conn_arm_H" value="0.0985"/>
+        
+        <!-- Arm Links -->
+        <xacro:property name="d_arm_link_L" value="0.900"/>
+        <xacro:property name="d_arm_link_R" value="0.030"/>
+        <xacro:property name="m_arm_link" value="0.395"/>
+
+        <!-- Arm Joints -->
+        <xacro:property name="d_J12_L" value="0.12914"/>
+        <xacro:property name="d_J12_W" value="0.076"/>
+        <xacro:property name="d_J12_H" value="0.15705"/>
+        <xacro:property name="m_J12" value="0.851"/>
+
+        <xacro:property name="d_J3_L" value="0.14614"/>
+        <xacro:property name="d_J3_W" value="0.15705"/>
+        <xacro:property name="d_J3_H" value="0.076"/>
+        <xacro:property name="m_J3" value="0.982"/>
+
+        <!-- Arm Tip / Manipulator Mount -->
+        <xacro:property name="d_arm_tip_L" value="0.100"/>
+        <xacro:property name="d_arm_tip_W" value="0.070"/>
+        <xacro:property name="d_arm_tip_H" value="0.0935"/>
+        <xacro:property name="m_arm_tip" value="0.170"/>
+
+        <!-- Manipulator Joints -->
+        <xacro:property name="d_MJ1_L" value="0.0405"/>
+        <xacro:property name="d_MJ1_W" value="0.0405"/>
+        <xacro:property name="d_MJ1_H" value="0.020"/>
+
+        <xacro:property name="d_MJ23_L" value="0.058"/>
+        <xacro:property name="d_MJ23_W" value="0.0307"/>
+        <xacro:property name="d_MJ23_H" value="0.0436"/>
+
+        <xacro:property name="m_MJ" value="0.039"/>
+
+        <!-- ********************[ MACROS ]******************** -->
+
+        <xacro:macro name="arm_link_macro" params="name">
+            <link name="${name}">
+                <visual>
+                    <origin xyz="0 0 0" rpy="0 ${PI/2} ${PI/2}"/>
+                    <geometry>
+                        <mesh filename="package://libra/meshes/arm-link.stl" scale="0.001 0.001 0.001"/>
+                    </geometry>
+                    <material name="gray"/>
+                </visual>
+                <collision>
+                    <origin xyz="0 0 0" rpy="0 ${PI/2} 0"/>
+                    <geometry>
+                        <cylinder length="${d_arm_link_L}" radius="${d_arm_link_R}"/>
+                    </geometry>
+                </collision>
+                <xacro:cylinder_inertia m="${m_arm_link}" r="${d_arm_link_R}" h="${d_arm_link_L}"/>
+            </link>
+        </xacro:macro>
+
+        <xacro:macro name="arm_joint_macro" params="name L W H mass">
+            <link name="${name}">
+                <visual>
+                    <origin xyz="0 0 0" rpy="0 0 0"/>
+                    <geometry>
+                        <box size="${L} ${W} ${H}"/>
+                        <!-- TODO
+                        <mesh filename="package://libra/meshes/arm-j1_2.stl" scale="0.001 0.001 0.001"/>
+                        <mesh filename="package://libra/meshes/arm-j3.stl" scale="0.001 0.001 0.001"/>
+                        -->
+                    </geometry>
+                    <material name="red"/>
+                </visual>
+                <collision>
+                    <origin xyz="0 0 0" rpy="0 0 0"/>
+                    <geometry>
+                        <box size="${L} ${W} ${H}"/>
+                    </geometry>
+                </collision>
+                <xacro:box_inertia m="${mass}" x="${L}" y="${W}" z="${H}"/>
+            </link>
+        </xacro:macro>
+
+        <!-- ********************[ LINKS ]******************** -->
+        <!-- NOTE
+            X = forward/red, Y = left/green, Z = upwards/blue
+        -->
+
+        <!-- TODO
+            Arm joints should be divided into stator/rotor pairs like the 2-DoF Joint.
+        -->
+
+        <!-- Arm Segment #1 -->
+        <xacro:arm_link_macro name="L1_link"/>
+        <joint name="parent_to_L1" type="fixed">
+            <parent link="${parent}"/>
+            <child link="L1_link"/>
+            <origin xyz="${d_conn_arm_L/2 + d_arm_link_L/2} 0 -${d_conn_arm_H/2 - 0.038}" rpy="0 0 0"/>
+        </joint>
+
+        <xacro:arm_joint_macro name="J1_link" L="${d_J12_L}" W="${d_J12_W}" H="${d_J12_H}" mass="${m_J12}"/>
+        <joint name="L1_to_J1" type="revolute">
+            <parent link="L1_link"/>
+            <child link="J1_link"/>
+            <origin xyz="${d_arm_link_L/2 + d_J12_L/2} 0 ${-0.038 + d_J12_H/2}" rpy="0 0 0"/>
+            <axis xyz="0 0 1"/><limit lower="-${PI}" upper="${PI}" effort="100" velocity="1.0"/>
+        </joint>
+
+        ---
+
+        <!-- Arm Segment #2 -->
+        <xacro:arm_link_macro name="L2_link"/>
+        <joint name="J1_to_L2" type="fixed">
+            <parent link="J1_link"/>
+            <child link="L2_link"/>
+            <origin xyz="${(d_J12_L/2 - 0.04014) + d_arm_link_L/2} 0 ${d_J12_H/2 - 0.038}" rpy="0 0 0"/>
+        </joint>
+
+        <xacro:arm_joint_macro name="J2_link" L="${d_J12_L}" W="${d_J12_W}" H="${d_J12_H}" mass="${m_J12}"/>
+        <joint name="L2_to_J2" type="revolute">
+            <parent link="L2_link"/>
+            <child link="J2_link"/>
+            <origin xyz="${d_arm_link_L/2 + d_J12_L/2} 0 ${0.038 - d_J12_H/2}" rpy="0 0 0"/>
+            <axis xyz="0 0 1"/>
+            <limit lower="-${PI}" upper="${PI}" effort="100" velocity="1.0"/>
+        </joint>
+
+        ---
+
+        <!-- Arm Segment #3 -->
+        <xacro:arm_link_macro name="L3_link"/>
+        <joint name="J2_to_L3" type="fixed">
+            <parent link="J2_link"/>
+            <child link="L3_link"/>
+            <origin xyz="${(d_J12_L/2 - 0.04014) + d_arm_link_L/2} 0 ${-d_J12_H/2 + 0.038}" rpy="0 0 0"/>
+        </joint>
+
+        <xacro:arm_joint_macro name="J3_link" L="${d_J3_L}" W="${d_J3_W}" H="${d_J3_H}" mass="${m_J3}"/>
+        <joint name="L3_to_J3" type="revolute">
+            <parent link="L3_link"/>
+            <child link="J3_link"/>
+            <origin xyz="${d_arm_link_L/2 + d_J3_L/2} ${-0.03805 + d_J3_W/2} 0" rpy="0 0 0"/>
+            <axis xyz="0 1 0"/>
+            <limit lower="-${PI/2}" upper="${PI/2}" effort="100" velocity="1.0"/>
+        </joint>
+
+        ---
+
+        <!-- Arm Segment #4 -->
+        <xacro:arm_link_macro name="L4_link"/>
+        <joint name="J3_to_L4" type="fixed">
+            <parent link="J3_link"/>
+            <child link="L4_link"/>
+            <origin xyz="${(d_J3_L/2 - 0.04014) + d_arm_link_L/2} ${d_J3_W/2 - 0.038} 0" rpy="0 0 0"/>
+        </joint>
+        
+        <link name="arm_tip_link">
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <box size="${d_arm_tip_L} ${d_arm_tip_W} ${d_arm_tip_H}"/>
+                    <!-- TODO
+                    <mesh filename="package://libra/meshes/arm-tip.stl" scale="0.001 0.001 0.001"/>
+                    -->
+                </geometry>
+                <material name="black"/>
+            </visual>
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <box size="${d_arm_tip_L} ${d_arm_tip_W} ${d_arm_tip_H}"/>
+                </geometry>
+            </collision>
+            <xacro:box_inertia m="${m_arm_tip}" x="${d_arm_tip_L}" y="${d_arm_tip_W}" z="${d_arm_tip_H}"/>
+        </link>
+        <joint name="L4_to_arm_tip" type="fixed">
+            <parent link="L4_link"/>
+            <child link="arm_tip_link"/>
+            <origin xyz="${d_arm_link_L/2 + d_arm_tip_L/2} 0 ${0.042 - d_arm_tip_H/2}" rpy="0 0 0"/>
+        </joint>
+
+        ---
+
+        <!-- Manipulator Joints -->
+        <link name="mj1_link">
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <box size="${d_MJ1_L} ${d_MJ1_W} ${d_MJ1_H}"/>
+                    <!-- TODO
+                    <mesh filename="package://libra/meshes/manip-j1.stl" scale="0.001 0.001 0.001"/>
+                    -->
+                </geometry>
+                <material name="purple"/>
+            </visual>
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <box size="${d_MJ1_L} ${d_MJ1_W} ${d_MJ1_H}"/>
+                </geometry>
+            </collision>
+            <xacro:box_inertia m="${m_MJ}" x="${d_MJ1_L}" y="${d_MJ1_W}" z="${d_MJ1_H}"/>
+        </link>
+        <joint name="arm_tip_to_MJ1" type="revolute">
+            <parent link="arm_tip_link"/>
+            <child link="mj1_link"/>
+            <origin xyz="${(d_arm_tip_L/2 - 0.00875) - d_MJ1_L/2} ${-d_arm_tip_W/2 - 0.0121 + d_MJ1_W/2} ${(d_arm_tip_H/2 - 0.006) - d_MJ1_H/2}" rpy="0 0 0"/>
+            <axis xyz="0 1 0"/>
+            <limit lower="-${PI/2}" upper="${PI/2}" effort="50" velocity="1.5"/>
+        </joint>
+
+        <link name="mj2_link">
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <box size="${d_MJ23_L} ${d_MJ23_W} ${d_MJ23_H}"/>
+                    <!-- TODO
+                    <mesh filename="package://libra/meshes/manip-j2_3.stl" scale="0.001 0.001 0.001"/>
+                    -->
+                </geometry>
+                <material name="purple"/>
+            </visual>
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <box size="${d_MJ23_L} ${d_MJ23_W} ${d_MJ23_H}"/>
+                </geometry>
+            </collision>
+            <xacro:box_inertia m="${m_MJ}" x="${d_MJ23_L}" y="${d_MJ23_W}" z="${d_MJ23_H}"/>
+        </link>
+        <joint name="mj1_to_MJ2" type="revolute">
+            <parent link="mj1_link"/>
+            <child link="mj2_link"/>
+            <origin xyz="${(d_MJ1_L/2 + 0.0295) - d_MJ23_L/2} ${-d_MJ1_W/2 - d_MJ23_W/2} ${(d_MJ1_H/2 + 0.0091) - d_MJ23_H/2}" rpy="0 0 0"/>
+            <axis xyz="0 0 1"/>
+            <limit lower="-${PI/2}" upper="${PI/2}" effort="50" velocity="1.5"/>
+        </joint>
+
+        <link name="mj3_link">
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <box size="${d_MJ23_L} ${d_MJ23_H} ${d_MJ23_W}"/>
+                    <!-- TODO
+                    <mesh filename="package://libra/meshes/manip-j2_3.stl" scale="0.001 0.001 0.001"/>
+                    -->
+                </geometry>
+                <material name="purple"/>
+            </visual>
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <box size="${d_MJ23_L} ${d_MJ23_H} ${d_MJ23_W}"/>
+                </geometry>
+            </collision>
+            <xacro:box_inertia m="${m_MJ}" x="${d_MJ23_L}" y="${d_MJ23_H}" z="${d_MJ23_W}"/>
+        </link>
+        <joint name="mj2_to_mj3" type="revolute">
+            <parent link="mj2_link"/>
+            <child link="mj3_link"/>
+            <origin xyz="${(-d_MJ23_L/2 + 0.00025) + d_MJ23_L/2} ${d_MJ23_W/2 + 0.0053 - d_MJ23_H/2} ${d_MJ23_H/2 + d_MJ23_W/2}" rpy="0 0 0"/>
+            <axis xyz="0 1 0"/>
+            <limit lower="-${PI/2}" upper="${PI/2}" effort="50" velocity="1.5"/>
+        </joint>
+
+        <!-- ********************[ GAZEBO CONFIG ]******************** -->
+
+        <gazebo reference="L1_link"><material>Gazebo/Gray</material></gazebo>
+        <gazebo reference="J1_link"><material>Gazebo/Red</material></gazebo>
+        <gazebo reference="L2_link"><material>Gazebo/Gray</material></gazebo>
+        <gazebo reference="J2_link"><material>Gazebo/Red</material></gazebo>
+        <gazebo reference="L3_link"><material>Gazebo/Gray</material></gazebo>
+        <gazebo reference="J3_link"><material>Gazebo/Red</material></gazebo>
+        <gazebo reference="L4_link"><material>Gazebo/Gray</material></gazebo>
+        <gazebo reference="arm_tip_link"><material>Gazebo/Black</material></gazebo>
+        <gazebo reference="mj1_link"><material>Gazebo/Purple</material></gazebo>
+        <gazebo reference="mj2_link"><material>Gazebo/Purple</material></gazebo>
+        <gazebo reference="mj3_link"><material>Gazebo/Purple</material></gazebo>
+        
+    </xacro:macro>
+</robot>
