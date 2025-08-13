@@ -73,7 +73,7 @@
     <!-- ********************[ LINKS ]******************** -->
 
     <!-- Base Link -->
-    <link name="base_link"/>  <!-- sensor_suite_base -->
+    <link name="sensor_suite_base_link"/>
 
     <!-- LIDAR Mount -->
     <link name="mount_lidar_link">
@@ -171,7 +171,7 @@
     <!-- NOTE: X = forward/red, Y = left/green, Z = upwards/blue -->
 
     <joint name="base_to_mount_lidar" type="fixed">
-        <parent link="base_link"/>  <!-- sensor_suite_base -->
+        <parent link="sensor_suite_base_link"/>
         <child link="mount_lidar_link"/>
         <origin xyz="0.001 0 0" rpy="0 0 0"/>  <!-- accounts for mounting bracket -->
     </joint>
@@ -183,7 +183,7 @@
     </joint>
 
     <joint name="base_to_mount_camera" type="fixed">
-        <parent link="base_link"/>  <!-- sensor_suite_base -->
+        <parent link="sensor_suite_base_link"/>
         <child link="mount_camera_link"/>
         <origin xyz="-0.001 0 0" rpy="0 0 0"/>  <!-- accounts for mounting bracket -->
     </joint>
