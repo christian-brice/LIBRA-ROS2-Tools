@@ -19,9 +19,9 @@
     <xacro:property name="m_2djnt_r" value="1.317"/>
 
     <!-- 2-DoF-to-Arm Connector -->
-    <xacro:property name="d_conn_L" value="0.076"/>
-    <xacro:property name="d_conn_W" value="0.076"/>
-    <xacro:property name="d_conn_H" value="0.0985"/>
+    <xacro:property name="d_conn_arm_L" value="0.076"/>
+    <xacro:property name="d_conn_arm_W" value="0.076"/>
+    <xacro:property name="d_conn_arm_H" value="0.0985"/>
     <xacro:property name="m_conn" value="0.326"/>
 
     <!-- Arm Links -->
@@ -215,20 +215,20 @@
         <collision>
             <origin xyz="0 0 0" rpy="0 0 0"/>
             <geometry>
-                <box size="${d_conn_L} ${d_conn_W} ${d_conn_H}"/>
+                <box size="${d_conn_arm_L} ${d_conn_arm_W} ${d_conn_arm_H}"/>
             </geometry>
         </collision>
-        <xacro:box_inertia m="${m_conn}" x="${d_conn_L}" y="${d_conn_W}" z="${d_conn_H}"/>
+        <xacro:box_inertia m="${m_conn}" x="${d_conn_arm_L}" y="${d_conn_arm_W}" z="${d_conn_arm_H}"/>
     </link>
     <joint name="2d_stator_to_2d_arm_connector" type="fixed">
         <parent link="2d_rotor_roll_link"/>
         <child link="2d_arm_connector_link"/>
-        <origin xyz="${(d_2djnt_r_L/2 - 0.022) + d_conn_L/2} 0 ${d_2djnt_r_H/2 - 0.020 - d_conn_H/2}" rpy="0 0 0"/>
+        <origin xyz="${(d_2djnt_r_L/2 - 0.022) + d_conn_arm_L/2} 0 ${d_2djnt_r_H/2 - 0.020 - d_conn_arm_H/2}" rpy="0 0 0"/>
     </joint>
 
     ---
 
-    <!-- TODO:
+    <!-- TODO
             Arm joints should be divided into stator/rotor pairs like the 2-DoF Joint.
     -->
 
@@ -237,7 +237,7 @@
     <joint name="2d_arm_connector_to_L1" type="fixed">
         <parent link="2d_arm_connector_link"/>
         <child link="L1_link"/>
-        <origin xyz="${d_conn_L/2 + d_arm_link_L/2} 0 -${d_conn_H/2 - 0.038}" rpy="0 0 0"/>
+        <origin xyz="${d_conn_arm_L/2 + d_arm_link_L/2} 0 -${d_conn_arm_H/2 - 0.038}" rpy="0 0 0"/>
     </joint>
 
     <xacro:arm_joint_macro name="J1_link" L="${d_J12_L}" W="${d_J12_W}" H="${d_J12_H}" mass="${m_J12}"/>
