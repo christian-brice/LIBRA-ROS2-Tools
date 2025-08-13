@@ -16,7 +16,7 @@
 
         <!-- ********************[ PROPERTIES ]******************** -->
 
-        <!-- Arm Connector (copied from libra1_2djnt.urdf.xacro) -->
+        <!-- 2DJNT Connector (copied from libra1_2djnt.urdf.xacro) -->
         <xacro:property name="d_conn_arm_L" value="0.076"/>
         <xacro:property name="d_conn_arm_H" value="0.0985"/>
         
