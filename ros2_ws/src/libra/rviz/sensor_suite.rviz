@@ -63,6 +63,10 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
+        base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
         camera_link:
           Alpha: 1
           Show Axes: false
@@ -83,10 +87,6 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
-        sensor_suite_base_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
       Mass Properties:
         Inertia: false
         Mass: false
@@ -100,6 +100,8 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
+        base_link:
+          Value: false
         camera_accel_frame:
           Value: true
         camera_accel_optical_frame:
@@ -138,15 +140,13 @@ Visualization Manager:
           Value: true
         mount_lidar_link:
           Value: true
-        sensor_suite_base_link:
-          Value: false
       Marker Scale: 1
       Name: TF
       Show Arrows: false
       Show Axes: false
       Show Names: false
       Tree:
-        sensor_suite_base_link:
+        base_link:
           mount_camera_link:
             camera_link:
               camera_accel_frame:
@@ -337,7 +337,7 @@ Visualization Manager:
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
-    Fixed Frame: sensor_suite_base_link
+    Fixed Frame: base_link
     Frame Rate: 30
   Name: root
   Tools:

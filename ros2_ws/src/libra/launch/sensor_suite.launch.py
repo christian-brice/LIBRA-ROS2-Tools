@@ -24,7 +24,7 @@ def generate_launch_description():
     default_rviz_config_path = os.path.join(
         pkg_share, 'rviz', 'sensor_suite.rviz')
     default_urdf_model_path = os.path.join(
-        pkg_share, 'models/sensor_suite.urdf.xacro')
+        pkg_share, 'models', 'display_sensors.urdf.xacro')
 
     # --- DEFINE LAUNCH OPTIONS ---
 

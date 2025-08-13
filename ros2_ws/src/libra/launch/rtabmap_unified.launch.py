@@ -46,7 +46,7 @@ def generate_launch_description():
     # Get package-specific paths
     pkg_share = get_package_share_directory('libra')
     config_dir = os.path.join(pkg_share, 'config')
-    default_urdf_model_path = os.path.join(pkg_share, 'models', 'sensor_suite.urdf.xacro')
+    default_urdf_model_path = os.path.join(pkg_share, 'models', 'robots', 'libra1.urdf.xacro')
 
     #--------------------------------------------------------------------------
     # !Launch Arguments

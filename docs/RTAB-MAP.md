@@ -147,7 +147,7 @@ This launches the following seven (7) nodes:
 - `rtabmap`, the main SLAM node w/ loop closure detector.
 - `rtabmap_viz`, which brings up the RTAB-Map GUI.
 - `robot_state_publisher`, to inform RTAB-Map of the spatial relationships between sensors.
-    - The sensor suite model is defined in `models/sensor_suite.urdf.xacro`.
+    - The sensor suite model is defined in `models/assemblies/sensor_suite.urdf.xacro`.
 
 If the LIDAR scans aren't showing up in the RTAB-Map GUI, ensure that the following options are set under "Window" -> "Preferences".
 

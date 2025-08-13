@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!--***************************************************************************
+/// @file   libra1_no_sensors.urdf.xacro
+/// @brief  LIBRA-I (sensorless) model constructor.
+///
+/// @author brice.c.aa
+****************************************************************************-->
+
+<robot name="LIBRA-I" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <xacro:include filename="$(find libra)/models/assemblies/2djnt.urdf.xacro" />
+    <xacro:include filename="$(find libra)/models/assemblies/arm.urdf.xacro" />
+
+    <!-- NOTE
+        Black = static elements
+        Gray = static elements (links only)
+        Red = active elements (primary actuators)
+        Purple = active elements (secondary actuators)
+    -->
+
+    <link name="base_link"/>
+    <xacro:spawn_2djnt parent="base_link"/>
+    <xacro:spawn_arm parent="2d_arm_connector_link"/>
+
+</robot>

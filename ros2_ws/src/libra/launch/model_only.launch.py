@@ -29,8 +29,8 @@ def generate_launch_description():
     pkg_share = get_package_share_directory('libra')
     default_rviz_config_path = os.path.join(pkg_share, 'rviz', 'rviz_basic_settings.rviz')
 
-    sensor_suite_urdf = os.path.join(pkg_share, 'models', 'sensor_suite.urdf.xacro')
-    arm_urdf = os.path.join(pkg_share, 'models', '2dof_and_arm.urdf.xacro')
+    sensor_suite_urdf = os.path.join(pkg_share, 'models', 'display_sensors.urdf.xacro')
+    arm_urdf = os.path.join(pkg_share, 'models', 'robots', 'libra1_no_sensors.urdf.xacro')
 
     # --------------------------------------------------------------------------
     # !Launch Arguments

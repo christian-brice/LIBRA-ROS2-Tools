@@ -51,7 +51,7 @@ ros2 run lightwarelidar2 sf45b --ros-args -p port:=/dev/lidar -p frameId:=lidar_
 The parameters have the following effects:
 
 - Specify the communications port used to interface with the SF45/B.
-- Gives the node's `tf` the same name as the LIDAR link in the URDF (`models/sensor_suite.urdf.xacro`).
+- Gives the node's `tf` the same name as the LIDAR link in the URDF (`models/assemblies/sensor_suite.urdf.xacro`).
 - Sets the update rate to 5000 readings per second (fastest).
 - Sets the scan angle to 320 degrees (maximum).
 
