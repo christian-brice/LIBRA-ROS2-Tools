@@ -10,6 +10,7 @@ The instructions in this file assume an Ubuntu 22.04 machine, so all ROS-related
 ## Table of Contents
 
 - [Basic Packages](#basic-packages)
+    - [*VS Code Extensions*](#vs-code-extensions)
 - [ROS 2 Installation](#ros-2-installation)
 - [Git Submodules](#git-submodules)
     - [*Intel® RealSense™ ROS2 Wrapper*](#intel-realsense-ros2-wrapper)
@@ -35,6 +36,13 @@ sudo apt install -y build-essential git terminator
 - `build-essential`: programs and libraries necessary for basic software development.
 - `git`: popular open-source version control system ([link](https://git-scm.com)).
 - `terminator`: useful tool for arranging terminals and saving layouts ([link](https://gnometerminator.blogspot.com/p/introduction.html)).
+
+### *VS Code Extensions*
+
+The following are recommendations &ndash; they aren't required to run the project.
+
+- **Markdown Preview Enhanced** ([shd101wyy.markdown-preview-enhanced](https://marketplace.visualstudio.com/items?itemName=shd101wyy.markdown-preview-enhanced)): prettier, more robust Markdown visualizer than the one included with VS Code.
+- **URDF Visualizer** ([morningfrog.urdf-visualizer](https://marketplace.visualstudio.com/items?itemName=morningfrog.urdf-visualizer)): allows you to visualize ROS2 `urdf` and `xacro` files and update them in real-time. Make sure to follow the instructions to set your `urdf-visualizer.packages` path.
 
 ## ROS 2 Installation
 
