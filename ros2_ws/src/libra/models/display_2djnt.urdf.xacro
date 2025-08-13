@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!--***************************************************************************
+/// @file   display_2djnt.urdf.xacro
+/// @brief  LIBRA-I 2DJNT (2-DoF joint) model constructor.
+///
+/// @author brice.c.aa
+****************************************************************************-->
+
+<robot name="LIBRA-I_2DJNT" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <xacro:include filename="$(find libra)/models/assemblies/2djnt.urdf.xacro" />
+    <link name="base_link"/>
+    <xacro:spawn_2djnt parent="base_link"/>
+
+</robot>
