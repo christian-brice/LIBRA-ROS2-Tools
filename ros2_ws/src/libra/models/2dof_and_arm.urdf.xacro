@@ -398,7 +398,7 @@
         </collision>
         <xacro:box_inertia m="${m_MJ}" x="${d_MJ23_L}" y="${d_MJ23_H}" z="${d_MJ23_W}"/>
     </link>
-    <joint name="mj2_to_MJ3" type="revolute">
+    <joint name="mj2_to_mj3" type="revolute">
         <parent link="mj2_link"/>
         <child link="mj3_link"/>
         <origin xyz="${(-d_MJ23_L/2 + 0.00025) + d_MJ23_L/2} ${d_MJ23_W/2 + 0.0053 - d_MJ23_H/2} ${d_MJ23_H/2 + d_MJ23_W/2}" rpy="0 0 0"/>
