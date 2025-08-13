@@ -228,6 +228,10 @@
 
     ---
 
+    <!-- TODO:
+            Arm joints should be divided into stator/rotor pairs like the 2-DoF Joint.
+    -->
+
     <!-- Arm Segment #1 -->
     <xacro:arm_link_macro name="L1_link"/>
     <joint name="2d_arm_connector_to_L1" type="fixed">
