@@ -25,16 +25,23 @@
         <xacro:property name="d_arm_link_R" value="0.030"/>
         <xacro:property name="m_arm_link" value="0.395"/>
 
-        <!-- Arm Joints -->
-        <xacro:property name="d_J12_L" value="0.12914"/>
-        <xacro:property name="d_J12_W" value="0.076"/>
-        <xacro:property name="d_J12_H" value="0.15705"/>
-        <xacro:property name="m_J12" value="0.851"/>
+        <!-- Joint Connectors -->
+        <xacro:property name="d_conn_L" value="0.076"/>
+        <xacro:property name="d_conn_W" value="0.076"/>
+        <xacro:property name="d_conn_H" value="0.076"/>
+        <xacro:property name="m_conn_inner" value="0.169"/>
+        <xacro:property name="m_conn_outer" value="0.192"/>
+    
+        <xacro:property name="d_adapter_L" value="0.017"/>
+        <xacro:property name="d_adapter_W" value="0.076"/>
+        <xacro:property name="d_adapter_H" value="0.076"/>
+        <xacro:property name="m_adapter" value="0.131"/>
 
-        <xacro:property name="d_J3_L" value="0.14614"/>
-        <xacro:property name="d_J3_W" value="0.15705"/>
-        <xacro:property name="d_J3_H" value="0.076"/>
-        <xacro:property name="m_J3" value="0.982"/>
+        <!-- HEBI X8-16 Actuators -->
+        <xacro:property name="d_hebi_L" value="0.110"/>
+        <xacro:property name="d_hebi_W" value="0.073"/>
+        <xacro:property name="d_hebi_H" value="0.0451"/>
+        <xacro:property name="m_hebi" value="0.490"/>
 
         <!-- Arm Tip / Manipulator Mount -->
         <xacro:property name="d_arm_tip_L" value="0.100"/>
@@ -55,7 +62,7 @@
 
         <!-- ********************[ MACROS ]******************** -->
 
-        <xacro:macro name="arm_link_macro" params="name">
+        <xacro:macro name="link_macro" params="name">
             <link name="${name}">
                 <visual>
                     <origin xyz="0 0 0" rpy="0 ${PI/2} ${PI/2}"/>
@@ -74,15 +81,45 @@
             </link>
         </xacro:macro>
 
-        <xacro:macro name="arm_joint_macro" params="name L W H mass">
-            <link name="${name}">
+        <xacro:macro name="joint_subassembly_macro" params="name parent_name origin_xyz origin_rpy">
+            <xacro:property name="conn_rpy" value="${origin_rpy}"/>
+            <xacro:property name="hebi_rpy" value="${origin_rpy}"/>
+            <xacro:property name="outer_rpy" value="${origin_rpy}"/>
+
+            <!-- Inbound Connection -->
+            <link name="${name}_conn_inner_link">
                 <visual>
                     <origin xyz="0 0 0" rpy="0 0 0"/>
                     <geometry>
-                        <box size="${L} ${W} ${H}"/>
+                        <box size="${d_conn_L} ${d_conn_W} ${d_conn_H}"/>
                         <!-- TODO
-                        <mesh filename="package://libra/meshes/arm-j1_2.stl" scale="0.001 0.001 0.001"/>
-                        <mesh filename="package://libra/meshes/arm-j3.stl" scale="0.001 0.001 0.001"/>
+                        <mesh filename="package://libra/meshes/conn_inner.stl" scale="0.001 0.001 0.001"/>
+                        -->
+                    </geometry>
+                    <material name="black"/>
+                </visual>
+                <collision>
+                    <origin xyz="0 0 0" rpy="0 0 0"/>
+                    <geometry>
+                        <box size="${d_conn_L} ${d_conn_W} ${d_conn_H}"/>
+                    </geometry>
+                </collision>
+                <xacro:box_inertia m="${m_conn_inner}" x="${d_conn_L}" y="${d_conn_W}" z="${d_conn_H}"/>
+            </link>
+            <joint name="${parent_name}_to_${name}_conn_inner" type="fixed">
+                <parent link="${parent_name}_link"/>
+                <child link="${name}_conn_inner_link"/>
+                <origin xyz="${origin_xyz}" rpy="${origin_rpy}"/>
+            </joint>
+
+            <!-- Actuator -->
+            <link name="${name}_hebi_link">
+                <visual>
+                    <origin xyz="0 0 0" rpy="0 0 0"/>
+                    <geometry>
+                        <box size="${d_hebi_L} ${d_hebi_W} ${d_hebi_H}"/>
+                        <!-- TODO
+                        <mesh filename="package://libra/meshes/hebi_x8-16.stl" scale="0.001 0.001 0.001"/>
                         -->
                     </geometry>
                     <material name="red"/>
@@ -90,11 +127,44 @@
                 <collision>
                     <origin xyz="0 0 0" rpy="0 0 0"/>
                     <geometry>
-                        <box size="${L} ${W} ${H}"/>
+                        <box size="${d_hebi_L} ${d_hebi_W} ${d_hebi_H}"/>
                     </geometry>
                 </collision>
-                <xacro:box_inertia m="${mass}" x="${L}" y="${W}" z="${H}"/>
+                <xacro:box_inertia m="${m_hebi}" x="${d_hebi_L}" y="${d_hebi_W}" z="${d_hebi_H}"/>
             </link>
+            <joint name="${name}_conn_inner_to_${name}_hebi" type="fixed">
+                <parent link="${name}_conn_inner_link"/>
+                <child link="${name}_hebi_link"/>
+                <origin xyz="${d_conn_L/2 + 0.05314 - d_hebi_L/2} 0 ${-d_conn_H/2 + 0.036 + d_hebi_H/2}" rpy="0 0 0"/>
+            </joint>
+
+            <!-- Outbound Connection -->
+            <link name="${name}_conn_outer_link">
+                <visual>
+                    <origin xyz="0 0 0" rpy="0 0 0"/>
+                    <geometry>
+                        <box size="${d_conn_L} ${d_conn_W} ${d_conn_H}"/>
+                        <!-- TODO
+                        <mesh filename="package://libra/meshes/conn_outer.stl" scale="0.001 0.001 0.001"/>
+                        -->
+                    </geometry>
+                    <material name="black"/>
+                </visual>
+                <collision>
+                    <origin xyz="0 0 0" rpy="0 0 0"/>
+                    <geometry>
+                        <box size="${d_conn_L} ${d_conn_W} ${d_conn_H}"/>
+                    </geometry>
+                </collision>
+                <xacro:box_inertia m="${m_conn_outer}" x="${d_conn_L}" y="${d_conn_W}" z="${d_conn_H}"/>
+            </link>
+            <joint name="${name}_hebi_to_${name}_conn_outer" type="revolute">
+                <parent link="${name}_hebi_link"/>
+                <child link="${name}_conn_outer_link"/>
+                <origin xyz="${d_hebi_L/2 - 0.04014 - d_conn_L/2} 0 ${d_hebi_H/2 + d_conn_H/2}" rpy="0 0 0"/>
+                <axis xyz="0 0 1"/>  <!-- Although this defines a yaw joint, it can be changed by providing a non-zero origin_rpy (see J3) -->
+                <limit lower="-${PI}" upper="${PI}" effort="100" velocity="1.0"/>
+            </joint>
         </xacro:macro>
 
         <!-- ********************[ LINKS ]******************** -->
@@ -102,72 +172,76 @@
             X = forward/red, Y = left/green, Z = upwards/blue
         -->
 
-        <!-- TODO
-            Arm joints should be divided into stator/rotor pairs like the 2-DoF Joint.
-        -->
-
         <!-- Arm Segment #1 -->
-        <xacro:arm_link_macro name="L1_link"/>
+        <xacro:link_macro name="L1_link"/>
         <joint name="parent_to_L1" type="fixed">
             <parent link="${parent}"/>
             <child link="L1_link"/>
             <origin xyz="${d_conn_arm_L/2 + d_arm_link_L/2} 0 -${d_conn_arm_H/2 - 0.038}" rpy="0 0 0"/>
         </joint>
 
-        <xacro:arm_joint_macro name="J1_link" L="${d_J12_L}" W="${d_J12_W}" H="${d_J12_H}" mass="${m_J12}"/>
-        <joint name="L1_to_J1" type="revolute">
-            <parent link="L1_link"/>
-            <child link="J1_link"/>
-            <origin xyz="${d_arm_link_L/2 + d_J12_L/2} 0 ${-0.038 + d_J12_H/2}" rpy="0 0 0"/>
-            <axis xyz="0 0 1"/><limit lower="-${PI}" upper="${PI}" effort="100" velocity="1.0"/>
-        </joint>
+        <xacro:joint_subassembly_macro name="J1" parent_name="L1"
+            origin_xyz="${d_arm_link_L/2 + d_conn_L/2} 0 0" origin_rpy="0 0 0"/>
 
         ---
 
         <!-- Arm Segment #2 -->
-        <xacro:arm_link_macro name="L2_link"/>
+        <xacro:link_macro name="L2_link"/>
         <joint name="J1_to_L2" type="fixed">
-            <parent link="J1_link"/>
+            <parent link="J1_conn_outer_link"/>
             <child link="L2_link"/>
-            <origin xyz="${(d_J12_L/2 - 0.04014) + d_arm_link_L/2} 0 ${d_J12_H/2 - 0.038}" rpy="0 0 0"/>
+            <origin xyz="${d_conn_L/2 + d_arm_link_L/2} 0 0" rpy="0 0 0"/>
         </joint>
 
-        <xacro:arm_joint_macro name="J2_link" L="${d_J12_L}" W="${d_J12_W}" H="${d_J12_H}" mass="${m_J12}"/>
-        <joint name="L2_to_J2" type="revolute">
-            <parent link="L2_link"/>
-            <child link="J2_link"/>
-            <origin xyz="${d_arm_link_L/2 + d_J12_L/2} 0 ${0.038 - d_J12_H/2}" rpy="0 0 0"/>
-            <axis xyz="0 0 1"/>
-            <limit lower="-${PI}" upper="${PI}" effort="100" velocity="1.0"/>
-        </joint>
+        <xacro:joint_subassembly_macro name="J2" parent_name="L2"
+            origin_xyz="${d_arm_link_L/2 + d_conn_L/2} 0 0" origin_rpy="0 ${PI} 0"/>
 
         ---
 
         <!-- Arm Segment #3 -->
-        <xacro:arm_link_macro name="L3_link"/>
+        <xacro:link_macro name="L3_link"/>
         <joint name="J2_to_L3" type="fixed">
-            <parent link="J2_link"/>
+            <parent link="J2_conn_outer_link"/>
             <child link="L3_link"/>
-            <origin xyz="${(d_J12_L/2 - 0.04014) + d_arm_link_L/2} 0 ${-d_J12_H/2 + 0.038}" rpy="0 0 0"/>
+            <origin xyz="${d_conn_L/2 + d_arm_link_L/2} 0 0" rpy="0 0 0"/>
         </joint>
 
-        <xacro:arm_joint_macro name="J3_link" L="${d_J3_L}" W="${d_J3_W}" H="${d_J3_H}" mass="${m_J3}"/>
-        <joint name="L3_to_J3" type="revolute">
+        <link name="J3_conn_adapter_link">
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <box size="${d_adapter_L} ${d_adapter_W} ${d_adapter_H}"/>
+                    <!-- TODO
+                    <mesh filename="package://libra/meshes/conn_adapter.stl" scale="0.001 0.001 0.001"/>
+                    -->
+                </geometry>
+                <material name="black"/>
+            </visual>
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <box size="${d_adapter_L} ${d_adapter_W} ${d_adapter_H}"/>
+                </geometry>
+            </collision>
+            <xacro:box_inertia m="${m_adapter}" x="${d_adapter_L}" y="${d_adapter_W}" z="${d_adapter_H}"/>
+        </link>
+        <joint name="L3_to_J3_conn_adapter" type="fixed">
             <parent link="L3_link"/>
-            <child link="J3_link"/>
-            <origin xyz="${d_arm_link_L/2 + d_J3_L/2} ${-0.03805 + d_J3_W/2} 0" rpy="0 0 0"/>
-            <axis xyz="0 1 0"/>
-            <limit lower="-${PI/2}" upper="${PI/2}" effort="100" velocity="1.0"/>
+            <child link="J3_conn_adapter_link"/>
+            <origin xyz="${d_arm_link_L/2 + d_adapter_L/2} 0 0" rpy="0 0 0"/>
         </joint>
+
+        <xacro:joint_subassembly_macro name="J3" parent_name="J3_conn_adapter"
+            origin_xyz="${d_adapter_L/2 + d_conn_L/2} 0 0" origin_rpy="${PI/2} 0 0"/>
 
         ---
 
         <!-- Arm Segment #4 -->
-        <xacro:arm_link_macro name="L4_link"/>
+        <xacro:link_macro name="L4_link"/>
         <joint name="J3_to_L4" type="fixed">
-            <parent link="J3_link"/>
+            <parent link="J3_conn_outer_link"/>
             <child link="L4_link"/>
-            <origin xyz="${(d_J3_L/2 - 0.04014) + d_arm_link_L/2} ${d_J3_W/2 - 0.038} 0" rpy="0 0 0"/>
+            <origin xyz="${d_conn_L/2 + d_arm_link_L/2} 0 0" rpy="0 0 0"/>
         </joint>
         
         <link name="arm_tip_link">
