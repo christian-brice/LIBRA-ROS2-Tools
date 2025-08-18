@@ -26,11 +26,15 @@
         <xacro:property name="m_arm_link" value="0.395"/>
 
         <!-- Joint Connectors -->
-        <xacro:property name="d_conn_L" value="0.076"/>
-        <xacro:property name="d_conn_W" value="0.076"/>
-        <xacro:property name="d_conn_H" value="0.076"/>
-        <xacro:property name="m_conn_inner" value="0.169"/>
+        <xacro:property name="d_conn_outer_L" value="0.076"/>
+        <xacro:property name="d_conn_outer_W" value="0.076"/>
+        <xacro:property name="d_conn_outer_H" value="0.076"/>
         <xacro:property name="m_conn_outer" value="0.192"/>
+
+        <xacro:property name="d_conn_inner_L" value="0.056"/>
+        <xacro:property name="d_conn_inner_W" value="0.076"/>
+        <xacro:property name="d_conn_inner_H" value="0.076"/>
+        <xacro:property name="m_conn_inner" value="0.169"/>
     
         <xacro:property name="d_adapter_L" value="0.017"/>
         <xacro:property name="d_adapter_W" value="0.076"/>
@@ -87,7 +91,7 @@
             <xacro:property name="outer_rpy" value="${origin_rpy}"/>
 
             <!-- Inbound Connection -->
-            <link name="${name}_conn_inner_link">
+            <link name="${name}_conn_outer_link">
                 <visual>
                     <origin xyz="0 0 0" rpy="0 0 0"/>
                     <geometry>
@@ -101,14 +105,14 @@
                 <collision>
                     <origin xyz="0 0 0" rpy="0 0 0"/>
                     <geometry>
-                        <box size="${d_conn_L} ${d_conn_W} ${d_conn_H}"/>
+                        <box size="${d_conn_outer_L} ${d_conn_outer_W} ${d_conn_outer_H}"/>
                     </geometry>
                 </collision>
-                <xacro:box_inertia m="${m_conn_inner}" x="${d_conn_L}" y="${d_conn_W}" z="${d_conn_H}"/>
+                <xacro:box_inertia m="${m_conn_outer}" x="${d_conn_outer_L}" y="${d_conn_outer_W}" z="${d_conn_outer_H}"/>
             </link>
-            <joint name="${parent_name}_to_${name}_conn_inner" type="fixed">
+            <joint name="${parent_name}_to_${name}_conn_outer" type="fixed">
                 <parent link="${parent_name}_link"/>
-                <child link="${name}_conn_inner_link"/>
+                <child link="${name}_conn_outer_link"/>
                 <origin xyz="${origin_xyz}" rpy="${origin_rpy}"/>
             </joint>
 
@@ -132,14 +136,14 @@
                 </collision>
                 <xacro:box_inertia m="${m_hebi}" x="${d_hebi_L}" y="${d_hebi_W}" z="${d_hebi_H}"/>
             </link>
-            <joint name="${name}_conn_inner_to_${name}_hebi" type="fixed">
-                <parent link="${name}_conn_inner_link"/>
+            <joint name="${name}_conn_outer_to_${name}_hebi" type="fixed">
+                <parent link="${name}_conn_outer_link"/>
                 <child link="${name}_hebi_link"/>
-                <origin xyz="${d_conn_L/2 + 0.05314 - d_hebi_L/2} 0 ${-d_conn_H/2 + 0.036 + d_hebi_H/2}" rpy="0 0 0"/>
+                <origin xyz="${d_conn_outer_L/2 + 0.05314 - d_hebi_L/2} 0 ${-d_conn_outer_H/2 + 0.036 + d_hebi_H/2}" rpy="0 0 0"/>
             </joint>
 
             <!-- Outbound Connection -->
-            <link name="${name}_conn_outer_link">
+            <link name="${name}_conn_inner_link">
                 <visual>
                     <origin xyz="0 0 0" rpy="0 0 0"/>
                     <geometry>
@@ -153,15 +157,15 @@
                 <collision>
                     <origin xyz="0 0 0" rpy="0 0 0"/>
                     <geometry>
-                        <box size="${d_conn_L} ${d_conn_W} ${d_conn_H}"/>
+                        <box size="${d_conn_inner_L} ${d_conn_inner_W} ${d_conn_inner_H}"/>
                     </geometry>
                 </collision>
-                <xacro:box_inertia m="${m_conn_outer}" x="${d_conn_L}" y="${d_conn_W}" z="${d_conn_H}"/>
+                <xacro:box_inertia m="${m_conn_inner}" x="${d_conn_inner_L}" y="${d_conn_inner_W}" z="${d_conn_inner_H}"/>
             </link>
-            <joint name="${name}_hebi_to_${name}_conn_outer" type="revolute">
+            <joint name="${name}_hebi_to_${name}_conn_inner" type="revolute">
                 <parent link="${name}_hebi_link"/>
-                <child link="${name}_conn_outer_link"/>
-                <origin xyz="${d_hebi_L/2 - 0.04014 - d_conn_L/2} 0 ${d_hebi_H/2 + d_conn_H/2}" rpy="0 0 0"/>
+                <child link="${name}_conn_inner_link"/>
+                <origin xyz="${d_hebi_L/2 - 0.04014 - d_conn_inner_L/2} 0 ${d_hebi_H/2 + d_conn_inner_H/2}" rpy="0 0 0"/>
                 <axis xyz="0 0 1"/>  <!-- Although this defines a yaw joint, it can be changed by providing a non-zero origin_rpy (see J3) -->
                 <limit lower="-${PI}" upper="${PI}" effort="100" velocity="1.0"/>
             </joint>
@@ -181,29 +185,29 @@
         </joint>
 
         <xacro:joint_subassembly_macro name="J1" parent_name="L1"
-            origin_xyz="${d_arm_link_L/2 + d_conn_L/2} 0 0" origin_rpy="0 0 0"/>
+            origin_xyz="${d_arm_link_L/2 + d_conn_outer_L/2} 0 0" origin_rpy="0 0 0"/>
 
         ---
 
         <!-- Arm Segment #2 -->
         <xacro:link_macro name="L2_link"/>
         <joint name="J1_to_L2" type="fixed">
-            <parent link="J1_conn_outer_link"/>
+            <parent link="J1_conn_inner_link"/>
             <child link="L2_link"/>
-            <origin xyz="${d_conn_L/2 + d_arm_link_L/2} 0 0" rpy="0 0 0"/>
+            <origin xyz="${d_conn_inner_L/2 + d_arm_link_L/2} 0 0" rpy="0 0 0"/>
         </joint>
 
         <xacro:joint_subassembly_macro name="J2" parent_name="L2"
-            origin_xyz="${d_arm_link_L/2 + d_conn_L/2} 0 0" origin_rpy="${PI} 0 0"/>
+            origin_xyz="${d_arm_link_L/2 + d_conn_outer_L/2} 0 0" origin_rpy="${PI} 0 0"/>
 
         ---
 
         <!-- Arm Segment #3 -->
         <xacro:link_macro name="L3_link"/>
         <joint name="J2_to_L3" type="fixed">
-            <parent link="J2_conn_outer_link"/>
+            <parent link="J2_conn_inner_link"/>
             <child link="L3_link"/>
-            <origin xyz="${d_conn_L/2 + d_arm_link_L/2} 0 0" rpy="0 0 0"/>
+            <origin xyz="${d_conn_inner_L/2 + d_arm_link_L/2} 0 0" rpy="0 0 0"/>
         </joint>
 
         <link name="J3_conn_adapter_link">
@@ -232,16 +236,16 @@
         </joint>
 
         <xacro:joint_subassembly_macro name="J3" parent_name="J3_conn_adapter"
-            origin_xyz="${d_adapter_L/2 + d_conn_L/2} 0 0" origin_rpy="${PI/2} 0 0"/>
+            origin_xyz="${d_adapter_L/2 + d_conn_outer_L/2} 0 0" origin_rpy="${PI/2} 0 0"/>
 
         ---
 
         <!-- Arm Segment #4 -->
         <xacro:link_macro name="L4_link"/>
         <joint name="J3_to_L4" type="fixed">
-            <parent link="J3_conn_outer_link"/>
+            <parent link="J3_conn_inner_link"/>
             <child link="L4_link"/>
-            <origin xyz="${d_conn_L/2 + d_arm_link_L/2} 0 0" rpy="${PI/2} 0 0"/>
+            <origin xyz="${d_conn_inner_L/2 + d_arm_link_L/2} 0 0" rpy="${PI/2} 0 0"/>
         </joint>
         
         <link name="arm_tip_link">
