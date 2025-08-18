@@ -1,0 +1,185 @@
+<?xml version="1.0"?>
+<!--***************************************************************************
+/// @file   manip.urdf.xacro
+/// @brief  LIBRA-I manipulator model definition.
+///
+/// @author brice.c.aa
+****************************************************************************-->
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <!-- Includes -->
+    <xacro:include filename="$(find libra)/models/common/common.urdf.xacro" />
+    
+    <!-- Definition -->
+    <xacro:macro name="spawn_manip" params="parent">
+
+        <!-- ********************[ PROPERTIES ]******************** -->
+
+        <!-- Servo -->
+        <xacro:property name="d_servo_L" value="0.054"/>
+        <xacro:property name="d_servo_W" value="0.0462"/>
+        <xacro:property name="d_servo_H" value="0.020"/>
+
+        <!-- Servo w/ Bracket -->
+        <xacro:property name="d_servo_bracket_L" value="0.058"/>
+        <xacro:property name="d_servo_bracket_W" value="0.0493"/>
+        <xacro:property name="d_servo_bracket_H" value="0.025"/>
+
+        <xacro:property name="m_servo" value="0.039"/>
+
+        <!-- Sensor Mounting Bracket -->
+        <xacro:property name="d_sensor_bracket_L" value="0.065"/>
+        <xacro:property name="d_sensor_bracket_W" value="0.025"/>
+        <xacro:property name="d_sensor_bracket_H" value="0.055"/>
+        <xacro:property name="m_sensor_bracket" value="0.0081"/>
+
+        <!-- ********************[ LINKS ]******************** -->
+        <!-- NOTE
+            X = forward/red, Y = left/green, Z = upwards/blue
+        -->
+
+        <!-- Manipulator Joint #1 (servo) -->
+        <link name="MJ1_stator_link">
+            <visual>
+                <origin xyz="0.0104 -0.0156 0.002" rpy="${PI/2} 0 0"/>
+                <geometry>
+                    <mesh filename="package://libra/meshes/manip-j1.stl" scale="0.001 0.001 0.001"/>
+                </geometry>
+                <material name="purple"/>
+            </visual>
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <box size="${d_servo_L} ${d_servo_W} ${d_servo_H}"/>
+                </geometry>
+            </collision>
+            <xacro:box_inertia m="${m_servo}" x="${d_servo_L}" y="${d_servo_W}" z="${d_servo_H}"/>
+        </link>
+        <joint name="parent_to_MJ1_stator" type="fixed">
+            <parent link="${parent}"/>
+            <child link="MJ1_stator_link"/>
+            <origin xyz="0 0.0178 0" rpy="0 0 0"/>
+        </joint>
+
+        <link name="MJ1_rotor_link"/>
+        <joint name="MJ1_stator_to_MJ1_rotor" type="revolute">
+            <parent link="MJ1_stator_link"/>
+            <child link="MJ1_rotor_link"/>
+            <origin xyz="${d_servo_L/2 - 0.01675} -${d_servo_W/2} ${d_servo_H/2 - 0.010}" rpy="0 0 0"/>
+            <axis xyz="0 1 0"/>
+            <limit lower="-${PI/2}" upper="${PI/2}" effort="50" velocity="1.5"/>
+        </joint>
+
+        ---
+
+        <!-- Manipulator Joint #2 (servo w/ bracket) -->
+        <link name="MJ2_stator_link">
+            <visual>
+                <origin xyz="-0.0104 -0.003 ${d_servo_bracket_H/2 + 0.0045}" rpy="0 0 ${PI}"/>
+                <geometry>
+                    <mesh filename="package://libra/meshes/manip-j2_3.stl" scale="0.001 0.001 0.001"/>
+                </geometry>
+                <material name="purple"/>
+            </visual>
+            <collision>
+                <origin xyz="0 0 0" rpy="${PI/2} 0 0"/>
+                <geometry>
+                    <box size="${d_servo_bracket_L} ${d_servo_bracket_W} ${d_servo_bracket_H}"/>
+                </geometry>
+            </collision>
+            <xacro:box_inertia m="${m_servo}" x="${d_servo_bracket_L}" y="${d_servo_bracket_W}" z="${d_servo_bracket_H}"/>
+        </link>
+        <joint name="MJ1_rotor_to_MJ2_stator" type="fixed">
+            <parent link="MJ1_rotor_link"/>
+            <child link="MJ2_stator_link"/>
+            <origin xyz="${d_servo_bracket_L/2 - 0.0185} -${d_servo_bracket_H/2} ${d_servo_bracket_W/2 - 0.0248}" rpy="0 0 0"/>
+        </joint>
+
+        <link name="MJ2_rotor_link"/>
+        <joint name="MJ2_stator_to_MJ2_rotor" type="revolute">
+            <parent link="MJ2_stator_link"/>
+            <child link="MJ2_rotor_link"/>
+            <origin xyz="${-d_servo_bracket_L/2 + 0.01875} ${-d_servo_bracket_H/2 + 0.0115} ${d_servo_bracket_W/2}" rpy="0 0 0"/>
+            <axis xyz="0 0 1"/>
+            <limit lower="-${PI/2}" upper="${PI/2}" effort="50" velocity="1.5"/>
+        </joint>
+
+        ---
+
+        <!-- Manipulator Joint #3 (servo w/ bracket) -->
+        <link name="MJ3_stator_link">
+            <visual>
+                <origin xyz="0.0104 -${d_servo_bracket_W/2 - 0.0075} 0.003" rpy="${PI/2} 0 0"/>
+                <geometry>
+                    <mesh filename="package://libra/meshes/manip-j2_3.stl" scale="0.001 0.001 0.001"/>
+                </geometry>
+                <material name="purple"/>
+            </visual>
+            <collision>
+                <origin xyz="0 0 0" rpy="${PI/2} 0 0"/>
+                <geometry>
+                    <box size="${d_servo_bracket_L} ${d_servo_bracket_H} ${d_servo_bracket_W}"/>
+                </geometry>
+            </collision>
+            <xacro:box_inertia m="${m_servo}" x="${d_servo_bracket_L}" y="${d_servo_bracket_H}" z="${d_servo_bracket_W}"/>
+        </link>
+        <joint name="MJ2_rotor_to_MJ3_stator" type="fixed">
+            <parent link="MJ2_rotor_link"/>
+            <child link="MJ3_stator_link"/>
+            <origin xyz="${d_servo_bracket_L/2 - 0.0185} ${d_servo_bracket_W/2 - 0.0245} ${d_servo_bracket_H/2}" rpy="0 0 0"/>
+        </joint>
+
+        <link name="MJ3_rotor_link"/>
+        <joint name="MJ3_stator_to_MJ3_rotor" type="revolute">
+            <parent link="MJ3_stator_link"/>
+            <child link="MJ3_rotor_link"/>
+            <origin xyz="${d_servo_bracket_L/2 - 0.01875} -${d_servo_bracket_W/2} ${d_servo_bracket_H/2 - 0.0115}" rpy="0 0 0"/>
+            <axis xyz="0 1 0"/>
+            <limit lower="-${PI/2}" upper="${PI/2}" effort="50" velocity="1.5"/>
+        </joint>
+
+        ---
+
+        <!-- Sensor Mounting Bracket -->
+        <link name="sensor_bracket_link">
+            <visual>
+                <origin xyz="${d_sensor_bracket_L/2} 0 0" rpy="${PI/2} 0 -${PI/2}"/>
+                <geometry>
+                    <mesh filename="package://libra/meshes/sensor_bracket.stl" scale="0.001 0.001 0.001"/>
+                </geometry>
+                <material name="black"/>
+            </visual>
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <box size="${d_sensor_bracket_L} ${d_sensor_bracket_H} ${d_sensor_bracket_W}"/>
+                </geometry>
+            </collision>
+            <xacro:box_inertia m="${m_sensor_bracket}" x="${d_sensor_bracket_L}" y="${d_sensor_bracket_H}" z="${d_sensor_bracket_W}"/>
+        </link>
+        <joint name="MJ3_rotor_to_sensor_bracket" type="fixed">
+            <parent link="MJ3_rotor_link"/>
+            <child link="sensor_bracket_link"/>
+            <origin xyz="${d_sensor_bracket_L/2 - 0.0125} ${d_sensor_bracket_W} 0" rpy="0 0 0"/>
+        </joint>
+
+        ---
+
+        <!-- Outbound Link -->
+        <link name="manip_out_link"/>
+        <joint name="sensor_bracket_to_manip_out" type="fixed">
+            <parent link="sensor_bracket_link"/>
+            <child link="manip_out_link"/>
+            <origin xyz="0.0525 0 0" rpy="0 0 0"/>
+        </joint>
+
+        <!-- ********************[ GAZEBO CONFIG ]******************** -->
+
+        <gazebo reference="MJ1_stator_link"><material>Gazebo/Purple</material></gazebo>
+        <gazebo reference="MJ2_stator_link"><material>Gazebo/Purple</material></gazebo>
+        <gazebo reference="MJ3_stator_link"><material>Gazebo/Purple</material></gazebo>
+        <gazebo reference="sensor_bracket_link"><material>Gazebo/Black</material></gazebo>
+        
+    </xacro:macro>
+</robot>
