@@ -194,7 +194,7 @@
         </joint>
 
         <xacro:joint_subassembly_macro name="J2" parent_name="L2"
-            origin_xyz="${d_arm_link_L/2 + d_conn_L/2} 0 0" origin_rpy="0 ${PI} 0"/>
+            origin_xyz="${d_arm_link_L/2 + d_conn_L/2} 0 0" origin_rpy="${PI} 0 0"/>
 
         ---
 
@@ -241,7 +241,7 @@
         <joint name="J3_to_L4" type="fixed">
             <parent link="J3_conn_outer_link"/>
             <child link="L4_link"/>
-            <origin xyz="${d_conn_L/2 + d_arm_link_L/2} 0 0" rpy="0 0 0"/>
+            <origin xyz="${d_conn_L/2 + d_arm_link_L/2} 0 0" rpy="${PI/2} 0 0"/>
         </joint>
         
         <link name="arm_tip_link">
