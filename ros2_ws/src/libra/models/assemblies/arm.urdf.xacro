@@ -15,10 +15,6 @@
     <xacro:macro name="spawn_arm" params="parent">
 
         <!-- ********************[ PROPERTIES ]******************** -->
-
-        <!-- 2DJNT Connector (copied from libra1_2djnt.urdf.xacro) -->
-        <xacro:property name="d_conn_arm_L" value="0.076"/>
-        <xacro:property name="d_conn_arm_H" value="0.0985"/>
         
         <!-- Arm Links -->
         <xacro:property name="d_arm_link_L" value="0.900"/>
@@ -53,17 +49,6 @@
         <xacro:property name="d_arm_tip_H" value="0.0935"/>
         <xacro:property name="m_arm_tip" value="0.170"/>
 
-        <!-- Manipulator Joints -->
-        <xacro:property name="d_MJ1_L" value="0.0405"/>
-        <xacro:property name="d_MJ1_W" value="0.0405"/>
-        <xacro:property name="d_MJ1_H" value="0.020"/>
-
-        <xacro:property name="d_MJ23_L" value="0.058"/>
-        <xacro:property name="d_MJ23_W" value="0.0307"/>
-        <xacro:property name="d_MJ23_H" value="0.0436"/>
-
-        <xacro:property name="m_MJ" value="0.039"/>
-
         <!-- ********************[ MACROS ]******************** -->
 
         <xacro:macro name="link_macro" params="name">
@@ -86,15 +71,15 @@
         </xacro:macro>
 
         <xacro:macro name="joint_subassembly_macro" params="name parent_name origin_xyz origin_rpy">
+            <xacro:property name="inbound_correction" value="0.003"/>
+            <xacro:property name="outbound_correction" value="0.005"/>
+
             <!-- Inbound Connection -->
             <link name="${name}_conn_outer_link">
                 <visual>
-                    <origin xyz="0 0 0" rpy="0 0 0"/>
+                    <origin xyz="-${inbound_correction} 0 ${d_conn_outer_H/2}" rpy="${PI} 0 ${PI}"/>
                     <geometry>
-                        <box size="${d_conn_L} ${d_conn_W} ${d_conn_H}"/>
-                        <!-- TODO
-                        <mesh filename="package://libra/meshes/conn_inner.stl" scale="0.001 0.001 0.001"/>
-                        -->
+                        <mesh filename="package://libra/meshes/conn_outer.stl" scale="0.001 0.001 0.001"/>
                     </geometry>
                     <material name="black"/>
                 </visual>
@@ -113,14 +98,11 @@
             </joint>
 
             <!-- Actuator -->
-            <link name="${name}_hebi_link">
+            <link name="${name}_hebi_stator_link">
                 <visual>
-                    <origin xyz="0 0 0" rpy="0 0 0"/>
+                    <origin xyz="${d_conn_outer_L/2 - 0.05314 - inbound_correction} 0 0" rpy="0 0 0"/>
                     <geometry>
-                        <box size="${d_hebi_L} ${d_hebi_W} ${d_hebi_H}"/>
-                        <!-- TODO
                         <mesh filename="package://libra/meshes/hebi_x8-16.stl" scale="0.001 0.001 0.001"/>
-                        -->
                     </geometry>
                     <material name="red"/>
                 </visual>
@@ -134,19 +116,25 @@
             </link>
             <joint name="${name}_conn_outer_to_${name}_hebi" type="fixed">
                 <parent link="${name}_conn_outer_link"/>
-                <child link="${name}_hebi_link"/>
+                <child link="${name}_hebi_stator_link"/>
                 <origin xyz="${d_conn_outer_L/2 + 0.05314 - d_hebi_L/2} 0 ${-d_conn_outer_H/2 + 0.036 + d_hebi_H/2}" rpy="0 0 0"/>
+            </joint>
+
+            <link name="${name}_hebi_rotor_link"/>
+            <joint name="${name}_hebi_stator_to_${name}_hebi_rotor" type="revolute">
+                <parent link="${name}_hebi_stator_link"/>
+                <child link="${name}_hebi_rotor_link"/>
+                <origin xyz="${d_hebi_L/2 - 0.073} 0 ${d_hebi_H/2}" rpy="0 0 0"/>
+                <axis xyz="0 0 1"/>  <!-- although this defines a yaw joint, it can be changed by providing a non-zero origin_rpy (see J3) -->
+                <limit lower="-${PI}" upper="${PI}" effort="100" velocity="1.0"/>
             </joint>
 
             <!-- Outbound Connection -->
             <link name="${name}_conn_inner_link">
                 <visual>
-                    <origin xyz="0 0 0" rpy="0 0 0"/>
+                    <origin xyz="-${outbound_correction} 0 -${d_conn_inner_H/2}" rpy="0 0 0"/>
                     <geometry>
-                        <box size="${d_conn_L} ${d_conn_W} ${d_conn_H}"/>
-                        <!-- TODO
-                        <mesh filename="package://libra/meshes/conn_outer.stl" scale="0.001 0.001 0.001"/>
-                        -->
+                        <mesh filename="package://libra/meshes/conn_inner.stl" scale="0.001 0.001 0.001"/>
                     </geometry>
                     <material name="black"/>
                 </visual>
@@ -158,12 +146,10 @@
                 </collision>
                 <xacro:box_inertia m="${m_conn_inner}" x="${d_conn_inner_L}" y="${d_conn_inner_W}" z="${d_conn_inner_H}"/>
             </link>
-            <joint name="${name}_hebi_to_${name}_conn_inner" type="revolute">
-                <parent link="${name}_hebi_link"/>
+            <joint name="${name}_hebi_to_${name}_conn_inner" type="fixed">
+                <parent link="${name}_hebi_rotor_link"/>
                 <child link="${name}_conn_inner_link"/>
-                <origin xyz="${d_hebi_L/2 - 0.04014 - d_conn_inner_L/2} 0 ${d_hebi_H/2 + d_conn_inner_H/2}" rpy="0 0 0"/>
-                <axis xyz="0 0 1"/>  <!-- Although this defines a yaw joint, it can be changed by providing a non-zero origin_rpy (see J3) -->
-                <limit lower="-${PI}" upper="${PI}" effort="100" velocity="1.0"/>
+                <origin xyz="${d_conn_inner_L/2 - 0.023} 0 ${d_conn_inner_H/2}" rpy="0 0 0"/>
             </joint>
         </xacro:macro>
 
@@ -177,7 +163,7 @@
         <joint name="parent_to_L1" type="fixed">
             <parent link="${parent}"/>
             <child link="L1_link"/>
-            <origin xyz="${d_conn_arm_L/2 + d_arm_link_L/2} 0 -${d_conn_arm_H/2 - 0.038}" rpy="0 0 0"/>
+            <origin xyz="${d_arm_link_L/2} 0 0" rpy="0 0 0"/>
         </joint>
 
         <xacro:joint_subassembly_macro name="J1" parent_name="L1"
@@ -208,12 +194,9 @@
 
         <link name="J3_conn_adapter_link">
             <visual>
-                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <origin xyz="-${d_adapter_L/2} 0 0" rpy="${PI/2} -${PI/2} 0"/>
                 <geometry>
-                    <box size="${d_adapter_L} ${d_adapter_W} ${d_adapter_H}"/>
-                    <!-- TODO
                     <mesh filename="package://libra/meshes/conn_adapter.stl" scale="0.001 0.001 0.001"/>
-                    -->
                 </geometry>
                 <material name="black"/>
             </visual>
@@ -246,12 +229,9 @@
         
         <link name="arm_tip_link">
             <visual>
-                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <origin xyz="-${d_arm_tip_L/2} 0 ${d_arm_tip_H/2 - 0.002}" rpy="${PI/2} 0 ${PI/2}"/>
                 <geometry>
-                    <box size="${d_arm_tip_L} ${d_arm_tip_W} ${d_arm_tip_H}"/>
-                    <!-- TODO
                     <mesh filename="package://libra/meshes/arm-tip.stl" scale="0.001 0.001 0.001"/>
-                    -->
                 </geometry>
                 <material name="black"/>
             </visual>
@@ -269,88 +249,12 @@
             <origin xyz="${d_arm_link_L/2 + d_arm_tip_L/2} 0 ${0.042 - d_arm_tip_H/2}" rpy="0 0 0"/>
         </joint>
 
-        ---
-
-        <!-- Manipulator Joints -->
-        <link name="mj1_link">
-            <visual>
-                <origin xyz="0 0 0" rpy="0 0 0"/>
-                <geometry>
-                    <box size="${d_MJ1_L} ${d_MJ1_W} ${d_MJ1_H}"/>
-                    <!-- TODO
-                    <mesh filename="package://libra/meshes/manip-j1.stl" scale="0.001 0.001 0.001"/>
-                    -->
-                </geometry>
-                <material name="purple"/>
-            </visual>
-            <collision>
-                <origin xyz="0 0 0" rpy="0 0 0"/>
-                <geometry>
-                    <box size="${d_MJ1_L} ${d_MJ1_W} ${d_MJ1_H}"/>
-                </geometry>
-            </collision>
-            <xacro:box_inertia m="${m_MJ}" x="${d_MJ1_L}" y="${d_MJ1_W}" z="${d_MJ1_H}"/>
-        </link>
-        <joint name="arm_tip_to_MJ1" type="revolute">
+        <!-- Outbound Link -->
+        <link name="arm_out_link"/>
+        <joint name="arm_tip_to_arm_out" type="fixed">
             <parent link="arm_tip_link"/>
-            <child link="mj1_link"/>
-            <origin xyz="${(d_arm_tip_L/2 - 0.00875) - d_MJ1_L/2} ${-d_arm_tip_W/2 - 0.0121 + d_MJ1_W/2} ${(d_arm_tip_H/2 - 0.006) - d_MJ1_H/2}" rpy="0 0 0"/>
-            <axis xyz="0 1 0"/>
-            <limit lower="-${PI/2}" upper="${PI/2}" effort="50" velocity="1.5"/>
-        </joint>
-
-        <link name="mj2_link">
-            <visual>
-                <origin xyz="0 0 0" rpy="0 0 0"/>
-                <geometry>
-                    <box size="${d_MJ23_L} ${d_MJ23_W} ${d_MJ23_H}"/>
-                    <!-- TODO
-                    <mesh filename="package://libra/meshes/manip-j2_3.stl" scale="0.001 0.001 0.001"/>
-                    -->
-                </geometry>
-                <material name="purple"/>
-            </visual>
-            <collision>
-                <origin xyz="0 0 0" rpy="0 0 0"/>
-                <geometry>
-                    <box size="${d_MJ23_L} ${d_MJ23_W} ${d_MJ23_H}"/>
-                </geometry>
-            </collision>
-            <xacro:box_inertia m="${m_MJ}" x="${d_MJ23_L}" y="${d_MJ23_W}" z="${d_MJ23_H}"/>
-        </link>
-        <joint name="mj1_to_MJ2" type="revolute">
-            <parent link="mj1_link"/>
-            <child link="mj2_link"/>
-            <origin xyz="${(d_MJ1_L/2 + 0.0295) - d_MJ23_L/2} ${-d_MJ1_W/2 - d_MJ23_W/2} ${(d_MJ1_H/2 + 0.0091) - d_MJ23_H/2}" rpy="0 0 0"/>
-            <axis xyz="0 0 1"/>
-            <limit lower="-${PI/2}" upper="${PI/2}" effort="50" velocity="1.5"/>
-        </joint>
-
-        <link name="mj3_link">
-            <visual>
-                <origin xyz="0 0 0" rpy="0 0 0"/>
-                <geometry>
-                    <box size="${d_MJ23_L} ${d_MJ23_H} ${d_MJ23_W}"/>
-                    <!-- TODO
-                    <mesh filename="package://libra/meshes/manip-j2_3.stl" scale="0.001 0.001 0.001"/>
-                    -->
-                </geometry>
-                <material name="purple"/>
-            </visual>
-            <collision>
-                <origin xyz="0 0 0" rpy="0 0 0"/>
-                <geometry>
-                    <box size="${d_MJ23_L} ${d_MJ23_H} ${d_MJ23_W}"/>
-                </geometry>
-            </collision>
-            <xacro:box_inertia m="${m_MJ}" x="${d_MJ23_L}" y="${d_MJ23_H}" z="${d_MJ23_W}"/>
-        </link>
-        <joint name="mj2_to_mj3" type="revolute">
-            <parent link="mj2_link"/>
-            <child link="mj3_link"/>
-            <origin xyz="${(-d_MJ23_L/2 + 0.00025) + d_MJ23_L/2} ${d_MJ23_W/2 + 0.0053 - d_MJ23_H/2} ${d_MJ23_H/2 + d_MJ23_W/2}" rpy="0 0 0"/>
-            <axis xyz="0 1 0"/>
-            <limit lower="-${PI/2}" upper="${PI/2}" effort="50" velocity="1.5"/>
+            <child link="arm_out_link"/>
+            <origin xyz="${d_arm_tip_L/2 - 0.029} ${-d_arm_tip_W} ${d_arm_tip_H/2 - 0.016}" rpy="0 0 0"/>
         </joint>
 
         <!-- ********************[ GAZEBO CONFIG ]******************** -->
@@ -363,9 +267,6 @@
         <gazebo reference="J3_link"><material>Gazebo/Red</material></gazebo>
         <gazebo reference="L4_link"><material>Gazebo/Gray</material></gazebo>
         <gazebo reference="arm_tip_link"><material>Gazebo/Black</material></gazebo>
-        <gazebo reference="mj1_link"><material>Gazebo/Purple</material></gazebo>
-        <gazebo reference="mj2_link"><material>Gazebo/Purple</material></gazebo>
-        <gazebo reference="mj3_link"><material>Gazebo/Purple</material></gazebo>
         
     </xacro:macro>
 </robot>
