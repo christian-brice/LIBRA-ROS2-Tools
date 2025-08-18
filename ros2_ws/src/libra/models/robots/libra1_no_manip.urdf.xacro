@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--***************************************************************************
-/// @file   libra1_no_sensors.urdf.xacro
-/// @brief  LIBRA-I (sensorless) model constructor.
+/// @file   libra1_no_manip.urdf.xacro
+/// @brief  LIBRA-I (w/o customization) model constructor.
 ///
 /// @author brice.c.aa
 ****************************************************************************-->
@@ -20,6 +20,6 @@
 
     <link name="base_link"/>
     <xacro:spawn_2djnt parent="base_link"/>
-    <xacro:spawn_arm parent="2d_arm_connector_link"/>
+    <xacro:spawn_arm parent="2djnt_out_arm_link"/>
 
 </robot>

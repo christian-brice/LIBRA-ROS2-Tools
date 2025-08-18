@@ -114,10 +114,10 @@
         ---
 
         <!-- Outbound Link -->
-        <link name="2d_out_arm_link"/>
+        <link name="2djnt_out_arm_link"/>
         <joint name="arm_conn_to_2d_out_arm" type="fixed">
             <parent link="arm_conn_link"/>
-            <child link="2d_out_arm_link"/>
+            <child link="2djnt_out_arm_link"/>
             <origin xyz="${d_conn_arm_L/2} 0 -${d_conn_arm_H/2 - 0.038}" rpy="0 0 0"/>
         </joint>
 
