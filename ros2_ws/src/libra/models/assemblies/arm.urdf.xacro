@@ -86,10 +86,6 @@
         </xacro:macro>
 
         <xacro:macro name="joint_subassembly_macro" params="name parent_name origin_xyz origin_rpy">
-            <xacro:property name="conn_rpy" value="${origin_rpy}"/>
-            <xacro:property name="hebi_rpy" value="${origin_rpy}"/>
-            <xacro:property name="outer_rpy" value="${origin_rpy}"/>
-
             <!-- Inbound Connection -->
             <link name="${name}_conn_outer_link">
                 <visual>
