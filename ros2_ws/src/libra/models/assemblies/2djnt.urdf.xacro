@@ -52,7 +52,7 @@
             </collision>
             <xacro:box_inertia m="${m_2djnt_s}" x="${d_2djnt_s_L}" y="${d_2djnt_s_W}" z="${d_2djnt_s_H}"/>
         </link>
-        <joint name="${parent}_to_stator" type="fixed">
+        <joint name="${parent}_to_2d_stator" type="fixed">
             <parent link="${parent}"/>
             <child link="2d_stator_link"/>
             <origin xyz="0 0 -${d_2djnt_s_H/2}" rpy="0 0 0"/>
@@ -67,7 +67,7 @@
             <child link="2d_rotor_pitch_link"/>
             <origin xyz="${-d_2djnt_s_L/2 - 0.059 + d_2djnt_r_L/2} 0 ${d_2djnt_s_H/2 - 0.080 - d_2djnt_r_H/2}" rpy="0 0 0"/>
             <axis xyz="0 1 0"/>
-            <limit lower="-${PI/2}" upper="${PI/2}" effort="100" velocity="1.0"/>
+            <limit lower="${-10 * PI / 180.0}" upper="${90 * PI / 180.0}" effort="100" velocity="1.0"/>
         </joint>
 
         <link name="2d_rotor_roll_link">
@@ -87,13 +87,13 @@
             <child link="2d_rotor_roll_link"/>
             <origin xyz="0 0 0" rpy="0 0 0"/>
             <axis xyz="1 0 0"/>
-            <limit lower="-${PI/2}" upper="${PI/2}" effort="100" velocity="1.0"/>
+            <limit lower="${-10 * PI / 180.0}" upper="${10 * PI / 180.0}" effort="100" velocity="1.0"/>
         </joint>
 
         ---
 
         <!-- Arm Connector -->
-        <link name="2d_arm_connector_link">
+        <link name="arm_conn_link">
             <visual>
                 <origin xyz="0.0030 0 0.0267" rpy="${PI} 0 0"/>
                 <geometry><mesh filename="package://libra/meshes/2d-arm_connector.stl" scale="0.001 0.001 0.001"/></geometry>
@@ -105,17 +105,27 @@
             </collision>
             <xacro:box_inertia m="${m_conn_arm}" x="${d_conn_arm_L}" y="${d_conn_arm_W}" z="${d_conn_arm_H}"/>
         </link>
-        <joint name="rotor_to_connector" type="fixed">
+        <joint name="2d_roll_joint_to_2d_out_arm" type="fixed">
             <parent link="2d_rotor_roll_link"/>
-            <child link="2d_arm_connector_link"/>
+            <child link="arm_conn_link"/>
             <origin xyz="${(d_2djnt_r_L/2 - 0.022) + d_conn_arm_L/2} 0 ${d_2djnt_r_H/2 - 0.020 - d_conn_arm_H/2}" rpy="0 0 0"/>
+        </joint>
+
+        ---
+
+        <!-- Outbound Link -->
+        <link name="2d_out_arm_link"/>
+        <joint name="arm_conn_to_2d_out_arm" type="fixed">
+            <parent link="arm_conn_link"/>
+            <child link="2d_out_arm_link"/>
+            <origin xyz="${d_conn_arm_L/2} 0 -${d_conn_arm_H/2 - 0.038}" rpy="0 0 0"/>
         </joint>
 
         <!-- ********************[ GAZEBO CONFIG ]******************** -->
         
         <gazebo reference="2d_stator_link"><material>Gazebo/Black</material></gazebo>
         <gazebo reference="2d_rotor_roll_link"><material>Gazebo/Red</material></gazebo>
-        <gazebo reference="2d_arm_connector_link"><material>Gazebo/Black</material></gazebo>
+        <gazebo reference="arm_conn_link"><material>Gazebo/Black</material></gazebo>
 
     </xacro:macro>
 </robot>
