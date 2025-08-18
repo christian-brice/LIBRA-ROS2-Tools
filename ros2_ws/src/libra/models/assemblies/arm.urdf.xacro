@@ -254,7 +254,7 @@
         <joint name="arm_tip_to_arm_out" type="fixed">
             <parent link="arm_tip_link"/>
             <child link="arm_out_link"/>
-            <origin xyz="${d_arm_tip_L/2 - 0.029} ${-d_arm_tip_W} ${d_arm_tip_H/2 - 0.016}" rpy="0 0 0"/>
+            <origin xyz="${d_arm_tip_L/2 - 0.029} ${-d_arm_tip_W/2} ${d_arm_tip_H/2 - 0.016}" rpy="0 0 0"/>
         </joint>
 
         <!-- ********************[ GAZEBO CONFIG ]******************** -->
