@@ -63,7 +63,7 @@
         </joint>
 
         <link name="MJ1_rotor_link"/>
-        <joint name="MJ1_stator_to_MJ1_rotor" type="revolute">
+        <joint name="MJ1" type="revolute">
             <parent link="MJ1_stator_link"/>
             <child link="MJ1_rotor_link"/>
             <origin xyz="${d_servo_L/2 - 0.01675} -${d_servo_W/2} ${d_servo_H/2 - 0.010}" rpy="0 0 0"/>
@@ -97,7 +97,7 @@
         </joint>
 
         <link name="MJ2_rotor_link"/>
-        <joint name="MJ2_stator_to_MJ2_rotor" type="revolute">
+        <joint name="MJ2" type="revolute">
             <parent link="MJ2_stator_link"/>
             <child link="MJ2_rotor_link"/>
             <origin xyz="${-d_servo_bracket_L/2 + 0.01875} ${-d_servo_bracket_H/2 + 0.0115} ${d_servo_bracket_W/2}" rpy="0 0 0"/>
@@ -131,7 +131,7 @@
         </joint>
 
         <link name="MJ3_rotor_link"/>
-        <joint name="MJ3_stator_to_MJ3_rotor" type="revolute">
+        <joint name="MJ3" type="revolute">
             <parent link="MJ3_stator_link"/>
             <child link="MJ3_rotor_link"/>
             <origin xyz="${d_servo_bracket_L/2 - 0.01875} -${d_servo_bracket_W/2} ${d_servo_bracket_H/2 - 0.0115}" rpy="0 0 0"/>

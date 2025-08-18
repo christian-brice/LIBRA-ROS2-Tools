@@ -121,7 +121,7 @@
             </joint>
 
             <link name="${name}_hebi_rotor_link"/>
-            <joint name="${name}_hebi_stator_to_${name}_hebi_rotor" type="revolute">
+            <joint name="${name}" type="revolute">
                 <parent link="${name}_hebi_stator_link"/>
                 <child link="${name}_hebi_rotor_link"/>
                 <origin xyz="${d_hebi_L/2 - 0.073} 0 ${d_hebi_H/2}" rpy="0 0 0"/>

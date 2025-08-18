@@ -62,7 +62,7 @@
 
         <!-- Rotor (moved part) -->
         <link name="2d_rotor_pitch_link"/>
-        <joint name="2d_pitch_joint" type="revolute">
+        <joint name="Pitch" type="revolute">
             <parent link="2d_stator_link"/>
             <child link="2d_rotor_pitch_link"/>
             <origin xyz="${-d_2djnt_s_L/2 - 0.059 + d_2djnt_r_L/2} 0 ${d_2djnt_s_H/2 - 0.080 - d_2djnt_r_H/2}" rpy="0 0 0"/>
@@ -82,7 +82,7 @@
             </collision>
             <xacro:box_inertia m="${m_2djnt_r}" x="${d_2djnt_r_L}" y="${d_2djnt_r_W}" z="${d_2djnt_r_H}"/>
         </link>
-        <joint name="2d_roll_joint" type="revolute">
+        <joint name="Roll" type="revolute">
             <parent link="2d_rotor_pitch_link"/>
             <child link="2d_rotor_roll_link"/>
             <origin xyz="0 0 0" rpy="0 0 0"/>
@@ -105,7 +105,7 @@
             </collision>
             <xacro:box_inertia m="${m_conn_arm}" x="${d_conn_arm_L}" y="${d_conn_arm_W}" z="${d_conn_arm_H}"/>
         </link>
-        <joint name="2d_roll_joint_to_2d_out_arm" type="fixed">
+        <joint name="2d_roll_to_2d_out_arm" type="fixed">
             <parent link="2d_rotor_roll_link"/>
             <child link="arm_conn_link"/>
             <origin xyz="${(d_2djnt_r_L/2 - 0.022) + d_conn_arm_L/2} 0 ${d_2djnt_r_H/2 - 0.020 - d_conn_arm_H/2}" rpy="0 0 0"/>
