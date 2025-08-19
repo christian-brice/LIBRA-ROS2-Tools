@@ -11,5 +11,6 @@
     <xacro:include filename="$(find libra)/models/assemblies/manip.urdf.xacro"/>
     <link name="base_link"/>
     <xacro:spawn_manip parent="base_link"/>
+    <!-- <xacro:spawn_manip_static parent="base_link"/> -->
 
 </robot>

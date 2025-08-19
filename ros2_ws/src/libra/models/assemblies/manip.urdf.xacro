@@ -11,10 +11,16 @@
     <!-- Includes -->
     <xacro:include filename="$(find libra)/models/common/common.urdf.xacro" />
     
-    <!-- Definition -->
+    <!-- Definition #1: 3-Servo Manipulator -->
     <xacro:macro name="spawn_manip" params="parent">
 
         <!-- ********************[ PROPERTIES ]******************** -->
+
+        <!-- Servo Mount (arm tip) -->
+        <xacro:property name="d_servo_mount_L" value="0.100"/>
+        <xacro:property name="d_servo_mount_W" value="0.070"/>
+        <xacro:property name="d_servo_mount_H" value="0.0935"/>
+        <xacro:property name="m_servo_mount" value="0.170"/>
 
         <!-- Servo -->
         <xacro:property name="d_servo_L" value="0.054"/>
@@ -38,6 +44,29 @@
         <!-- NOTE
             X = forward/red, Y = left/green, Z = upwards/blue
         -->
+        
+        <!-- Servo Mount (arm tip) -->
+        <link name="servo_mount_link">
+            <visual>
+                <origin xyz="-${d_servo_mount_L/2} 0 ${d_servo_mount_H/2 - 0.002}" rpy="${PI/2} 0 ${PI/2}"/>
+                <geometry>
+                    <mesh filename="package://libra/meshes/mount-servos.stl" scale="0.001 0.001 0.001"/>
+                </geometry>
+                <material name="black"/>
+            </visual>
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <box size="${d_servo_mount_L} ${d_servo_mount_W} ${d_servo_mount_H}"/>
+                </geometry>
+            </collision>
+            <xacro:box_inertia m="${m_servo_mount}" x="${d_servo_mount_L}" y="${d_servo_mount_W}" z="${d_servo_mount_H}"/>
+        </link>
+        <joint name="parent_to_servo_mount" type="fixed">
+            <parent link="${parent}"/>
+            <child link="servo_mount_link"/>
+            <origin xyz="${d_servo_mount_L/2} 0 ${0.042 - d_servo_mount_H/2}" rpy="0 0 0"/>
+        </joint>
 
         <!-- Manipulator Joint #1 (servo) -->
         <link name="MJ1_stator_link">
@@ -56,10 +85,10 @@
             </collision>
             <xacro:box_inertia m="${m_servo}" x="${d_servo_L}" y="${d_servo_W}" z="${d_servo_H}"/>
         </link>
-        <joint name="parent_to_MJ1_stator" type="fixed">
-            <parent link="${parent}"/>
+        <joint name="servo_mount_to_MJ1_stator" type="fixed">
+            <parent link="servo_mount_link"/>
             <child link="MJ1_stator_link"/>
-            <origin xyz="0 ${d_servo_W/2 - 0.0178} 0" rpy="0 0 0"/>
+            <origin xyz="${d_servo_mount_L/2 - 0.029} ${-d_servo_mount_W/2 + d_servo_W/2 - 0.0178} ${d_servo_mount_H/2 - 0.016}" rpy="0 0 0"/>
         </joint>
 
         <link name="MJ1_rotor_link"/>
@@ -176,9 +205,106 @@
 
         <!-- ********************[ GAZEBO CONFIG ]******************** -->
 
+        <gazebo reference="servo_mount_link"><material>Gazebo/Black</material></gazebo>
         <gazebo reference="MJ1_stator_link"><material>Gazebo/Purple</material></gazebo>
         <gazebo reference="MJ2_stator_link"><material>Gazebo/Purple</material></gazebo>
         <gazebo reference="MJ3_stator_link"><material>Gazebo/Purple</material></gazebo>
+        <gazebo reference="sensor_bracket_link"><material>Gazebo/Black</material></gazebo>
+        
+    </xacro:macro>
+
+    <!-- Definition #2: Static Manipulator Mount -->
+    <xacro:macro name="spawn_manip_static" params="parent">
+
+        <!-- ********************[ PROPERTIES ]******************** -->
+
+        <!-- Static Mount -->
+        <xacro:property name="d_static_L" value="0.060"/>
+        <xacro:property name="d_static_W" value="0.070"/>
+        <xacro:property name="d_static_H" value="0.070"/>
+        <xacro:property name="m_static" value="?"/>
+
+        <!-- Sensor Mounting Bracket -->
+        <xacro:property name="d_sensor_bracket_L" value="0.065"/>
+        <xacro:property name="d_sensor_bracket_W" value="0.025"/>
+        <xacro:property name="d_sensor_bracket_H" value="0.055"/>
+        <xacro:property name="m_sensor_bracket" value="0.0081"/>
+
+        <!-- ********************[ LINKS ]******************** -->
+        <!-- NOTE
+            X = forward/red, Y = left/green, Z = upwards/blue
+        -->
+
+        <!-- Static Mount -->
+        <link name="static_mount_link">
+            <visual>
+                <origin xyz="${-d_static_L/2 + 0.0049} 0 0" rpy="${PI/2} 0 ${PI/2}"/>
+                <geometry>
+                    <mesh filename="package://libra/meshes/mount-static.stl" scale="0.001 0.001 0.001"/>
+                </geometry>
+                <material name="black"/>
+            </visual>
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <box size="${d_static_L} ${d_static_W} ${d_static_H}"/>
+                </geometry>
+            </collision>
+            <xacro:box_inertia m="${m_static}" x="${d_static_L}" y="${d_static_W}" z="${d_static_H}"/>
+        </link>
+        <joint name="parent_to_static_mount" type="fixed">
+            <parent link="${parent}"/>
+            <child link="static_mount_link"/>
+            <origin xyz="${d_static_L/2} 0 0" rpy="0 0 0"/>
+        </joint>
+
+        <link name="pseudo_rotor_link"/>
+        <joint name="Static-Manip" type="revolute">
+            <parent link="static_mount_link"/>
+            <child link="pseudo_rotor_link"/>
+            <origin xyz="${d_static_L/2 - 0.023} ${-d_static_W/2 + 0.01} 0" rpy="0 0 0"/>
+            <axis xyz="0 1 0"/>
+            <limit lower="-${PI/2}" upper="${PI/2}" effort="50" velocity="1.5"/>
+        </joint>
+
+        ---
+
+        <!-- Sensor Mounting Bracket -->
+        <link name="sensor_bracket_link">
+            <visual>
+                <origin xyz="${d_sensor_bracket_L/2} 0 0" rpy="${PI/2} 0 -${PI/2}"/>
+                <geometry>
+                    <mesh filename="package://libra/meshes/sensor_bracket.stl" scale="0.001 0.001 0.001"/>
+                </geometry>
+                <material name="black"/>
+            </visual>
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <box size="${d_sensor_bracket_L} ${d_sensor_bracket_H} ${d_sensor_bracket_W}"/>
+                </geometry>
+            </collision>
+            <xacro:box_inertia m="${m_sensor_bracket}" x="${d_sensor_bracket_L}" y="${d_sensor_bracket_H}" z="${d_sensor_bracket_W}"/>
+        </link>
+        <joint name="pseudo_rotor_to_sensor_bracket" type="fixed">
+            <parent link="pseudo_rotor_link"/>
+            <child link="sensor_bracket_link"/>
+            <origin xyz="${d_sensor_bracket_L/2 - 0.0125} ${d_sensor_bracket_W} 0" rpy="0 0 0"/>
+        </joint>
+
+        ---
+
+        <!-- Outbound Link -->
+        <link name="manip_out_link"/>
+        <joint name="sensor_bracket_to_manip_out" type="fixed">
+            <parent link="sensor_bracket_link"/>
+            <child link="manip_out_link"/>
+            <origin xyz="${d_sensor_bracket_L/2} 0 0" rpy="0 0 0"/>
+        </joint>
+
+        <!-- ********************[ GAZEBO CONFIG ]******************** -->
+
+        <gazebo reference="static_mount_link"><material>Gazebo/Black</material></gazebo>
         <gazebo reference="sensor_bracket_link"><material>Gazebo/Black</material></gazebo>
         
     </xacro:macro>

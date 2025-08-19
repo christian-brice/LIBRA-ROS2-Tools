@@ -24,7 +24,8 @@
     <link name="base_link"/>
     <xacro:spawn_2djnt parent="base_link"/>
     <xacro:spawn_arm parent="2djnt_out_arm_link"/>
-    <xacro:spawn_manip parent="arm_out_link"/>
+    <!-- <xacro:spawn_manip parent="arm_out_link"/> -->
+    <xacro:spawn_manip_static parent="arm_out_link"/>
     <xacro:spawn_sensors parent="manip_out_link"/>
 
 </robot>

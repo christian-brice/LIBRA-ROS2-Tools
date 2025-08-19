@@ -43,12 +43,6 @@
         <xacro:property name="d_hebi_H" value="0.0451"/>
         <xacro:property name="m_hebi" value="0.490"/>
 
-        <!-- Arm Tip / Manipulator Mount -->
-        <xacro:property name="d_arm_tip_L" value="0.100"/>
-        <xacro:property name="d_arm_tip_W" value="0.070"/>
-        <xacro:property name="d_arm_tip_H" value="0.0935"/>
-        <xacro:property name="m_arm_tip" value="0.170"/>
-
         <!-- ********************[ MACROS ]******************** -->
 
         <xacro:macro name="link_macro" params="name">
@@ -226,35 +220,13 @@
             <child link="L4_link"/>
             <origin xyz="${d_conn_inner_L/2 + d_arm_link_L/2} 0 0" rpy="${PI/2} 0 0"/>
         </joint>
-        
-        <link name="arm_tip_link">
-            <visual>
-                <origin xyz="-${d_arm_tip_L/2} 0 ${d_arm_tip_H/2 - 0.002}" rpy="${PI/2} 0 ${PI/2}"/>
-                <geometry>
-                    <mesh filename="package://libra/meshes/arm-tip.stl" scale="0.001 0.001 0.001"/>
-                </geometry>
-                <material name="black"/>
-            </visual>
-            <collision>
-                <origin xyz="0 0 0" rpy="0 0 0"/>
-                <geometry>
-                    <box size="${d_arm_tip_L} ${d_arm_tip_W} ${d_arm_tip_H}"/>
-                </geometry>
-            </collision>
-            <xacro:box_inertia m="${m_arm_tip}" x="${d_arm_tip_L}" y="${d_arm_tip_W}" z="${d_arm_tip_H}"/>
-        </link>
-        <joint name="L4_to_arm_tip" type="fixed">
-            <parent link="L4_link"/>
-            <child link="arm_tip_link"/>
-            <origin xyz="${d_arm_link_L/2 + d_arm_tip_L/2} 0 ${0.042 - d_arm_tip_H/2}" rpy="0 0 0"/>
-        </joint>
 
         <!-- Outbound Link -->
         <link name="arm_out_link"/>
-        <joint name="arm_tip_to_arm_out" type="fixed">
-            <parent link="arm_tip_link"/>
+        <joint name="L4_to_arm_out" type="fixed">
+            <parent link="L4_link"/>
             <child link="arm_out_link"/>
-            <origin xyz="${d_arm_tip_L/2 - 0.029} ${-d_arm_tip_W/2} ${d_arm_tip_H/2 - 0.016}" rpy="0 0 0"/>
+            <origin xyz="${d_arm_link_L/2} 0 0" rpy="0 0 0"/>
         </joint>
 
         <!-- ********************[ GAZEBO CONFIG ]******************** -->
@@ -266,7 +238,6 @@
         <gazebo reference="L3_link"><material>Gazebo/Gray</material></gazebo>
         <gazebo reference="J3_link"><material>Gazebo/Red</material></gazebo>
         <gazebo reference="L4_link"><material>Gazebo/Gray</material></gazebo>
-        <gazebo reference="arm_tip_link"><material>Gazebo/Black</material></gazebo>
         
     </xacro:macro>
 </robot>
