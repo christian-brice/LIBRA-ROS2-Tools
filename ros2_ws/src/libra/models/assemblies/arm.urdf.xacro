@@ -2,14 +2,12 @@
 <!--***************************************************************************
 /// @file   arm.urdf.xacro
 /// @brief  LIBRA-I arm model definition.
+///         Requires include at top level: `common/common.urdf.xacro`.
 ///
 /// @author brice.c.aa
 ****************************************************************************-->
 
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
-
-    <!-- Includes -->
-    <xacro:include filename="$(find libra)/models/common/common.urdf.xacro" />
 
     <!-- Definition -->
     <xacro:macro name="spawn_arm" params="parent">

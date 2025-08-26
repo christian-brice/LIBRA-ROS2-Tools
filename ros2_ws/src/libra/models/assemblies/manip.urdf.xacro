@@ -2,14 +2,12 @@
 <!--***************************************************************************
 /// @file   manip.urdf.xacro
 /// @brief  LIBRA-I manipulator model definition.
+///         Requires include at top level: `common/common.urdf.xacro`.
 ///
 /// @author brice.c.aa
 ****************************************************************************-->
 
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
-
-    <!-- Includes -->
-    <xacro:include filename="$(find libra)/models/common/common.urdf.xacro" />
 
     <!-- Definition #1: 3-Servo Manipulator -->
     <xacro:macro name="spawn_manip" params="parent">

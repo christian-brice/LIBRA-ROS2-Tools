@@ -8,11 +8,15 @@
 
 <robot name="LIBRA-I" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
+    <!-- Includes -->
+    <xacro:include filename="$(find libra)/models/common/common.urdf.xacro"/>
+    
     <xacro:include filename="$(find libra)/models/assemblies/2djnt.urdf.xacro"/>
     <xacro:include filename="$(find libra)/models/assemblies/arm.urdf.xacro"/>
     <xacro:include filename="$(find libra)/models/assemblies/manip.urdf.xacro"/>
     <xacro:include filename="$(find libra)/models/assemblies/sensor_suite.urdf.xacro"/>
 
+    <!-- Model Construction -->
     <!-- NOTE
         Black = static elements
         Gray = static elements (links only)
@@ -20,11 +24,10 @@
         Purple = active elements (secondary actuators)
         Blue = sensors
     -->
-
     <link name="base_link"/>
     <xacro:spawn_2djnt parent="base_link"/>
     <xacro:spawn_arm parent="2djnt_out_arm_link"/>
-    <!-- <xacro:spawn_manip parent="arm_out_link"/> -->
+<!--<xacro:spawn_manip parent="arm_out_link"/>-->
     <xacro:spawn_manip_static parent="arm_out_link"/>
     <xacro:spawn_sensors parent="manip_out_link"/>
 
