@@ -10,7 +10,7 @@
 
     <!-- Includes -->
     <xacro:include filename="$(find libra)/models/common/common.urdf.xacro" />
-    
+
     <!-- Definition #1: 3-Servo Manipulator -->
     <xacro:macro name="spawn_manip" params="parent">
 
@@ -44,7 +44,7 @@
         <!-- NOTE
             X = forward/red, Y = left/green, Z = upwards/blue
         -->
-        
+
         <!-- Servo Mount (arm tip) -->
         <link name="servo_mount_link">
             <visual>
@@ -68,7 +68,7 @@
             <origin xyz="${d_servo_mount_L/2} 0 ${0.042 - d_servo_mount_H/2}" rpy="0 0 0"/>
         </joint>
 
-        <!-- Manipulator Joint #1 (servo) -->
+        <!-- Servo Joint #1 -->
         <link name="MJ1_stator_link">
             <visual>
                 <origin xyz="0.0104 -0.0156 0.002" rpy="${PI/2} 0 0"/>
@@ -100,9 +100,7 @@
             <limit lower="-${PI/2}" upper="${PI/2}" effort="50" velocity="1.5"/>
         </joint>
 
-        ---
-
-        <!-- Manipulator Joint #2 (servo w/ bracket) -->
+        <!-- Servo Joint #2 (w/ bracket) -->
         <link name="MJ2_stator_link">
             <visual>
                 <origin xyz="-0.0104 -0.003 ${d_servo_bracket_H/2 + 0.0045}" rpy="0 0 ${PI}"/>
@@ -134,9 +132,7 @@
             <limit lower="-${PI/2}" upper="${PI/2}" effort="50" velocity="1.5"/>
         </joint>
 
-        ---
-
-        <!-- Manipulator Joint #3 (servo w/ bracket) -->
+        <!-- Servo Joint #3 (w/ bracket) -->
         <link name="MJ3_stator_link">
             <visual>
                 <origin xyz="0.0104 -${d_servo_bracket_W/2 - 0.0075} 0.003" rpy="${PI/2} 0 0"/>
@@ -168,8 +164,6 @@
             <limit lower="-${PI/2}" upper="${PI/2}" effort="50" velocity="1.5"/>
         </joint>
 
-        ---
-
         <!-- Sensor Mounting Bracket -->
         <link name="sensor_bracket_link">
             <visual>
@@ -192,8 +186,6 @@
             <child link="sensor_bracket_link"/>
             <origin xyz="${d_sensor_bracket_L/2 - 0.0125} ${d_sensor_bracket_W} 0" rpy="0 0 0"/>
         </joint>
-
-        ---
 
         <!-- Outbound Link -->
         <link name="manip_out_link"/>
@@ -222,7 +214,7 @@
         <xacro:property name="d_static_L" value="0.060"/>
         <xacro:property name="d_static_W" value="0.070"/>
         <xacro:property name="d_static_H" value="0.070"/>
-        <xacro:property name="m_static" value="?"/>
+        <xacro:property name="m_static" value="0.150"/>
 
         <!-- Sensor Mounting Bracket -->
         <xacro:property name="d_sensor_bracket_L" value="0.065"/>
@@ -267,8 +259,6 @@
             <limit lower="-${PI/2}" upper="${PI/2}" effort="50" velocity="1.5"/>
         </joint>
 
-        ---
-
         <!-- Sensor Mounting Bracket -->
         <link name="sensor_bracket_link">
             <visual>
@@ -291,8 +281,6 @@
             <child link="sensor_bracket_link"/>
             <origin xyz="${d_sensor_bracket_L/2 - 0.0125} ${d_sensor_bracket_W} 0" rpy="0 0 0"/>
         </joint>
-
-        ---
 
         <!-- Outbound Link -->
         <link name="manip_out_link"/>

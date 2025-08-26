@@ -10,7 +10,7 @@
 
     <!-- Includes -->
     <xacro:include filename="$(find libra)/models/common/common.urdf.xacro" />
-    
+
     <!-- Definition -->
     <xacro:macro name="spawn_sensors" params="parent">
 
@@ -21,7 +21,7 @@
         <xacro:property name="m_lidar_W" value="0.100000"/>
         <xacro:property name="m_lidar_H" value="0.084000"/>
         <xacro:property name="m_lidar_m" value="0.009"/>
-        
+
         <xacro:property name="m_camera_L" value="0.104349"/>
         <xacro:property name="m_camera_W" value="0.135861"/>
         <xacro:property name="m_camera_H" value="0.059941"/>
@@ -32,7 +32,7 @@
         <xacro:property name="lidar_H" value="0.043979"/>
         <xacro:property name="lidar_L" value="0.050587"/>
         <xacro:property name="lidar_m" value="0.058"/>
-        
+
         <!-- RGB-D camera (Intel RealSense D456) -->
         <xacro:property name="camera_W" value="0.123999"/>
         <xacro:property name="camera_H" value="0.029093"/>
@@ -97,8 +97,6 @@
             <child link="lidar_link"/>
             <origin xyz="0.006 0 0" rpy="0 ${PI/2} 0"/>  <!-- facing downwards -->
         </joint>
-
-        ---
 
         <!-- Camera Mount -->
         <link name="mount_camera_link">

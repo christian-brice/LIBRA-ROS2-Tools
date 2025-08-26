@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--***************************************************************************
 /// @file   libra1_no_manip.urdf.xacro
-/// @brief  LIBRA-I (w/o customization) model constructor.
+/// @brief  LIBRA-I (base 5-DoF arm only) model constructor.
 ///
 /// @author brice.c.aa
 ****************************************************************************-->
