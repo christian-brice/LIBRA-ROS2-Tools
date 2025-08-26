@@ -29,8 +29,9 @@ def generate_launch_description():
     pkg_share = get_package_share_directory('libra')
     default_rviz_config_path = os.path.join(pkg_share, 'rviz', 'rviz_basic_settings.rviz')
 
+    libra1_urdf = os.path.join(pkg_share, 'models', 'robots', 'libra1.urdf.xacro')
+    libra1_no_manip_urdf = os.path.join(pkg_share, 'models', 'robots', 'libra1_no_manip.urdf.xacro')
     sensor_suite_urdf = os.path.join(pkg_share, 'models', 'display_sensors.urdf.xacro')
-    arm_urdf = os.path.join(pkg_share, 'models', 'robots', 'libra1_no_sensors.urdf.xacro')
 
     # --------------------------------------------------------------------------
     # !Launch Arguments
@@ -41,15 +42,15 @@ def generate_launch_description():
     use_rviz = LaunchConfiguration('use_rviz')
     use_sim_time = LaunchConfiguration('use_sim_time')
 
+    urdf_model_arg = DeclareLaunchArgument(
+        name='urdf_model',
+        default_value='libra1',
+        description='Model to load: "libra1", "libra1_basic", or "sensor_suite" (default: libra1)')
+
     rviz_config_file_arg = DeclareLaunchArgument(
         name='rviz_config_file',
         default_value=default_rviz_config_path,
         description='Full path to RViz config file (default: rviz_basic_settings.rviz)')
-
-    urdf_model_arg = DeclareLaunchArgument(
-        name='urdf_model',
-        default_value='sensor_suite',
-        description='Model to load: "sensor_suite" or "arm" (default: sensor_suite)')
 
     use_rviz_arg = DeclareLaunchArgument(
         name='use_rviz',
@@ -63,9 +64,10 @@ def generate_launch_description():
 
     # Resolve URDF path with strict checking
     urdf_path_expr = PythonExpression([
-        '"', sensor_suite_urdf, '" if "', urdf_model, '" == "sensor_suite" else ',
-        '("', arm_urdf, '" if "', urdf_model, '" == "arm" else exit('
-        '"Invalid urdf_model value. Must be \'sensor_suite\' or \'arm\'"))'
+        '"', libra1_urdf, '" if "', urdf_model, '" == "libra1" else ',
+        '("', libra1_no_manip_urdf, '" if "', urdf_model, '" == "libra1_no_manip" else ',
+        '("', sensor_suite_urdf, '" if "', urdf_model, '" == "sensor_suite" else ',
+        'exit("Invalid urdf_model value. Must be \'libra1\', \'libra1_no_manip\', or \'sensor_suite\'")))'
     ])
 
     #----------------------------------------------------------------------
