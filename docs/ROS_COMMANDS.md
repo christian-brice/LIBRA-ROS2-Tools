@@ -16,6 +16,8 @@
     - [*`ros2 interface show <topic_type>`*](#ros2-interface-show-topic_type)
 - [Visualizations](#visualizations)
     - [*`rqt_graph`*](#rqt_graph)
+    - [*ros2 run rqt\_tf\_tree rqt\_tf\_tree*](#ros2-run-rqt_tf_tree-rqt_tf_tree)
+    - [*ros2 run tf2\_tools view\_frames*](#ros2-run-tf2_tools-view_frames)
 
 ## Launch Files and Interfaces
 
@@ -91,3 +93,14 @@ Returns the data structure expected by the given topic type.
 ### *`rqt_graph`*
 
 Generates node graphs for the current ROS 2 system. For example, you can see how `tf` (transform frame) is propagated along all links in a robot.
+
+### *ros2 run rqt_tf_tree rqt_tf_tree*
+
+> ***NOTE:*** requires the rqt_tf_tree package for your ROS2 distro: `sudo apt install ros-humble-rqt-tf-tree 
+`.
+
+Shows a graph of all `tf` and their connections. Useful for troubleshooting your robot's URDF model.
+
+### *ros2 run tf2_tools view_frames*
+
+Generates a static PDF of the `tf` tree.
