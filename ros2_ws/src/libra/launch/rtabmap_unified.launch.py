@@ -204,9 +204,9 @@ def generate_launch_description():
             odom_exec = 'rgbd_odometry'
             odom_extra = {
                 # Without robot odometry, only visual odometry is supported
-                # TODO: this must change after the following are complete:
+                # TODO: this must change now that the following are complete:
                 #       - Confirmed that HebiThread outputs necessary odometry data
-                #       - LIBRA-I URDF model (currently only sensor suite is done)
+                #       - Full LIBRA-I URDF model
                 'Reg/Strategy': '0'
             }
             slam_extra = {
