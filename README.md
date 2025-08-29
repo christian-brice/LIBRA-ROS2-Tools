@@ -152,8 +152,6 @@ When replaying data, you must launch the following nodes. See `rtabmap_unified.l
 /tf /joint_states
 ```
 
-> ***NOTE:*** (TODO) `/joint_states` is not currently published by anything, but will eventually be handled by the LIBRA App.
-
 #### **RGB+D Camera**
 
 Published by `realsense2_camera` and `imu_filter_madgwick_node`.
