@@ -107,13 +107,17 @@ def generate_launch_description():
 
     # NOTE: for more detailed information on RTAB-Map parameters, see
     #       https://github.com/introlab/rtabmap/wiki/Change-parameters
+    #         and
+    #       https://wiki.ros.org/rtabmap_ros/Tutorials/Advanced%20Parameter%20Tuning
     
     # Common RTAB-Map parameters
     base_rtab_params = {
         'sync_queue_size': 30,  # default: 10
         'topic_queue_size': 30,  # default: 10
-        'subscribe_odom_info': True,
+        'subscribe_odom_info': True,  # NOTE: only published by RTAB-Map odom nodes
         'wait_imu_to_init': True,
+        # Odometry and registration
+        'Reg/Force3DoF': 'true',  # roll, pitch, and Z must be explicitly provided (i.e., won't be estimated)
     }
 
     # Mode-specific RTAB-Map parameters
@@ -143,7 +147,6 @@ def generate_launch_description():
         'RGBD/OptimizeMaxError': '0',  # must be 0 if RGBD/OptimizeRobust is true
         'Grid/FromDepth': 'false',  # true: depth, false: laser scans
         # Odometry and registration
-        'Reg/Force3DoF': 'true',  # roll, pitch, and Z must be explicitly provided (i.e., won't be estimated)
         'Icp/VoxelSize': '0.05',  # in m; filter scans down to 5 cm voxel before registration
         'Icp/MaxCorrespondenceDistance': '0.1'  # in m; max distance between points during registration
     }
