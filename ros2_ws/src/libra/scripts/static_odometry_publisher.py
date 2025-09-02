@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # Brief:
 #   Publishes a static odometry message with zero velocity, since LIBRA robots
 #   are stationary. This provides a stable odometry source for SLAM systems
@@ -43,7 +45,7 @@ class StaticOdometryPublisher(Node):
         # --- End of Initialization ---
         
         self.get_logger().info(
-            f"Static Odometry Publisher started. Publishing on '/robot_odom' "
+            f"Static Odometry Publisher started.\n  Publishing on '/robot_odom' "
             f"with frame_id='{self.odom_frame_}' and child_frame_id='{self.base_frame_}' "
             f"at {self.publish_frequency_} Hz."
         )

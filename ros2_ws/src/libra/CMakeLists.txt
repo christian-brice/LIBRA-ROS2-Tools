@@ -35,7 +35,7 @@ install(
 
 # Define executable Python nodes
 install(PROGRAMS
-    nodes/static_odometry_publisher.py
+    scripts/static_odometry_publisher.py
     DESTINATION lib/${PROJECT_NAME}
 )
 
