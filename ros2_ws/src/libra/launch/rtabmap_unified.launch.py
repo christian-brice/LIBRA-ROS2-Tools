@@ -1,13 +1,12 @@
 # Brief:
-#   Unified RTAB-Map launch file supporting multiple modes:
-#   - rgbd_lidar: RGB-D mode with RealSense and 2D LIDAR data
-#   - rgbd: RGB-D mode with only RealSense data  
-#   - stereo: Stereo mode with only RealSense data
-#   (no robot odometry; visual-inertial odometry is used instead)
+#   Unified RTAB-Map launch file supporting multiple modes and odometry sources:
+#   - Modes: rgbd_lidar, rgbd, stereo
+#   - Odometry: robot (actuator data), vio (visual-inertial data from RealSense)
 #
 # Requirements:
 #   An Intel RealSense D435i or D456
 #   A LightWare SF45/B (for rgbd_lidar mode)
+#   HEBI actuator states published on /joint_states (for robot odometry)
 #   Install required ROS2 packages:
 #     realsense2_camera (ros-$ROS_DISTRO-realsense2-camera)
 #     lightwarelidar2 (lightwarelidar2)
@@ -56,13 +55,20 @@ def generate_launch_description():
         'mode',
         default_value='rgbd_lidar',
         choices=['rgbd_lidar', 'rgbd', 'stereo'],
-        description='RTAB-Map mode: rgbd_lidar, rgbd, or stereo.'
+        description='RTAB-Map mode: "rgbd_lidar" for LIDAR-corrected RGB+D data, "rgbd" for RGB+D data only, or "stereo" for stereoscopic IR data only.'
+    )
+
+    declare_odom_source_cmd = DeclareLaunchArgument(
+        'odom_source',
+        default_value='robot',
+        choices=['robot', 'vio'],
+        description='Odometry source: "robot" for EKF-fused actuator + IMU data, "vio" for visual-inertial odometry fusion.'
     )
 
     declare_working_dir_cmd = DeclareLaunchArgument(
         'working_dir',
         default_value=default_working_dir,
-        description='Path to RTAB-Map working directory. If empty, defaults to .rtabmap/ in your user home.'
+        description='Path to RTAB-Map working directory. If empty, defaults to ".rtabmap/" in your user home.'
     )
 
     declare_delete_db_cmd = DeclareLaunchArgument(
@@ -92,7 +98,7 @@ def generate_launch_description():
     declare_lidar_port_cmd = DeclareLaunchArgument(
         'lidar_port',
         default_value='/dev/lidar',
-        description='Serial port for LightWare LIDAR. If empty, defaults to /dev/lidar. (rgbd_lidar only)'
+        description='Serial port for 2D LIDAR. If empty, defaults to "/dev/lidar". (rgbd_lidar only)'
     )
 
     #--------------------------------------------------------------------------
@@ -182,10 +188,11 @@ def generate_launch_description():
         
         # Get constant parameters
         mode = context.launch_configurations['mode']
-        working_dir = context.launch_configurations['working_dir']  # has default
+        odom_source = context.launch_configurations['odom_source']
+        working_dir = context.launch_configurations['working_dir']
         delete_db = context.launch_configurations['delete_db']
-        urdf_model = context.launch_configurations['urdf_model']  # has default
-        lidar_port = context.launch_configurations['lidar_port']  # has default
+        urdf_model = context.launch_configurations['urdf_model']
+        lidar_port = context.launch_configurations['lidar_port']
 
         # Get variable parameters
         frame_id_arg = context.launch_configurations['frame_id']
@@ -195,49 +202,54 @@ def generate_launch_description():
         # !Mode-based Parameters
         #----------------------------------------------------------------------
 
-        # Resolve parameters based on mode
+        # Resolve parameters based on mode and odom_source
         if mode == 'rgbd_lidar':
             frame_id = frame_id_arg or 'base_link'
             realsense_config = realsense_config_arg or os.path.join(config_dir, 'realsense_rgbd.yaml')
-            rtab_params = rgbd_lidar_params
-            remaps = rgbd_lidar_remaps
-            odom_exec = 'rgbd_odometry'
-            odom_extra = {
-                # Without robot odometry, only visual odometry is supported
-                # TODO: this must change now that the following are complete:
-                #       - Confirmed that HebiThread outputs necessary odometry data
-                #       - Full LIBRA-I URDF model
-                'Reg/Strategy': '0'
-            }
-            slam_extra = {
-                # Use laser scans to inform VSLAM
-                'Reg/Strategy': '2'
-            }
+
+            if odom_source == 'robot':
+                rtab_params = rgbd_lidar_params | {
+                    'subscribe_odom_info': False,  # OdomInfo is only published by RTAB-Map odom nodes
+                    'Odom/Strategy': '0',  # rely on external odometry
+                }
+                remaps = rgbd_lidar_remaps + [('odom', '/robot_odom')]
+                slam_extra = {'Reg/Strategy': '2'}  # improve VSLAM with laser scans
+
+            else:  # vio
+                rtab_params = rgbd_lidar_params
+                remaps = rgbd_lidar_remaps
+                odom_exec = 'rgbd_odometry'
+                odom_extra = {'Reg/Strategy': '0'}  # rely on visual odometry
+                slam_extra = {'Reg/Strategy': '2'}  # improve VSLAM with laser scans
+
         elif mode == 'rgbd':
             frame_id = frame_id_arg or 'camera_link'
             realsense_config = realsense_config_arg or os.path.join(config_dir, 'realsense_rgbd.yaml')
+
             rtab_params = rgbd_params
             remaps = rgbd_remaps
             odom_exec = 'rgbd_odometry'
             odom_extra = {}
             slam_extra = {}
-        else:  # stereo
+
+        else:  # mode == 'stereo'
             frame_id = frame_id_arg or 'camera_link'
             realsense_config = realsense_config_arg or os.path.join(config_dir, 'realsense_stereo.yaml')
+
             rtab_params = stereo_params
             remaps = stereo_remaps
             odom_exec = 'stereo_odometry'
             odom_extra = {}
             slam_extra = {}
 
-        nodes = []
-
         #----------------------------------------------------------------------
         # !Nodes
         #----------------------------------------------------------------------
 
-        # Publish robot frame transforms based on URDF model
+        nodes = []
+
         if mode == 'rgbd_lidar':
+            # Publish robot frame transforms based on URDF model
             nodes.append(Node(
                 package='robot_state_publisher',
                 executable='robot_state_publisher',
@@ -251,13 +263,48 @@ def generate_launch_description():
                     # removed by xacro so they are included in the output.
                     # (source: https://answers.ros.org/question/417369/caught-exception-in-launch-see-debug-for-traceback-unable-to-parse-the-value-of-parameter-robot_description-as-yaml/)
                     'robot_description': ParameterValue(
-                        Command(['xacro ', LaunchConfiguration('urdf_model')]),
-                        value_type=str
+                        Command(['xacro ', urdf_model]), value_type=str
                     )
-                }],
-                arguments=[urdf_model]
+                }]
             ))
         
+        # --- Conditional Odometry Nodes ---
+
+        if odom_source == 'robot':
+            # Publish static transform from 'odom' -> 'base_link'
+            nodes.append(Node(
+                package='tf2_ros',
+                executable='static_transform_publisher',
+                name='odom_to_base_link_publisher',
+                arguments=[
+                    '0', '0', '0',  # no X, Y, Z translation
+                    '0', '0', '0',  # no yaw, pitch, roll rotation
+                    'odom', 'base_link'  # parent and child frames
+                ]
+            ))
+
+            # Publish static odometry message to RTAB-Map
+            nodes.append(Node(
+                package='libra',
+                executable='static_odometry_publisher.py',
+                output='screen',
+            ))
+        
+        else:  # odom_source == 'vio'
+            # Compute visual-inertial odometry
+            nodes.append(Node(
+                package='rtabmap_odom',
+                executable=odom_exec,
+                output='screen',
+                parameters=[ rtab_params | odom_extra | {
+                    'Rtabmap\WorkingDirectory': working_dir,
+                    'frame_id': frame_id
+                }],
+                remappings=remaps
+            ))
+
+        # --- Common Nodes ---
+
         # RealSense camera
         nodes.append(IncludeLaunchDescription(
             PythonLaunchDescriptionSource([
@@ -299,23 +346,11 @@ def generate_launch_description():
                     'port': lidar_port,
                     'frameId': 'lidar_link',
                     'baudrate': 115200,
-                    'updateRate': 12,
-                    'lowAngleLimit': -160,
+                    'updateRate': 12,  # set fastest rotation rate  
+                    'lowAngleLimit': -160,  # set max scan angles
                     'highAngleLimit': 160
                 }],
             ))
-        
-        # Compute visual-inertial odometry
-        nodes.append(Node(
-            package='rtabmap_odom',
-            executable=odom_exec,
-            output='screen',
-            parameters=[ rtab_params | odom_extra | {
-                'Rtabmap\WorkingDirectory': working_dir,
-                'frame_id': frame_id
-            }],
-            remappings=remaps
-        ))
 
         # Primary RTAB-Map SLAM computation
         nodes.append(Node(
@@ -344,6 +379,7 @@ def generate_launch_description():
     return LaunchDescription([
         # Launch arguments
         declare_mode_cmd,
+        declare_odom_source_cmd,
         declare_working_dir_cmd,
         declare_delete_db_cmd,
         declare_urdf_model_cmd,
