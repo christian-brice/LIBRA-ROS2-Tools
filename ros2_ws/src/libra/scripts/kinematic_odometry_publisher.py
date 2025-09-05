@@ -19,6 +19,9 @@ from geometry_msgs.msg import Quaternion, Twist, Point
 import numpy as np
 import tf_transformations
 
+import tf2_ros
+from geometry_msgs.msg import TransformStamped
+
 class KinematicOdometryPublisher(Node):
     """
     Publishes odometry messages based on forward kinematics computation
@@ -30,7 +33,7 @@ class KinematicOdometryPublisher(Node):
 
         # --- Parameters ---
         self.declare_parameter('odom_frame', 'odom')
-        self.declare_parameter('child_frame', 'sensor_suite_base_link')
+        self.declare_parameter('child_frame', 'base_link')
         self.declare_parameter('publish_frequency', 50.0)
 
         self.odom_frame_ = self.get_parameter('odom_frame').get_parameter_value().string_value
@@ -61,6 +64,7 @@ class KinematicOdometryPublisher(Node):
             JointState, '/joint_states', self.joint_states_callback, 10)
         
         self.odom_pub_ = self.create_publisher(Odometry, '/robot_odom', 10)
+        self.tf_broadcaster_ = tf2_ros.TransformBroadcaster(self)
         
         # Timer for publishing odometry at fixed rate
         timer_period = 1.0 / self.publish_frequency_
@@ -260,6 +264,25 @@ class KinematicOdometryPublisher(Node):
         
         # Publish
         self.odom_pub_.publish(odom_msg)
+
+        # TODO: this is just copy/pasted, but it should be better integrated
+        #       (e.g., change function name, comments, etc.)
+        # Publish the TF transform
+        t = TransformStamped()
+        t.header.stamp = self.get_clock().now().to_msg()
+        t.header.frame_id = self.odom_frame_  # This is 'odom'
+        t.child_frame_id = self.child_frame_  # This is now 'base_link'
+
+        t.transform.translation.x = self.current_pose[0]
+        t.transform.translation.y = self.current_pose[1]
+        t.transform.translation.z = self.current_pose[2]
+
+        t.transform.rotation.x = self.current_pose[3]
+        t.transform.rotation.y = self.current_pose[4]
+        t.transform.rotation.z = self.current_pose[5]
+        t.transform.rotation.w = self.current_pose[6]
+
+        self.tf_broadcaster_.sendTransform(t)
 
 
 def main(args=None):

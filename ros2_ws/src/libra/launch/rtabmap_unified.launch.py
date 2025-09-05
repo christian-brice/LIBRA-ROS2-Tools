@@ -274,6 +274,18 @@ def generate_launch_description():
         # --- Conditional Odometry Nodes ---
 
         if odom_source == 'robot':
+            # Publish static transform from 'odom' -> 'base_link'
+            nodes.append(Node(
+                package='tf2_ros',
+                executable='static_transform_publisher',
+                name='odom_to_base_link_publisher',
+                arguments=[
+                    '0', '0', '0',  # no X, Y, Z translation
+                    '0', '0', '0',  # no yaw, pitch, roll rotation
+                    'odom', 'base_link'  # parent and child frames
+                ]
+            ))
+
             # Kinematic odometry publisher - computes sensor suite pose from joint states
             nodes.append(Node(
                 package='libra',
