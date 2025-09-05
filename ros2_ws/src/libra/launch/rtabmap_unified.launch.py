@@ -105,7 +105,7 @@ def generate_launch_description():
     # !Parameters and Remappings
     #--------------------------------------------------------------------------
 
-    # NOTE: for more detailed information on RTAB-Map parameters, see
+    # NOTE: For more detailed information on RTAB-Map parameters, see
     #       https://github.com/introlab/rtabmap/wiki/Change-parameters
     #         and
     #       https://wiki.ros.org/rtabmap_ros/Tutorials/Advanced%20Parameter%20Tuning
@@ -114,7 +114,7 @@ def generate_launch_description():
     base_rtab_params = {
         'sync_queue_size': 30,  # default: 10
         'topic_queue_size': 30,  # default: 10
-        'subscribe_odom_info': True,  # NOTE: only published by RTAB-Map odom nodes
+        'subscribe_odom_info': True,  # NOTE: Only published by RTAB-Map odom nodes
         'wait_imu_to_init': True,
         # Odometry and registration
         'Reg/Force3DoF': 'true',  # roll, pitch, and Z must be explicitly provided (i.e., won't be estimated)
