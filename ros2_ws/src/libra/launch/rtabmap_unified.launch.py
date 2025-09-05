@@ -207,11 +207,10 @@ def generate_launch_description():
 
         # Resolve parameters based on mode and odom_source
         if mode == 'rgbd_lidar':
+            frame_id = frame_id_arg or 'sensor_suite_base_link'
             realsense_config = realsense_config_arg or os.path.join(config_dir, 'realsense_rgbd.yaml')
 
             if odom_source == 'robot':
-                frame_id = frame_id_arg or 'base_link'
-
                 rtab_params = rgbd_lidar_params | {
                     'subscribe_odom_info': False,  # OdomInfo is only published by RTAB-Map odom nodes
                     'Odom/Strategy': '0',  # rely on external odometry
@@ -220,9 +219,7 @@ def generate_launch_description():
                 slam_extra = {'Reg/Strategy': '2'}  # improve VSLAM with laser scans
 
             else:  # vio
-                frame_id = frame_id_arg or 'sensor_suite_base_link'
-
-                rtab_params = rgbd_lidar_params
+                tab_params = rgbd_lidar_params
                 remaps = rgbd_lidar_remaps
                 odom_exec = 'rgbd_odometry'
                 odom_extra = {'Reg/Strategy': '0'}  # rely on visual odometry
@@ -277,24 +274,40 @@ def generate_launch_description():
         # --- Conditional Odometry Nodes ---
 
         if odom_source == 'robot':
-            # Publish static transform from 'odom' -> 'base_link'
-            nodes.append(Node(
-                package='tf2_ros',
-                executable='static_transform_publisher',
-                name='odom_to_base_link_publisher',
-                arguments=[
-                    '0', '0', '0',  # no X, Y, Z translation
-                    '0', '0', '0',  # no yaw, pitch, roll rotation
-                    'odom', 'base_link'  # parent and child frames
-                ]
-            ))
-
-            # Publish static odometry message to RTAB-Map
+            # Kinematic odometry publisher - computes sensor suite pose from joint states
             nodes.append(Node(
                 package='libra',
-                executable='static_odometry_publisher.py',
+                executable='kinematic_odometry_publisher.py',
                 output='screen',
+                parameters=[{
+                    'child_frame': frame_id,
+                    'publish_frequency': 50.0
+                }]
             ))
+
+            # NOTE: The following doesn't work but I'm keeping it for reference.
+            #       Specifically, RTAB-Map needs a non-static /odom in order to
+            #       attempt a loop closure. Even if /tf isn't static, and the
+            #       sensors move relative to the base_link, SLAM will not work.
+
+            # Publish static transform from 'odom' -> 'base_link'
+            #nodes.append(Node(
+            #    package='tf2_ros',
+            #    executable='static_transform_publisher',
+            #    name='odom_to_base_link_publisher',
+            #    arguments=[
+            #        '0', '0', '0',  # no X, Y, Z translation
+            #        '0', '0', '0',  # no yaw, pitch, roll rotation
+            #        'odom', 'base_link'  # parent and child frames
+            #    ]
+            #))
+            #
+            # Publish static odometry message to RTAB-Map
+            #nodes.append(Node(
+            #    package='libra',
+            #    executable='static_odometry_publisher.py',
+            #    output='screen',
+            #))
         
         else:  # odom_source == 'vio'
             # Compute visual-inertial odometry

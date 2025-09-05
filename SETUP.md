@@ -67,7 +67,7 @@ The following are recommendations &ndash; they aren't required to run the projec
 4. Install other important ROS packages.
 
     ```bash
-    sudo apt install -y ros-$ROS_DISTRO-imu-tools ros-$ROS_DISTRO-joint-state-publisher-gui ros-$ROS_DISTRO-xacro
+    sudo apt install -y ros-$ROS_DISTRO-imu-tools ros-$ROS_DISTRO-joint-state-publisher-gui ros-$ROS_DISTRO-xacro ros-$ROS_DISTRO-tf-transformations
     ```
 
 ## Git Submodules
