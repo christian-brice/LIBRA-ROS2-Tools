@@ -207,10 +207,11 @@ def generate_launch_description():
 
         # Resolve parameters based on mode and odom_source
         if mode == 'rgbd_lidar':
-            frame_id = frame_id_arg or 'base_link'
             realsense_config = realsense_config_arg or os.path.join(config_dir, 'realsense_rgbd.yaml')
 
             if odom_source == 'robot':
+                frame_id = frame_id_arg or 'base_link'
+
                 rtab_params = rgbd_lidar_params | {
                     'subscribe_odom_info': False,  # OdomInfo is only published by RTAB-Map odom nodes
                     'Odom/Strategy': '0',  # rely on external odometry
@@ -219,6 +220,8 @@ def generate_launch_description():
                 slam_extra = {'Reg/Strategy': '2'}  # improve VSLAM with laser scans
 
             else:  # vio
+                frame_id = frame_id_arg or 'sensor_suite_base_link'
+
                 rtab_params = rgbd_lidar_params
                 remaps = rgbd_lidar_remaps
                 odom_exec = 'rgbd_odometry'
