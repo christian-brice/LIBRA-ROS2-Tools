@@ -1,294 +1,168 @@
 #!/usr/bin/env python3
 
 # Brief:
-#   Publishes odometry based on forward kinematics of LIBRA robot arm.
-#   Computes the pose of the sensor suite in world coordinates using joint states.
+#   Publishes odometry based on existing TF data from robot_state_publisher.
+#   Computes velocities using real feedback values from joint states.
 #
 # Usage:
 #   $ ros2 run libra kinematic_odometry_publisher
-#
-# Note:
-#   This is a simplified implementation written via GenAI (Claude), so there may be errors or inaccuracies. For better accuracy, consider using the Jacobian method for velocity computation.
-#
 
 import rclpy
 from rclpy.node import Node
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import JointState
-from geometry_msgs.msg import Quaternion, Twist, Point
-import numpy as np
-import tf_transformations
-
 import tf2_ros
-from geometry_msgs.msg import TransformStamped
+from tf2_ros import LookupException, ConnectivityException, ExtrapolationException
+import numpy as np
 
 class KinematicOdometryPublisher(Node):
     """
-    Publishes odometry messages based on forward kinematics computation
-    from joint states to sensor suite pose.
+    Minimal odometry publisher using TF lookups from an active robot_state_publisher.
     """
     
     def __init__(self):
         super().__init__('kinematic_odometry_publisher_node')
 
-        # --- Parameters ---
+        # Parameters
         self.declare_parameter('odom_frame', 'odom')
-        self.declare_parameter('child_frame', 'base_link')
+        self.declare_parameter('target_frame', 'sensor_suite_base_link')  # TODO: check if this is supposed to be base_link
         self.declare_parameter('publish_frequency', 50.0)
 
         self.odom_frame_ = self.get_parameter('odom_frame').get_parameter_value().string_value
-        self.child_frame_ = self.get_parameter('child_frame').get_parameter_value().string_value
+        self.target_frame_ = self.get_parameter('target_frame').get_parameter_value().string_value
         self.publish_frequency_ = self.get_parameter('publish_frequency').get_parameter_value().double_value
 
-        # --- Robot Parameters ---
-        # Arm link length (from URDFs)
-        self.link_L = 0.900
+        # TF setup
+        self.tf_buffer_ = tf2_ros.Buffer()
+        self.tf_listener_ = tf2_ros.TransformListener(self.tf_buffer_, self)
         
-        # Joint offsets and corrections (from URDFs)
-        self.conn_outer_L = 0.076  # every arm joint
-        self.conn_inner_L = 0.056  # every arm joint
-        self.adapter_L = 0.017  # only J3
+        # Joint state tracking
+        self.current_joint_velocities_ = None
+        self.expected_joints_ = ['Roll', 'Pitch', 'J1', 'J2', 'J3', 'Static-Manip']
         
-        # Expected joint order (from /joint_states topic)
-        self.expected_joints = ['Roll', 'Pitch', 'J1', 'J2', 'J3', 'Static-Manip']
-        
-        # State tracking
-        self.last_joint_positions = None
-        self.last_joint_velocities = None
-        self.last_time = None
-        self.current_pose = None
-        self.current_twist = None
-
-        # --- ROS2 Interfaces ---
+        # Publishers and Subscribers
         self.joint_sub_ = self.create_subscription(
             JointState, '/joint_states', self.joint_states_callback, 10)
-        
         self.odom_pub_ = self.create_publisher(Odometry, '/robot_odom', 10)
-        self.tf_broadcaster_ = tf2_ros.TransformBroadcaster(self)
         
-        # Timer for publishing odometry at fixed rate
+        # Timer
         timer_period = 1.0 / self.publish_frequency_
-        self.timer = self.create_timer(timer_period, self.publish_odometry)
+        self.timer_ = self.create_timer(timer_period, self.publish_odometry)
 
         self.get_logger().info(
             f"Kinematic Odometry Publisher started.\n"
-            f"  Publishing on '/robot_odom' with frame_id='{self.odom_frame_}' "
-            f"and child_frame_id='{self.child_frame_}' at {self.publish_frequency_} Hz."
+            f"  Publishing TF '{self.odom_frame_} -> {self.target_frame_}' as odometry at {self.publish_frequency_} Hz\n"
+            f"  Using joint velocities from /joint_states for twist calculation"
         )
 
     def joint_states_callback(self, msg):
         """
-        Process joint state updates and compute forward kinematics.
+        Store current joint velocities for twist computation.
         """
-        current_time = self.get_clock().now()
-        
-        # Validate joint order
-        if msg.name != self.expected_joints:
-            self.get_logger().warn(f"Unexpected joint order: {msg.name}")
+        if msg.name != self.expected_joints_:
+            # Expecting [Roll, Pitch, J1, J2, J3, Static-Manip]
+            self.get_logger().warn(f"Unexpected joint order: {msg.name}", throttle_duration_sec=5.0)
             return
             
-        if len(msg.position) < 6 or len(msg.velocity) < 6:
-            self.get_logger().warn("Insufficient joint data")
-            return
-
-        # Extract joint values
-        roll = msg.position[0]
-        pitch = msg.position[1] 
-        j1 = msg.position[2]
-        j2 = msg.position[3]
-        j3 = msg.position[4]
-        # NOTE: Static-Manip (index 5) is always 0.0
-        
-        roll_vel = msg.velocity[0]
-        pitch_vel = msg.velocity[1]
-        j1_vel = msg.velocity[2]
-        j2_vel = msg.velocity[3]
-        j3_vel = msg.velocity[4]
-
-        # Compute forward kinematics
-        pose, twist = self.forward_kinematics(
-            roll, pitch, j1, j2, j3,
-            roll_vel, pitch_vel, j1_vel, j2_vel, j3_vel,
-            current_time
-        )
-        
-        self.current_pose = pose
-        self.current_twist = twist
-        self.last_time = current_time
-
-    def forward_kinematics(self, roll, pitch, j1, j2, j3, 
-                          roll_vel, pitch_vel, j1_vel, j2_vel, j3_vel, 
-                          current_time):
-        """
-        Compute forward kinematics from base_link to sensor_suite_base_link.
-        
-        Returns:
-            pose: [x, y, z, qx, qy, qz, qw] 
-            twist: [vx, vy, vz, wx, wy, wz]
-        """
-        
-        # Build transformation matrices for each joint
-        # Starting from base_link, following the kinematic chain
-        
-        # 1. Roll joint (around X-axis) - from 2djnt assembly
-        T_roll = self.tf_matrix([0, 0, 0], [roll, 0, 0])
-        
-        # 2. Pitch joint (around Y-axis) - from 2djnt assembly  
-        T_pitch = self.tf_matrix([0, 0, 0], [0, pitch, 0])
-        
-        # 3. Move to start of arm (L1 segment)
-        T_to_L1 = self.tf_matrix([self.link_L/2, 0, 0], [0, 0, 0])
-        
-        # 4. J1 joint (yaw around Z-axis)
-        T_J1_offset = self.tf_matrix([self.link_L/2 + self.conn_outer_L/2, 0, 0], [0, 0, 0])
-        T_J1 = self.tf_matrix([0, 0, 0], [0, 0, j1])
-        
-        # 5. Move to L2 segment  
-        T_to_L2 = self.tf_matrix([self.conn_inner_L/2 + self.link_L/2, 0, 0], [0, 0, 0])
-        
-        # 6. J2 joint (yaw around Z-axis, but flipped due to origin_rpy="PI 0 0")
-        T_J2_offset = self.tf_matrix([self.link_L/2 + self.conn_outer_L/2, 0, 0], [np.pi, 0, 0])
-        T_J2 = self.tf_matrix([0, 0, 0], [0, 0, j2])
-        
-        # 7. Move to L3 segment
-        T_to_L3 = self.tf_matrix([self.conn_inner_L/2 + self.link_L/2, 0, 0], [0, 0, 0])
-        
-        # 8. J3 joint (pitch around Y-axis after rotation, due to origin_rpy="PI/2 0 0")
-        T_J3_adapter = self.tf_matrix([self.link_L/2 + self.adapter_L/2, 0, 0], [0, 0, 0])
-        T_J3_offset = self.tf_matrix([self.adapter_L/2 + self.conn_outer_L/2, 0, 0], [np.pi/2, 0, 0])
-        T_J3 = self.tf_matrix([0, 0, 0], [0, 0, j3])  # This becomes pitch due to the PI/2 rotation
-        
-        # 9. Move to L4 segment and sensor suite
-        T_to_L4 = self.tf_matrix([self.conn_inner_L/2 + self.link_L/2, 0, 0], [np.pi/2, 0, 0])
-        T_to_sensor_suite = self.tf_matrix([self.link_L/2, 0, 0], [0, 0, 0])
-        
-        # Chain all transformations
-        T_total = (T_roll @ T_pitch @ T_to_L1 @ T_J1_offset @ T_J1 @ 
-                  T_to_L2 @ T_J2_offset @ T_J2 @ T_to_L3 @ T_J3_adapter @ 
-                  T_J3_offset @ T_J3 @ T_to_L4 @ T_to_sensor_suite)
-        
-        # Extract position
-        position = T_total[:3, 3]
-        
-        # Extract rotation as quaternion
-        rotation_matrix = T_total[:3, :3]
-        quaternion = tf_transformations.quaternion_from_matrix(T_total)
-        
-        pose = [position[0], position[1], position[2], 
-               quaternion[0], quaternion[1], quaternion[2], quaternion[3]]
-        
-        # Compute twist (velocities)
-        twist = self.compute_twist(
-            roll, pitch, j1, j2, j3,
-            roll_vel, pitch_vel, j1_vel, j2_vel, j3_vel
-        )
-        
-        return pose, twist
-
-    def tf_matrix(self, translation, rotation_rpy):
-        """
-        Create 4x4 transformation matrix from translation and RPY rotation.
-        
-        Args:
-            translation: [x, y, z]
-            rotation_rpy: [roll, pitch, yaw] in radians
-            
-        Returns:
-            4x4 numpy transformation matrix
-        """
-        # Create rotation matrix from RPY
-        R = tf_transformations.euler_matrix(
-            rotation_rpy[0], rotation_rpy[1], rotation_rpy[2], 'rxyz')
-        
-        # Set translation
-        R[:3, 3] = translation
-        
-        return R
-
-    def compute_twist(self, roll, pitch, j1, j2, j3,
-                     roll_vel, pitch_vel, j1_vel, j2_vel, j3_vel):
-        """
-        Compute linear and angular velocities using numerical differentiation.
-        TODO: This is a simplified approach written via GenAI - for better accuracy, use Jacobian method.
-        """
-        if self.last_joint_positions is None:
-            # First iteration - no velocity data
-            return [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-        
-        # Return joint velocities as a rough approximation
-        # TODO: compute Jacobian
-        linear_vel = [0.0, 0.0, 0.0]
-        angular_vel = [roll_vel, pitch_vel, j1_vel + j2_vel + j3_vel]
-        
-        return linear_vel + angular_vel
+        if len(msg.velocity) >= 6:
+            # There should only be 6 joints: 2-DoF Base, 3-DoF Arm, 1-DoF Manip
+            self.current_joint_velocities_ = msg.velocity[:6]
 
     def publish_odometry(self):
         """
-        Publish the current odometry message.
+        Look up current pose from TF and publish as odometry.
         """
-        if self.current_pose is None:
-            return  # no data yet
+        try:
+            # Get current transform
+            now = rclpy.time.Time()
+            t = self.tf_buffer_.lookup_transform(self.odom_frame_, self.target_frame_, now)
             
-        odom_msg = Odometry()
-        
-        # Set header
-        odom_msg.header.stamp = self.get_clock().now().to_msg()
-        odom_msg.header.frame_id = self.odom_frame_
-        odom_msg.child_frame_id = self.child_frame_
-        
-        # Set pose
-        odom_msg.pose.pose.position.x = self.current_pose[0]
-        odom_msg.pose.pose.position.y = self.current_pose[1] 
-        odom_msg.pose.pose.position.z = self.current_pose[2]
-        odom_msg.pose.pose.orientation.x = self.current_pose[3]
-        odom_msg.pose.pose.orientation.y = self.current_pose[4]
-        odom_msg.pose.pose.orientation.z = self.current_pose[5]
-        odom_msg.pose.pose.orientation.w = self.current_pose[6]
-        
-        # Set pose covariance (low value == high confidence)
-        pose_cov = [0.001] * 36  # initialize all to low covariance
-        odom_msg.pose.covariance = pose_cov
-        
-        # Set twist
-        if self.current_twist is not None:
-            odom_msg.twist.twist.linear.x = self.current_twist[0]
-            odom_msg.twist.twist.linear.y = self.current_twist[1]
-            odom_msg.twist.twist.linear.z = self.current_twist[2] 
-            odom_msg.twist.twist.angular.x = self.current_twist[3]
-            odom_msg.twist.twist.angular.y = self.current_twist[4]
-            odom_msg.twist.twist.angular.z = self.current_twist[5]
-        
-        # Set twist covariance
-        twist_cov = [0.001] * 36  # initialize all to low covariance
-        odom_msg.twist.covariance = twist_cov
-        
-        # Publish
-        self.odom_pub_.publish(odom_msg)
+            current_time = self.get_clock().now()
+            
+            # Create odometry message and prepare header
+            odom_msg = Odometry()
+            odom_msg.header.stamp = current_time.to_msg()
+            odom_msg.header.frame_id = self.odom_frame_
+            odom_msg.child_frame_id = self.target_frame_
+            
+            # Set pose from TF
+            odom_msg.pose.pose.position.x = t.transform.translation.x
+            odom_msg.pose.pose.position.y = t.transform.translation.y
+            odom_msg.pose.pose.position.z = t.transform.translation.z
+            odom_msg.pose.pose.orientation.x = t.transform.rotation.x
+            odom_msg.pose.pose.orientation.y = t.transform.rotation.y
+            odom_msg.pose.pose.orientation.z = t.transform.rotation.z
+            odom_msg.pose.pose.orientation.w = t.transform.rotation.w
+            
+            # Compute velocity using joint velocities (if available)
+            twist = self.compute_velocity_from_joints()
+            if twist is not None:
+                odom_msg.twist.twist.linear.x = twist[0]
+                odom_msg.twist.twist.linear.y = twist[1]
+                odom_msg.twist.twist.linear.z = twist[2]
+                odom_msg.twist.twist.angular.x = twist[3]
+                odom_msg.twist.twist.angular.y = twist[4]
+                odom_msg.twist.twist.angular.z = twist[5]
+            else:
+                # Fallback to zeros
+                odom_msg.twist.twist.linear.x = 0.0
+                odom_msg.twist.twist.linear.y = 0.0
+                odom_msg.twist.twist.linear.z = 0.0
+                odom_msg.twist.twist.angular.x = 0.0
+                odom_msg.twist.twist.angular.y = 0.0
+                odom_msg.twist.twist.angular.z = 0.0
+            
+            # Set reasonable covariance (low values = high confidence)
+            pose_cov = [0.001] * 36
+            twist_cov = [0.01] * 36  # slightly less confident in velocities
+            odom_msg.pose.covariance = pose_cov
+            odom_msg.twist.covariance = twist_cov
+            
+            # Publish
+            self.odom_pub_.publish(odom_msg)
+            
+        except (LookupException, ConnectivityException, ExtrapolationException) as e:
+            self.get_logger().warn(f"TF lookup failed: {e}", throttle_duration_sec=1.0)
 
-        # TODO: this is just copy/pasted, but it should be better integrated
-        #       (e.g., change function name, comments, etc.)
-        # Publish the TF transform
-        t = TransformStamped()
-        t.header.stamp = self.get_clock().now().to_msg()
-        t.header.frame_id = self.odom_frame_  # This is 'odom'
-        t.child_frame_id = self.child_frame_  # This is now 'base_link'
+    def compute_velocity_from_joints(self):
+        """
+        Compute end-effector velocities from joint velocities.
+        This is a simplified approximation - for exact velocities, compute the Jacobian matrix.
+        Returns [vx, vy, vz, wx, wy, wz] or None if no joint data available.
+        """
+        if self.current_joint_velocities_ is None:
+            return None
+            
+        # Extract joint velocities
+        roll_vel = self.current_joint_velocities_[0]
+        pitch_vel = self.current_joint_velocities_[1] 
+        j1_vel = self.current_joint_velocities_[2]
+        j2_vel = self.current_joint_velocities_[3]
+        j3_vel = self.current_joint_velocities_[4]
+        # (Static-Manip is always 0)
+        
+        # Over-simplified approximation
+        # TODO: Compute 6x6 Jacobian matrix `J` and use `v = J * q_dot`
 
-        t.transform.translation.x = self.current_pose[0]
-        t.transform.translation.y = self.current_pose[1]
-        t.transform.translation.z = self.current_pose[2]
-
-        t.transform.rotation.x = self.current_pose[3]
-        t.transform.rotation.y = self.current_pose[4]
-        t.transform.rotation.z = self.current_pose[5]
-        t.transform.rotation.w = self.current_pose[6]
-
-        self.tf_broadcaster_.sendTransform(t)
+        # Linear velocities
+        arm_reach = 4.0  # approximate total arm reach in meters
+        linear_vel = [
+            arm_reach * (j1_vel + j2_vel) * 0.5,  # vx 
+            arm_reach * (j1_vel + j2_vel) * 0.3,  # vy
+            arm_reach * pitch_vel * 0.2           # vz
+        ]
+        
+        # Angular velocities (direct from joint rates)
+        angular_vel = [
+            roll_vel,            # vroll (about x)
+            pitch_vel + j3_vel,  # vpitch (about y)  
+            j1_vel + j2_vel      # vyaw (about z)
+        ]
+        
+        return linear_vel + angular_vel
 
 
 def main(args=None):
-    """
-    Standard ROS2 entry point.
-    """
     rclpy.init(args=args)
     node = KinematicOdometryPublisher()
 
