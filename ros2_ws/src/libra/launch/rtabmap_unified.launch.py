@@ -21,6 +21,7 @@
 #           realsense_config:=/home/brice/repos/LIBRA-ROS/ros2_ws/install/libra/share/libra/config/realsense_all.yaml
 
 import os
+import time
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
@@ -211,7 +212,8 @@ def generate_launch_description():
         # Validate parameters
         if mode == 'replay':
             if not replay_bag:
-                raise RuntimeError('replay_bag parameter is required when mode is "replay"!')
+                print(f'[WARN] The replay_bag parameter was not provided; please run `ros2 bag play <filename>` in a separate terminal when you\'re ready.')
+                time.sleep(2)  # give user time to read warning
         elif replay_bag:
             print(f'[WARN] Ignoring replay_bag parameter since mode is not "replay".')
 
