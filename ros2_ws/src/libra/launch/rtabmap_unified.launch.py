@@ -39,6 +39,10 @@ from launch.substitutions import Command, LaunchConfiguration
 #  !Nodes
 #
 
+class c:  # ANSI color codes for terminal output
+    RESET = '\033[0m'
+    WARN = '\033[93m'  # yellow
+
 def generate_launch_description():
     # Get general paths
     default_working_dir = os.path.join(os.path.expanduser("~"), '.rtabmap')
@@ -100,12 +104,6 @@ def generate_launch_description():
         'lidar_port',
         default_value='/dev/lidar',
         description='Serial port for 2D LIDAR. If empty, defaults to "/dev/lidar". (rgbd_lidar only)'
-    )
-
-    declare_replay_bag_cmd = DeclareLaunchArgument(
-        'replay_bag',
-        default_value='',
-        description='Path to rosbag file for replay mode.'
     )
 
     #--------------------------------------------------------------------------
@@ -203,7 +201,6 @@ def generate_launch_description():
         delete_db = context.launch_configurations['delete_db']
         urdf_model = context.launch_configurations['urdf_model']
         lidar_port = context.launch_configurations['lidar_port']
-        replay_bag = context.launch_configurations['replay_bag']
 
         # Get variable parameters
         frame_id_arg = context.launch_configurations['frame_id']
@@ -211,11 +208,8 @@ def generate_launch_description():
 
         # Validate parameters
         if mode == 'replay':
-            if not replay_bag:
-                print(f'[WARN] The replay_bag parameter was not provided; please run `ros2 bag play <filename>` in a separate terminal when you\'re ready.')
-                time.sleep(2)  # give user time to read warning
-        elif replay_bag:
-            print(f'[WARN] Ignoring replay_bag parameter since mode is not "replay".')
+            print(f'{c.WARN}[WARN] In replay mode, no input nodes are instantiated.\n  Please run `ros2 bag play <filename>` in a separate terminal when you\'re ready.{c.RESET}')
+            time.sleep(2)  # give user time to read warning
 
         #----------------------------------------------------------------------
         # !Mode-based Parameters
@@ -230,6 +224,11 @@ def generate_launch_description():
                 rtab_params = rgbd_lidar_params | {
                     'subscribe_odom_info': False,  # OdomInfo is only published by RTAB-Map odom nodes
                     'Odom/Strategy': '0',  # rely on external odometry
+
+                    # TODO: the following is for testing purposes only
+                    'Rtabmap/LoopThr': '0.05',  # temporarily lower from 0.11
+                    'RGBD/AngularUpdate': '0.1',  # temporarily raise from 0.01  
+                    'RGBD/LinearUpdate': '0.1',   # temporarily raise from 0.01
                 }
                 remaps = rgbd_lidar_remaps + [('odom', '/robot_odom')]
                 slam_extra = {'Reg/Strategy': '2'}  # improve VSLAM with laser scans
@@ -352,16 +351,7 @@ def generate_launch_description():
 
         # --- Input Nodes ---
 
-        if mode == 'replay':
-            # Rosbag playback
-            nodes.append(Node(
-                package='rosbag2_transport',
-                executable='play',
-                output='screen',
-                arguments=[replay_bag, '--clock'],
-            ))
-
-        else:
+        if mode != 'replay':
             # RealSense camera
             nodes.append(IncludeLaunchDescription(
                 PythonLaunchDescriptionSource([
@@ -445,7 +435,6 @@ def generate_launch_description():
         declare_frame_id_cmd,
         declare_realsense_config_cmd,
         declare_lidar_port_cmd,
-        declare_replay_bag_cmd,
         # Nodes
         OpaqueFunction(function=launch_nodes)
     ])
