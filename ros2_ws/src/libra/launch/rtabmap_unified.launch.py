@@ -208,6 +208,13 @@ def generate_launch_description():
         frame_id_arg = context.launch_configurations['frame_id']
         realsense_config_arg = context.launch_configurations['realsense_config']
 
+        # Validate parameters
+        if mode == 'replay':
+            if not replay_bag:
+                raise RuntimeError('replay_bag parameter is required when mode is "replay"!')
+        elif replay_bag:
+            print(f'[WARN] Ignoring replay_bag parameter since mode is not "replay".')
+
         #----------------------------------------------------------------------
         # !Mode-based Parameters
         #----------------------------------------------------------------------
