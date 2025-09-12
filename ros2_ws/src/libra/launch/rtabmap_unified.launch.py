@@ -54,8 +54,8 @@ def generate_launch_description():
     declare_mode_cmd = DeclareLaunchArgument(
         'mode',
         default_value='rgbd_lidar',
-        choices=['rgbd_lidar', 'rgbd', 'stereo'],
-        description='RTAB-Map mode: "rgbd_lidar" for LIDAR-corrected RGB+D data, "rgbd" for RGB+D data only, or "stereo" for stereoscopic IR data only.'
+        choices=['rgbd_lidar', 'rgbd', 'stereo', 'replay'],
+        description='RTAB-Map mode: "rgbd_lidar" for LIDAR-corrected RGB+D data, "rgbd" for RGB+D data only, "stereo" for stereoscopic IR data only, or "replay" for rosbag playback.'
     )
 
     declare_odom_source_cmd = DeclareLaunchArgument(
@@ -99,6 +99,12 @@ def generate_launch_description():
         'lidar_port',
         default_value='/dev/lidar',
         description='Serial port for 2D LIDAR. If empty, defaults to "/dev/lidar". (rgbd_lidar only)'
+    )
+
+    declare_replay_bag_cmd = DeclareLaunchArgument(
+        'replay_bag',
+        default_value='',
+        description='Path to rosbag file for replay mode.'
     )
 
     #--------------------------------------------------------------------------
@@ -196,6 +202,7 @@ def generate_launch_description():
         delete_db = context.launch_configurations['delete_db']
         urdf_model = context.launch_configurations['urdf_model']
         lidar_port = context.launch_configurations['lidar_port']
+        replay_bag = context.launch_configurations['replay_bag']
 
         # Get variable parameters
         frame_id_arg = context.launch_configurations['frame_id']
@@ -206,9 +213,9 @@ def generate_launch_description():
         #----------------------------------------------------------------------
 
         # Resolve parameters based on mode and odom_source
-        if mode == 'rgbd_lidar':
+        if mode == 'rgbd_lidar' or mode == 'replay':
             frame_id = frame_id_arg or 'sensor_suite_base_link'
-            realsense_config = realsense_config_arg or os.path.join(config_dir, 'realsense_rgbd.yaml')
+            realsense_config = realsense_config_arg or os.path.join(config_dir, 'realsense_rgbd.yaml')  # unused in replay mode
 
             if odom_source == 'robot':
                 rtab_params = rgbd_lidar_params | {
@@ -219,7 +226,7 @@ def generate_launch_description():
                 slam_extra = {'Reg/Strategy': '2'}  # improve VSLAM with laser scans
 
             else:  # vio
-                tab_params = rgbd_lidar_params
+                rtab_params = rgbd_lidar_params
                 remaps = rgbd_lidar_remaps
                 odom_exec = 'rgbd_odometry'
                 odom_extra = {'Reg/Strategy': '0'}  # rely on visual odometry
@@ -334,54 +341,66 @@ def generate_launch_description():
                 remappings=remaps
             ))
 
-        # --- Common Nodes ---
+        # --- Input Nodes ---
 
-        # RealSense camera
-        nodes.append(IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([
-                os.path.join(
-                    get_package_share_directory('realsense2_camera'),
-                    'launch',
-                    'rs_launch.py'
-                )
-            ]),
-            launch_arguments={
-                'camera_namespace': '',  # avoid nesting "/camera/camera"
-                'config_file': realsense_config
-            }.items()
-        ))
-
-        # Compute quaternion of the IMU
-        nodes.append(Node(
-            package='imu_filter_madgwick',
-            executable='imu_filter_madgwick_node',
-            output='screen',
-            parameters=[{
-                'use_mag': False,
-                'world_frame': 'enu',
-                'publish_tf': False
-            }],
-            remappings=[
-                # Inputs: realsense2_camera
-                ('imu/data_raw', '/camera/imu')
-            ]
-        ))
-
-        # LightWare 2D LIDAR
-        if mode == 'rgbd_lidar':
+        if mode == 'replay':
+            # Rosbag playback
             nodes.append(Node(
-                package='lightwarelidar2',
-                executable='sf45b',
+                package='rosbag2_transport',
+                executable='play',
+                output='screen',
+                arguments=[replay_bag, '--clock'],
+            ))
+
+        else:
+            # RealSense camera
+            nodes.append(IncludeLaunchDescription(
+                PythonLaunchDescriptionSource([
+                    os.path.join(
+                        get_package_share_directory('realsense2_camera'),
+                        'launch',
+                        'rs_launch.py'
+                    )
+                ]),
+                launch_arguments={
+                    'camera_namespace': '',  # avoid nesting "/camera/camera"
+                    'config_file': realsense_config
+                }.items()
+            ))
+
+            # Compute quaternion of the IMU
+            nodes.append(Node(
+                package='imu_filter_madgwick',
+                executable='imu_filter_madgwick_node',
                 output='screen',
                 parameters=[{
-                    'port': lidar_port,
-                    'frameId': 'lidar_link',
-                    'baudrate': 115200,
-                    'updateRate': 12,  # set fastest rotation rate  
-                    'lowAngleLimit': -160,  # set max scan angles
-                    'highAngleLimit': 160
+                    'use_mag': False,
+                    'world_frame': 'enu',
+                    'publish_tf': False
                 }],
+                remappings=[
+                    # Inputs: realsense2_camera
+                    ('imu/data_raw', '/camera/imu')
+                ]
             ))
+
+            # LightWare 2D LIDAR
+            if mode == 'rgbd_lidar':
+                nodes.append(Node(
+                    package='lightwarelidar2',
+                    executable='sf45b',
+                    output='screen',
+                    parameters=[{
+                        'port': lidar_port,
+                        'frameId': 'lidar_link',
+                        'baudrate': 115200,
+                        'updateRate': 12,  # set fastest rotation rate  
+                        'lowAngleLimit': -160,  # set max scan angles
+                        'highAngleLimit': 160
+                    }],
+                ))
+
+        # --- Common Nodes ---
 
         # Primary RTAB-Map SLAM computation
         nodes.append(Node(
@@ -417,6 +436,7 @@ def generate_launch_description():
         declare_frame_id_cmd,
         declare_realsense_config_cmd,
         declare_lidar_port_cmd,
+        declare_replay_bag_cmd,
         # Nodes
         OpaqueFunction(function=launch_nodes)
     ])
