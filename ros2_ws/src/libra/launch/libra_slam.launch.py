@@ -1,11 +1,13 @@
 # Brief:
 #   Unified RTAB-Map launch file supporting multiple modes and odometry sources:
-#   - Modes: rgbd_lidar, rgbd, stereo
+#   - Modes: RGB+D, Stereo (IR)
+#   - Data: live (sensor nodes), replay (rosbag)
 #   - Odometry: robot (actuator data), vio (visual-inertial data from RealSense)
+#   - Additional Sensors: LIDAR
 #
 # Requirements:
 #   An Intel RealSense D435i or D456
-#   A LightWare SF45/B (for rgbd_lidar mode)
+#   A LightWare SF45/B (for SLAM refinement only)
 #   HEBI actuator states published on /joint_states (for robot odometry)
 #   Install required ROS2 packages:
 #     realsense2_camera (ros-$ROS_DISTRO-realsense2-camera)
@@ -13,9 +15,9 @@
 #
 # Usage:
 #   Use defaults:
-#     $ ros2 launch libra rtabmap_unified.launch.py
+#     $ ros2 launch libra libra_slam.launch.py
 #   RGB+D-only mode with all RealSense streams enabled and unique working directory:
-#     $ ros2 launch libra rtabmap_unified.launch.py \
+#     $ ros2 launch libra libra_slam.launch.py \
 #           mode:=rgbd \
 #           realsense_config:=/home/brice/repos/LIBRA-ROS/ros2_ws/install/libra/share/libra/config/realsense_all.yaml \
 #           working_dir:=/home/brice/repos/LIBRA-ROS/ros2_ws/maps
@@ -80,7 +82,7 @@ def generate_launch_description():
     declare_urdf_model_cmd = DeclareLaunchArgument(
         'urdf_model',
         default_value=default_urdf_model_path,
-        description='Path to URDF file with robot model definition. (rgbd_lidar only)'
+        description='Path to URDF file with robot model definition.'
     )
 
     declare_frame_id_cmd = DeclareLaunchArgument(

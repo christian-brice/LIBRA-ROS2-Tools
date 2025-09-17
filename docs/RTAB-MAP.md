@@ -107,9 +107,9 @@ See [REALSENSE.md "Calibration"](./REALSENSE.md#calibration) and [LIDAR.md "Cali
 cd ros2_ws/
 colcon build && . install/local_setup.bash
 # To use infrared data
-ros2 launch libra rtabmap_unified.launch.py mode:=stereo
+ros2 launch libra libra_slam.launch.py mode:=stereo
 # To use RGB + depth data
-ros2 launch libra rtabmap_unified.launch.py mode:=rgbd
+ros2 launch libra libra_slam.launch.py mode:=rgbd
 ```
 
 This launches the following five (5) nodes:
@@ -131,7 +131,7 @@ Once finished, save the database in the RTAB-Map GUI by clicking "File" -> "Clos
 ```bash
 cd ros2_ws/
 colcon build && . install/local_setup.bash
-ros2 launch libra rtabmap_unified.launch.py mode:=rgbd_lidar
+ros2 launch libra libra_slam.launch.py mode:=rgbd use_lidar:=true
 ```
 
 This launches the following seven (7) nodes:
