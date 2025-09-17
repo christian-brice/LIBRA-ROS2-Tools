@@ -74,7 +74,7 @@ Then, source the project workspace and you're ready to go!
 
 Run one of the provided configurations.
 
-- `rtabmap_unified`: **primary launch file**; can launch a variety of RTAB-Map/sensor suite configurations.
+- `libra_slam`: **primary launch file**; can launch a variety of RTAB-Map/sensor suite configurations.
 - `model_only`: displays a model in RViz.
 - `sensor_suite`: displays the sensor suite (RealSense + 2D LIDAR) model and data in RViz.
 - `test_lidar`: displays 2D LIDAR data in RViz.
@@ -89,14 +89,14 @@ For example, to run RTAB-Map in RGB+D mode with the RealSense as the main sensor
 
 ```bash
 # Example
-ros2 launch libra rtabmap_unified.launch.py mode:=rgbd_lidar realsense_config:=/home/brice/repos/LIBRA-ROS/ros2_ws/install/libra/share/libra/config/realsense_all.yaml
+ros2 launch libra libra_slam.launch.py mode:=rgbd use_lidar:=true realsense_config:=/home/brice/repos/LIBRA-ROS/ros2_ws/install/libra/share/libra/config/realsense_all.yaml
 ```
 
 > ***NOTE:*** it is recommended that you also set the parameter `working_dir:=<PATH>` on every launch so as to not get your databases mixed up. For example: `working_dir:=/home/brice/experiments/<YYYY-MM-DD>_<Title>`.
 
 #### **Archived**
 
-The following have been superseded by `rtabmap_unified` and are kept in `launch/archive`.
+The following have been superseded by `libra_slam` and are kept in `launch/archive`.
 
 - `rtabmap_rgbd_2d-lidar`: launches RTAB-Map in RGB-D mode with laser scan correction, with the full sensor suite publishing data.
 - `rtabmap_rgbd`: launches RTAB-Map in RGB-D mode with *only* RealSense publishing pre-packed RGB-D data.
@@ -139,7 +139,7 @@ ros2 bag record <desired-topics>
 
 Build a `ros2 bag record` command for your selected sensors by using the topic lists in the following subsections. Topics under ["Common"](#common) should always be captured. See [docs/ROS_COMMANDS.md "`record`"](./docs/ROS_COMMANDS.md#record) for more details.
 
-When replaying data, you must launch the following nodes. See `rtabmap_unified.launch.py` for relevant launch parameters.
+When replaying data, you must launch the following nodes. See `libra_slam.launch.py` for relevant launch parameters.
 
 - `robot_state_publisher`
 - `rgbd_odometry` or `stereo_odometry`
@@ -148,8 +148,10 @@ When replaying data, you must launch the following nodes. See `rtabmap_unified.l
 
 #### **Common**
 
+TODO: I'm not sure if either of the `/tf` are required, since they should be automatically published by `robot_state_publisher` upon processing `libra1.urdf.xacro` and subscribing to `/joint_states`.
+
 ```bash
-/tf /joint_states
+/tf /tf_static /joint_states
 ```
 
 #### **RGB+D Camera**

@@ -96,8 +96,7 @@ Generates node graphs for the current ROS 2 system. For example, you can see how
 
 ### *ros2 run rqt_tf_tree rqt_tf_tree*
 
-> ***NOTE:*** requires the rqt_tf_tree package for your ROS2 distro: `sudo apt install ros-humble-rqt-tf-tree 
-`.
+> ***NOTE:*** requires the rqt_tf_tree package for your ROS2 distro: `sudo apt install ros-humble-rqt-tf-tree`.
 
 Shows a graph of all `tf` and their connections. Useful for troubleshooting your robot's URDF model.
 
