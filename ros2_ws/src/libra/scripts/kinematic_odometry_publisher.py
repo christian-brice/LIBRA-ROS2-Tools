@@ -24,7 +24,7 @@ class KinematicOdometryPublisher(Node):
         super().__init__('kinematic_odometry_publisher_node')
 
         # Parameters
-        self.declare_parameter('odom_frame', 'odom')
+        self.declare_parameter('odom_frame', 'map')
         self.declare_parameter('target_frame', 'sensor_suite_base_link')  # TODO: check if this is supposed to be base_link
         self.declare_parameter('publish_frequency', 50.0)
 
