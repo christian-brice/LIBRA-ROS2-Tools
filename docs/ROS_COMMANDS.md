@@ -16,8 +16,9 @@
     - [*`ros2 interface show <topic_type>`*](#ros2-interface-show-topic_type)
 - [Visualizations](#visualizations)
     - [*`rqt_graph`*](#rqt_graph)
-    - [*ros2 run rqt\_tf\_tree rqt\_tf\_tree*](#ros2-run-rqt_tf_tree-rqt_tf_tree)
-    - [*ros2 run tf2\_tools view\_frames*](#ros2-run-tf2_tools-view_frames)
+    - [*`rqt_image_view`*](#rqt_image_view)
+    - [*`ros2 run rqt_tf_tree rqt_tf_tree`*](#ros2-run-rqt_tf_tree-rqt_tf_tree)
+    - [*`ros2 run tf2_tools view_frames`*](#ros2-run-tf2_tools-view_frames)
 
 ## Launch Files and Interfaces
 
@@ -34,11 +35,6 @@ The following sub-subsection headers correspond to subcommands of `ros2 bag`.
 Records active topics to a bag file until `Ctrl+C` is pressed.
 
 - `<topic1_name> [topic2_name ...]`: record only the provided topic(s).
-
-    ```bash
-    ros2 bag record /camera/camera/depth/image_rect_raw /tf_static /camera/camera/color/image_raw /pointcloud /camera/camera/imu /camera/camera/depth/color/points /initialpose /joint_states /scan /robot_description /tf
-    ```
-
 - `-a`: record ALL topics.
 - `-e <regex>`: exclude topics matching the provided regex.
 - `-d <max_duration>`: specify a maximum duration (in seconds) before the bag file is split.
@@ -94,12 +90,16 @@ Returns the data structure expected by the given topic type.
 
 Generates node graphs for the current ROS 2 system. For example, you can see how `tf` (transform frame) is propagated along all links in a robot.
 
-### *ros2 run rqt_tf_tree rqt_tf_tree*
+### *`rqt_image_view`*
+
+Brings up a GUI that allows you to view image data from standard image topics (e.g., `sensor_msgs/Image`) in real time.
+
+### *`ros2 run rqt_tf_tree rqt_tf_tree`*
 
 > ***NOTE:*** requires the rqt_tf_tree package for your ROS2 distro: `sudo apt install ros-humble-rqt-tf-tree`.
 
-Shows a graph of all `tf` and their connections. Useful for troubleshooting your robot's URDF model.
+Shows a graph of all `tf` and their connections. Useful for troubleshooting your robot's URDF model and the availability of dynamic transforms, such as actuators (`/joint_states` data).
 
-### *ros2 run tf2_tools view_frames*
+### *`ros2 run tf2_tools view_frames`*
 
 Generates a static PDF of the `tf` tree.
