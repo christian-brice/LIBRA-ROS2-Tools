@@ -221,6 +221,7 @@ def generate_launch_description():
         'subscribe_scan_cloud': True,
         # Mapping
         'Grid/FromDepth': 'false',  # true: depth, false: laser scans
+        'Grid/Sensor': '1',  # construct occupancy grid map using cloud projection
         'RGBD/NeighborLinkRefining': 'true',  # correct odom with laser scans + ICP
         'RGBD/ProximityBySpace': 'true',  # find local loop closures based on robot position using ICP
         # Odometry and Registration
@@ -337,15 +338,15 @@ def generate_launch_description():
         # --- Conditional Odometry Nodes ---
 
         if odom_source == 'robot':
-            # Publish static transform from 'map' -> 'base_link'
+            # Publish static transform from 'odom' -> 'base_link'
             nodes.append(Node(
                 package='tf2_ros',
                 executable='static_transform_publisher',
-                name='map_to_base_link_publisher',
+                name='odom_to_base_link_publisher',
                 arguments=[
                     '0', '0', '0',  # no X, Y, Z translation
                     '0', '0', '0',  # no yaw, pitch, roll rotation
-                    'map', 'base_link'  # parent and child frames
+                    'odom', 'base_link'  # parent and child frames
                 ]
             ))
 
