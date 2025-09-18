@@ -148,11 +148,11 @@ When replaying data, you must launch the following nodes. See `libra_slam.launch
 
 #### **Common**
 
-TODO: I'm not sure if either of the `/tf` are required, since they should be automatically published by `robot_state_publisher` upon processing `libra1.urdf.xacro` and subscribing to `/joint_states`.
-
 ```bash
 /tf /tf_static /joint_states
 ```
+
+> ***NOTE:*** Ideally, we would just record the /joint_states and let the `robot_state_publisher` generate the `/tf` and `/tf_static`, but since `realsense2_ros` also generates unique `/tf_static` for the camera, we have to record them.
 
 #### **RGB+D Camera**
 
