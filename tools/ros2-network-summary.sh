@@ -4,7 +4,7 @@
 # topics and displays the results in a formatted table.
 #
 # Usage:
-#   ./ros2_pub_summary.sh [--debug]
+#   ./ros2-network-summary.sh [--csv] [--debug]
 #
 # Disclaimer:
 #   This script was vibe-coded using Gemini and manually tweaked by Christian Brice.
@@ -15,8 +15,8 @@
 # (useful if a topic has and especially low publishing rate)
 sampling_time_sec=5
 
-# Use a single temporary file to capture command output
-output_temp_file=$(mktemp)
+output_temp_file=$(mktemp)  # capture command output in a temporary file
+csv_file="network_summary.csv"  # in case the "--csv" flag is provided
 
 color_echo() {
     local level=$1
@@ -46,7 +46,14 @@ color_echo() {
 
 color_echo INFO "Sampling active ROS2 topics..."
 
-# ==================== (0) GLOBAL VARIABLES AND PRELIMINARY INFO ====================
+# ==================== (0) SCRIPT OPTIONS AND PRELIMINARY ACTIONS ====================
+
+# Handle the CSV flag
+csv_mode=false
+if [[ "$1" == "--csv" ]]; then
+    csv_mode=true
+    color_echo INFO "CSV mode enabled"
+fi
 
 # Handle the debug flag
 debug_mode=false
@@ -69,6 +76,9 @@ sleep 1;  # let user see this message
 START_TIME=$(date +%s.%N)
 SLEEP_TIME=0
 #-------------------------
+if [ "$csv_mode" = true ]; then
+    echo "\"Topic Name\",\"Bandwidth (KiB/s)\",\"Frequency (Hz)\"" > "$csv_filename"
+fi
 echo "----------------------------------------------------------------------------------------"
 echo "  Topic Name                                         Bandwidth        Frequency"
 echo "----------------------------------------------------------------------------------------"
@@ -123,9 +133,15 @@ do
         #-------------------------
         # Print the data in a single, formatted line
         printf "%-50s %10.2f KiB/s %10.2f Hz\n" "$topic" "$bw_kib" "$hz_val_clean"
+        if [ "$csv_mode" = true ]; then
+            printf "%s,%.2f,%.2f\n" "$topic" "$bw_kib" "$hz_val_clean" >> "$csv_filename"
+        fi
     else
         # Also print a line for topics that aren't active
         printf "%-50s %10s KiB/s %10s Hz\n" "$topic" "--" "--"
+        if [ "$csv_mode" = true ]; then
+            printf "%s,%.2f,%.2f\n" "$topic" "0.00" "0.00" >> "$csv_filename"
+        fi
         #-------------------------
     fi
 done
@@ -144,3 +160,6 @@ color_echo INFO "$F_ELAPSED_TIME"
 
 # Cleanup
 rm -f "$output_temp_file"
+if [ "$csv_mode" = true ]; then
+    color_echo INFO "CSV file saved to: $csv_filename"
+fi
