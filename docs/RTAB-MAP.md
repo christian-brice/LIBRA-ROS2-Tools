@@ -45,11 +45,11 @@ The communication middleware that ROS 2 uses is DDS; specifically, [Fast DDS](ht
 
     ```bash
     echo 'export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp' >> ~/.bashrc
-    echo 'export CYCLONEDDS_URI=file://$HOME/cyclonedds_config.xml' >> ~/.bashrc
+    echo 'export CYCLONEDDS_URI=file://$HOME/cyclonedds.xml' >> ~/.bashrc
     source ~/.bashrc
     ```
 
-    > ***NOTE:*** if you don't see `cyclonedds_config.xml` in the home directory (`/home/brice`), copy it from the `config/ros2/` directory in this repo.
+    > ***NOTE:*** if you don't see `cyclonedds.xml` in the home directory (`/home/brice`), copy it from the `config/ros2/` directory in this repo.
 
 It may also be useful to sync RTAB-Map's command-line logs with ROS 2's. Add the following to your `.bashrc` to do so.
 
