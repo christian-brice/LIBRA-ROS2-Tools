@@ -67,7 +67,7 @@ topics=$(ros2 topic list)
 
 # Estimate time to completion
 num_topics=$(echo "$topics" | wc -l)
-color_echo INFO "Estimated time to complete: $((num_topics * sampling_time_sec)) seconds"
+color_echo INFO "Estimated time to complete: $((num_topics * 2 * sampling_time_sec)) seconds"
 sleep 1;  # let user see this message
 
 # ==================== (1) LOOP THROUGH AVAILABLE TOPICS ====================
@@ -77,7 +77,7 @@ START_TIME=$(date +%s.%N)
 SLEEP_TIME=0
 #-------------------------
 if [ "$csv_mode" = true ]; then
-    echo "\"Topic Name\",\"Bandwidth (KiB/s)\",\"Frequency (Hz)\"" > "$csv_filename"
+    echo "\"Topic Name\",\"Bandwidth (KiB/s)\",\"Frequency (Hz)\"" > "$csv_file"
 fi
 echo "----------------------------------------------------------------------------------------"
 echo "  Topic Name                                         Bandwidth        Frequency"
@@ -134,13 +134,13 @@ do
         # Print the data in a single, formatted line
         printf "%-50s %10.2f KiB/s %10.2f Hz\n" "$topic" "$bw_kib" "$hz_val_clean"
         if [ "$csv_mode" = true ]; then
-            printf "%s,%.2f,%.2f\n" "$topic" "$bw_kib" "$hz_val_clean" >> "$csv_filename"
+            printf "%s,%.2f,%.2f\n" "$topic" "$bw_kib" "$hz_val_clean" >> "$csv_file"
         fi
     else
         # Also print a line for topics that aren't active
         printf "%-50s %10s KiB/s %10s Hz\n" "$topic" "--" "--"
         if [ "$csv_mode" = true ]; then
-            printf "%s,%.2f,%.2f\n" "$topic" "0.00" "0.00" >> "$csv_filename"
+            printf "%s,%.2f,%.2f\n" "$topic" "0.00" "0.00" >> "$csv_file"
         fi
         #-------------------------
     fi
@@ -161,5 +161,5 @@ color_echo INFO "$F_ELAPSED_TIME"
 # Cleanup
 rm -f "$output_temp_file"
 if [ "$csv_mode" = true ]; then
-    color_echo INFO "CSV file saved to: $csv_filename"
+    color_echo INFO "CSV file saved to: $csv_file"
 fi
