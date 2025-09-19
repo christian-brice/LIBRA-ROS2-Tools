@@ -1,7 +1,7 @@
 # Hawrdware
 #"depth_module.emitter_enabled": 0
 # Data streams
-"enable_color": true
+"enable_color": true  # only for overlay
 "enable_depth": false
 "enable_infra1": true
 "enable_infra2": true
