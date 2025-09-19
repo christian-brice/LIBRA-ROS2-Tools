@@ -57,19 +57,19 @@ def generate_launch_description():
     #--------------------------------------------------------------------------
     # !Launch Arguments
     #--------------------------------------------------------------------------
-    
+
+    declare_script_mode_cmd = DeclareLaunchArgument(
+        'script_mode',
+        default_value='full_stack',
+        choices=['full_stack', 'record' 'replay'],
+        description='Script mode: "full_stack" launches the entire LIBRA SLAM pipeline, "record" only launches sensors and related nodes, "replay" only launches SLAM nodes reliant on rosbag playback.'
+    )
+
     declare_slam_mode_cmd = DeclareLaunchArgument(
         'slam_mode',
         default_value='rgbd',
         choices=['rgbd', 'stereo'],
         description='RTAB-Map mode: "rgbd" for RGB + depth data, "stereo" for stereoscopic infrared data.'
-    )
-
-    declare_data_source_cmd = DeclareLaunchArgument(
-        'data_source',
-        default_value='live',
-        choices=['live', 'replay'],
-        description='Input data source: "live" launches necessary sensor nodes, "replay" relies on rosbag playback.'
     )
 
     declare_odom_source_cmd = DeclareLaunchArgument(
@@ -248,8 +248,8 @@ def generate_launch_description():
         """
         
         # Get constant parameters
+        script_mode = context.launch_configurations['script_mode']
         slam_mode = context.launch_configurations['slam_mode']
-        data_source = context.launch_configurations['data_source']
         odom_source = context.launch_configurations['odom_source']
         urdf_model = context.launch_configurations['urdf_model']
         use_lidar = context.launch_configurations['use_lidar'].lower() == 'true'
@@ -270,7 +270,7 @@ def generate_launch_description():
         odom_extra = {}
         slam_extra = {}
 
-        # Build parameters based on slam_mode, odom_source, and active sensors
+        # Build individual node parameters based on launch arguments
         if slam_mode == 'rgbd':
             realsense_config = realsense_config_arg or os.path.join(config_dir, 'realsense_rgbd.yaml')
             rtab_params |= rgbd_params
@@ -287,7 +287,7 @@ def generate_launch_description():
             remaps += robot_odom_remaps
         else:  # odom_source == 'vio'
             rtab_params |= vio_params
-            odom_extra |= {'Reg/Strategy': '0'}  # VIO inherently can't use laser scans (only overrides rtab_params for odometry node)
+            odom_extra |= {'Reg/Strategy': '0'}  # VIO inherently can't use laser scans
 
         if use_lidar:
             frame_id = frame_id_arg or 'sensor_suite_base_link'  # nearest common link to RealSense and LIDAR
@@ -310,84 +310,108 @@ def generate_launch_description():
         # !Nodes
         #----------------------------------------------------------------------
 
-        if data_source == 'replay':
+        kinematics_en = False
+        camera_en = False
+        lidar_en = False
+        rtabmap_en = False
+
+        # Determine which nodes will run
+        if script_mode == 'full_stack':
+            kinematics_en = True
+            camera_en = True
+            if use_lidar:
+                lidar_en = True
+            rtabmap_en = True
+
+        elif script_mode == 'record':
+            camera_en = True
+            if use_lidar:
+                lidar_en = True
+
+        else:  # script_mode == 'replay'
+            kinematics_en = True
+            rtabmap_en = True
+
             print(f'{c.WARN}[WARN] In replay mode, no input nodes are instantiated.\n  Please run `ros2 bag play <filename>` in a separate terminal when you\'re ready.{c.RESET}')
             time.sleep(2)  # give user time to read warning
 
         nodes = []
 
-        # Publish robot frame transforms based on URDF model
-        nodes.append(Node(
-            package='robot_state_publisher',
-            executable='robot_state_publisher',
-            output='screen',
-            parameters=[{
-                # NOTE: If ANY text in the xacro output can be interpreted as yaml,
-                # the roslaunch system will try to interpret the ENTIRE text as yaml
-                # instead of passing on the string. The biggest cause of this false
-                # interpretation is commenting out xacro calls since the xacro:property
-                # convention looks a lot like a yaml key:value pair. Comments are not
-                # removed by xacro so they are included in the output.
-                # (source: https://answers.ros.org/question/417369/caught-exception-in-launch-see-debug-for-traceback-unable-to-parse-the-value-of-parameter-robot_description-as-yaml/)
-                'robot_description': ParameterValue(
-                    Command(['xacro ', urdf_model]), value_type=str
-                )
-            }]
-        ))
-        
-        # --- Conditional Odometry Nodes ---
+        # --- Kinematics & Odometry Nodes ---
 
-        if odom_source == 'robot':
-            # Publish static transform from 'odom' -> 'base_link'
+        if kinematics_en:
+            # Publish robot frame transforms based on URDF model
             nodes.append(Node(
-                package='tf2_ros',
-                executable='static_transform_publisher',
-                name='odom_to_base_link_publisher',
-                arguments=[
-                    '0', '0', '0',  # no X, Y, Z translation
-                    '0', '0', '0',  # no yaw, pitch, roll rotation
-                    'odom', 'base_link'  # parent and child frames
-                ]
-            ))
-
-            # Kinematic odometry publisher - computes sensor suite pose from joint states
-            nodes.append(Node(
-                package='libra',
-                executable='kinematic_odometry_publisher.py',
+                package='robot_state_publisher',
+                executable='robot_state_publisher',
                 output='screen',
                 parameters=[{
-                    'child_frame': frame_id,
-                    'publish_frequency': 50.0
+                    # NOTE: If ANY text in the xacro output can be interpreted as yaml,
+                    # the roslaunch system will try to interpret the ENTIRE text as yaml
+                    # instead of passing on the string. The biggest cause of this false
+                    # interpretation is commenting out xacro calls since the xacro:property
+                    # convention looks a lot like a yaml key:value pair. Comments are not
+                    # removed by xacro so they are included in the output.
+                    # (source: https://answers.ros.org/question/417369/caught-exception-in-launch-see-debug-for-traceback-unable-to-parse-the-value-of-parameter-robot_description-as-yaml/)
+                    'robot_description': ParameterValue(
+                        Command(['xacro ', urdf_model]), value_type=str
+                    )
                 }]
             ))
-
-            # NOTE: The following doesn't work but I'm keeping it for reference.
-            #       Specifically, RTAB-Map needs a non-static /odom in order to
-            #       attempt a loop closure. Even if /tf isn't static, and the
-            #       sensors move relative to the base_link, SLAM will not work.
-            #
-            # Publish static odometry message to RTAB-Map
-            #nodes.append(Node(
-            #    package='libra',
-            #    executable='static_odometry_publisher.py',
-            #    output='screen',
-            #))
         
-        else:  # odom_source == 'vio'
-            # Compute visual-inertial odometry
-            nodes.append(Node(
-                package='rtabmap_odom',
-                executable=odom_exec,
-                output='screen',
-                parameters=[ rtab_params | odom_extra | {
-                    'Rtabmap/WorkingDirectory': working_dir
-                }],
-                remappings=remaps
-            ))
+            # --- Conditional Odometry Nodes ---
 
-        # --- Input Nodes ---
+            if odom_source == 'robot':
+                # Publish static transform from 'odom' -> 'base_link'
+                nodes.append(Node(
+                    package='tf2_ros',
+                    executable='static_transform_publisher',
+                    name='odom_to_base_link_publisher',
+                    arguments=[
+                        '0', '0', '0',  # no X, Y, Z translation
+                        '0', '0', '0',  # no yaw, pitch, roll rotation
+                        'odom', 'base_link'  # parent and child frames
+                    ]
+                ))
 
-        if data_source == 'live':
+                # Kinematic odometry publisher - computes sensor suite pose from joint states
+                nodes.append(Node(
+                    package='libra',
+                    executable='kinematic_odometry_publisher.py',
+                    output='screen',
+                    parameters=[{
+                        'child_frame': frame_id,
+                        'publish_frequency': 50.0
+                    }]
+                ))
+
+                # NOTE: The following doesn't work but I'm keeping it for reference.
+                #       Specifically, RTAB-Map needs a non-static /odom in order to
+                #       attempt a loop closure. Even if /tf isn't static, and the
+                #       sensors move relative to the base_link, SLAM will not work.
+                #
+                # Publish static odometry message to RTAB-Map
+                #nodes.append(Node(
+                #    package='libra',
+                #    executable='static_odometry_publisher.py',
+                #    output='screen',
+                #))
+            
+            else:  # odom_source == 'vio'
+                # Compute visual-inertial odometry
+                nodes.append(Node(
+                    package='rtabmap_odom',
+                    executable=odom_exec,
+                    output='screen',
+                    parameters=[ rtab_params | odom_extra | {
+                        'Rtabmap/WorkingDirectory': working_dir
+                    }],
+                    remappings=remaps
+                ))
+
+        # --- Sensor Nodes ---
+
+        if camera_en:
             # RealSense camera
             nodes.append(IncludeLaunchDescription(
                 PythonLaunchDescriptionSource([
@@ -419,51 +443,52 @@ def generate_launch_description():
                 ]
             ))
 
+        if lidar_en:
             # LightWare 2D LIDAR
-            if use_lidar:
-                nodes.append(Node(
-                    package='lightwarelidar2',
-                    executable='sf45b',
-                    output='screen',
-                    parameters=[{
-                        'port': lidar_port,
-                        'frameId': 'lidar_link',
-                        'baudrate': 115200,
-                        'updateRate': 12,  # fastest rotation rate  
-                        'lowAngleLimit': -160,  # max scan angles
-                        'highAngleLimit': 160
-                    }],
-                ))
+            nodes.append(Node(
+                package='lightwarelidar2',
+                executable='sf45b',
+                output='screen',
+                parameters=[{
+                    'port': lidar_port,
+                    'frameId': 'lidar_link',
+                    'baudrate': 115200,
+                    'updateRate': 12,  # fastest rotation rate  
+                    'lowAngleLimit': -160,  # max scan angles
+                    'highAngleLimit': 160
+                }],
+            ))
 
-        # --- Common Nodes ---
+        # --- SLAM Nodes ---
 
-        # Primary RTAB-Map SLAM computation
-        nodes.append(Node(
-            package='rtabmap_slam',
-            executable='rtabmap',
-            output='screen',
-            parameters=[ rtab_params | slam_extra | {
-                'Rtabmap/WorkingDirectory': working_dir
-            }],
-            remappings=remaps,
-            arguments=['-d'] if delete_db else []
-        ))
+        if rtabmap_en:
+            # Primary RTAB-Map SLAM computation
+            nodes.append(Node(
+                package='rtabmap_slam',
+                executable='rtabmap',
+                output='screen',
+                parameters=[ rtab_params | slam_extra | {
+                    'Rtabmap/WorkingDirectory': working_dir
+                }],
+                remappings=remaps,
+                arguments=['-d'] if delete_db else []
+            ))
 
-        # RTAB-Map's custom RViz GUI
-        nodes.append(Node(
-            package='rtabmap_viz',
-            executable='rtabmap_viz',
-            output='screen',
-            parameters=[ rtab_params ],
-            remappings=remaps
-        ))
+            # RTAB-Map's custom RViz GUI
+            nodes.append(Node(
+                package='rtabmap_viz',
+                executable='rtabmap_viz',
+                output='screen',
+                parameters=[ rtab_params ],
+                remappings=remaps
+            ))
         
         return nodes
 
     return LaunchDescription([
         # Launch arguments
+        declare_script_mode_cmd,
         declare_slam_mode_cmd,
-        declare_data_source_cmd,
         declare_odom_source_cmd,
         declare_urdf_model_cmd,
         declare_frame_id_cmd,
