@@ -18,7 +18,7 @@
 #     $ ros2 launch libra libra_slam.launch.py
 #   RGB+D-only mode with all RealSense streams enabled and unique working directory:
 #     $ ros2 launch libra libra_slam.launch.py \
-#           mode:=rgbd \
+#           slam_mode:=rgbd \
 #           realsense_config:=/home/brice/repos/LIBRA-ROS/ros2_ws/install/libra/share/libra/config/realsense_all.yaml \
 #           working_dir:=/home/brice/repos/LIBRA-ROS/ros2_ws/maps
 
@@ -58,8 +58,8 @@ def generate_launch_description():
     # !Launch Arguments
     #--------------------------------------------------------------------------
     
-    declare_mode_cmd = DeclareLaunchArgument(
-        'mode',
+    declare_slam_mode_cmd = DeclareLaunchArgument(
+        'slam_mode',
         default_value='rgbd',
         choices=['rgbd', 'stereo'],
         description='RTAB-Map mode: "rgbd" for RGB + depth data, "stereo" for stereoscopic infrared data.'
@@ -87,14 +87,14 @@ def generate_launch_description():
 
     declare_frame_id_cmd = DeclareLaunchArgument(
         'frame_id',
-        default_value='',  # set conditionally based on mode
-        description='Robot model base frame ID. If empty, value determined by mode.'
+        default_value='',  # set conditionally based on slam_mode
+        description='Robot model base frame ID. If empty, value determined by slam_mode.'
     )
 
     declare_realsense_config_cmd = DeclareLaunchArgument(
         'realsense_config',
-        default_value='',  # set conditionally based on mode
-        description='Path to YAML file with RealSense camera parameters. If empty, value determined by mode.'
+        default_value='',  # set conditionally based on slam_mode
+        description='Path to YAML file with RealSense camera parameters. If empty, value determined by slam_mode.'
     )
     
     declare_use_lidar_cmd = DeclareLaunchArgument(
@@ -235,7 +235,7 @@ def generate_launch_description():
     ]
 
     def launch_nodes(context, *args, **kwargs):
-        """Generates a list of nodes to be launched based on mode.
+        """Generates a list of nodes to be launched based launch arguments.
         Supplied to the ROS2 `LaunchDescription` via `OpaqueFunction`.
 
         Usage:
@@ -248,7 +248,7 @@ def generate_launch_description():
         """
         
         # Get constant parameters
-        mode = context.launch_configurations['mode']
+        slam_mode = context.launch_configurations['slam_mode']
         data_source = context.launch_configurations['data_source']
         odom_source = context.launch_configurations['odom_source']
         urdf_model = context.launch_configurations['urdf_model']
@@ -270,13 +270,13 @@ def generate_launch_description():
         odom_extra = {}
         slam_extra = {}
 
-        # Build parameters based on mode, odom_source, and active sensors
-        if mode == 'rgbd':
+        # Build parameters based on slam_mode, odom_source, and active sensors
+        if slam_mode == 'rgbd':
             realsense_config = realsense_config_arg or os.path.join(config_dir, 'realsense_rgbd.yaml')
             rtab_params |= rgbd_params
             remaps += rgbd_remaps
             odom_exec = 'rgbd_odometry'
-        else:  # mode == 'stereo'
+        else:  # slam_mode == 'stereo'
             realsense_config = realsense_config_arg or os.path.join(config_dir, 'realsense_stereo.yaml')
             rtab_params |= stereo_params
             remaps += stereo_remaps
@@ -462,7 +462,7 @@ def generate_launch_description():
 
     return LaunchDescription([
         # Launch arguments
-        declare_mode_cmd,
+        declare_slam_mode_cmd,
         declare_data_source_cmd,
         declare_odom_source_cmd,
         declare_urdf_model_cmd,
