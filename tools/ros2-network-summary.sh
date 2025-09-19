@@ -67,7 +67,7 @@ topics=$(ros2 topic list)
 
 # Estimate time to completion
 num_topics=$(echo "$topics" | wc -l)
-color_echo INFO "Estimated time to complete: $((num_topics * sampling_time_sec)) seconds."
+color_echo INFO "Estimated time to complete: $((num_topics * sampling_time_sec)) seconds"
 sleep 1;  # let user see this message
 
 # ==================== (1) LOOP THROUGH AVAILABLE TOPICS ====================
