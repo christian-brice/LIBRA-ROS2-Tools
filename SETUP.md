@@ -12,6 +12,7 @@ The instructions in this file assume an Ubuntu 22.04 machine, so all ROS-related
 - [Basic Packages](#basic-packages)
     - [*VS Code Extensions*](#vs-code-extensions)
 - [ROS 2 Installation](#ros-2-installation)
+- [RTAB-Map (SLAM) Installation](#rtab-map-slam-installation)
 - [Git Submodules](#git-submodules)
     - [*Intel® RealSense™ ROS2 Wrapper*](#intel-realsense-ros2-wrapper)
     - [*LightWare LIDAR© ROS2 Wrapper*](#lightware-lidar-ros2-wrapper)
@@ -69,6 +70,10 @@ The following are recommendations &ndash; they aren't required to run the projec
     ```bash
     sudo apt install -y ros-$ROS_DISTRO-imu-tools ros-$ROS_DISTRO-joint-state-publisher-gui ros-$ROS_DISTRO-xacro ros-$ROS_DISTRO-tf-transformations
     ```
+
+## RTAB-Map (SLAM) Installation
+
+See [docs/RTAB-MAP.md "Installing RTAB-Map"](docs/RTAB-MAP.md#installing-rtab-map) for instructions.
 
 ## Git Submodules
 

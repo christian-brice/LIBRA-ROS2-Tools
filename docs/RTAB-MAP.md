@@ -41,14 +41,17 @@ The communication middleware that ROS 2 uses is DDS; specifically, [Fast DDS](ht
     sudo apt install ros-$ROS_DISTRO-rmw-cyclonedds-cpp
     ```
 
-2. Add a persistent environment variable to your `.bashrc` defining Cyclone DDS as the preferred middleware.
+2. Add a persistent environment variable to your `.bashrc` defining Cyclone DDS as the preferred middleware. Also tell Cyclone DDS what config file to use.
 
     ```bash
     echo 'export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp' >> ~/.bashrc
+    echo 'export CYCLONEDDS_URI=file://$HOME/cyclonedds_config.xml' >> ~/.bashrc
     source ~/.bashrc
     ```
 
-It may also be useful to make RTAB-Map's command-line logs appear synced with ROS 2's. Add the following to your `.bashrc` to do so.
+    > ***NOTE:*** if you don't see `cyclonedds_config.xml` in the home directory (`/home/brice`), copy it from the `config/ros2/` directory in this repo.
+
+It may also be useful to sync RTAB-Map's command-line logs with ROS 2's. Add the following to your `.bashrc` to do so.
 
 ```bash
 cat << 'EOF' >> ~/.bashrc
