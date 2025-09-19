@@ -61,8 +61,8 @@ def generate_launch_description():
     declare_script_mode_cmd = DeclareLaunchArgument(
         'script_mode',
         default_value='full_stack',
-        choices=['full_stack', 'record' 'replay'],
-        description='Script mode: "full_stack" launches the entire LIBRA SLAM pipeline, "record" only launches sensors and related nodes, "replay" only launches SLAM nodes reliant on rosbag playback.'
+        choices=['full_stack', 'sensors_only', 'replay'],
+        description='Script mode: "full_stack" launches the entire LIBRA SLAM pipeline, "sensors_only" only launches sensors and related nodes, "replay" only launches SLAM nodes reliant on rosbag playback.'
     )
 
     declare_slam_mode_cmd = DeclareLaunchArgument(
@@ -323,7 +323,7 @@ def generate_launch_description():
                 lidar_en = True
             rtabmap_en = True
 
-        elif script_mode == 'record':
+        elif script_mode == 'sensors_only':
             camera_en = True
             if use_lidar:
                 lidar_en = True
