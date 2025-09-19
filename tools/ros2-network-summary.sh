@@ -16,7 +16,7 @@
 sampling_time_sec=5
 
 output_temp_file=$(mktemp)  # capture command output in a temporary file
-csv_file="network_summary.csv"  # in case the "--csv" flag is provided
+csv_file="network_summary.csv"  # default filename for "--csv" flag
 
 color_echo() {
     local level=$1
@@ -46,25 +46,49 @@ color_echo() {
 
 color_echo INFO "Sampling active ROS2 topics..."
 
-# ==================== (0) SCRIPT OPTIONS AND PRELIMINARY ACTIONS ====================
+# ==================== (0) ARG PARSING AND PRELIMINARY ACTIONS ====================
 
-# Handle the CSV flag
+#-------------------------
 csv_mode=false
-if [[ "$1" == "--csv" ]]; then
-    csv_mode=true
-    color_echo INFO "CSV mode enabled"
-fi
-
-# Handle the debug flag
 debug_mode=false
-if [[ "$1" == "--debug" ]]; then
-    debug_mode=true
+while [[ "$#" -gt 0 ]]; do
+    case "$1" in
+        --debug)
+            debug_mode=true
+            shift  # consume the flag
+            ;;
+        --csv)
+            csv_mode=true
+            # Check the next argument, if any, for a filename
+            if [[ -n "$2" && ! "$2" =~ ^-- ]]; then
+                csv_file="$2"
+                # If it doesn't end in ".csv", append it
+                if [[ ! "$csv_file" =~ \.csv$ ]]; then
+                    csv_file+=".csv"
+                fi
+                shift  # consume the flag
+                shift  # consume the filename
+            else
+                shift  # only consume the flag
+            fi
+            ;;
+        *)
+            color_echo WARN "Unrecognized option: '$1'"
+            shift
+            ;;
+    esac
+done
+#-------------------------
+if [ "$debug_mode" = true ]; then
     color_echo INFO "Debug mode enabled"
 fi
-
-# Get a list of all ROS 2 topics
+if [ "$csv_mode" = true ]; then
+    color_echo INFO "CSV mode enabled. Output file: $csv_file"
+fi
+#-------------------------
+# Get a list of all ROS 2 topics (used mainly in Section 1)
 topics=$(ros2 topic list)
-
+#-------------------------
 # Estimate time to completion
 num_topics=$(echo "$topics" | wc -l)
 color_echo INFO "Estimated time to complete: $((num_topics * 2 * sampling_time_sec)) s"
