@@ -1,12 +1,16 @@
-# Hawrdware
-#"depth_module.emitter_enabled": 0
-# Data streams
+# Hardware
+#"depth_module.emitter_enabled": 0  # uncomment to use external IR projector
+# Data Streams
 "enable_color": true
+"color_qos": "SENSOR_DATA"  # best-effort, smaller queue
 "enable_depth": true
+"depth_qos": "SENSOR_DATA"
 "enable_infra1": false
 "enable_infra2": false
 "enable_gyro": true
+"gyro_qos": "SENSOR_DATA"
 "enable_accel": true
+"accel_qos": "SENSOR_DATA"
 # Post-processing
 "unite_imu_method": 2
 "enable_sync": true
