@@ -47,7 +47,7 @@ class c:  # ANSI color codes for terminal output
 
 def generate_launch_description():
     # Get general paths
-    default_working_dir = os.path.join(os.path.expanduser("~"), '.rtabmap')
+    default_working_dir = os.path.join(os.path.expanduser('~'), '.rtabmap')
     
     # Get package-specific paths
     pkg_share = get_package_share_directory('libra')
@@ -132,10 +132,10 @@ def generate_launch_description():
     
     # NOTE: Parameters that are lowercase and use underscore separators take
     #       Pythonic values (e.g., 30 or True). All others take string values
-    #       (e.g., "30" or "True").
+    #       (e.g., '30' or 'True').
 
-    # NOTE: Some parameters that are part of the "RGBD" category are not actually
-    #       exclusive to RGBD-based odometry.
+    # NOTE: Apparently, some parameters that are part of the "RGBD" category are
+    #       not actually exclusive to RGBD-based odometry.
 
     # Common
     
@@ -235,8 +235,9 @@ def generate_launch_description():
     ]
 
     def launch_nodes(context, *args, **kwargs):
-        """Generates a list of nodes to be launched based launch arguments.
-        Supplied to the ROS2 `LaunchDescription` via `OpaqueFunction`.
+        """
+        Generates a list of nodes to be launched based launch arguments.
+        This is supplied to the ROS2 `LaunchDescription` via `OpaqueFunction`.
 
         Usage:
             OpaqueFunction(function=launch_nodes)
