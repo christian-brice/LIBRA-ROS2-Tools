@@ -143,6 +143,7 @@ def generate_launch_description():
         # General
         'sync_queue_size': 30,  # default: 10
         'topic_queue_size': 30,  # default: 10
+        'qos': 2,  # 0 = SYSTEM_DEFAULT, 1 = RELIABLE, 2 = BEST_EFFORT
         'wait_imu_to_init': True,
         # Mapping
         'RGBD/OptimizeFromGraphEnd': 'false',  # correct all previous poses based on latest pose (/odom and /map will always match)
