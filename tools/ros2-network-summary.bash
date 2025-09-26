@@ -4,7 +4,7 @@
 # topics and displays the results in a formatted table.
 #
 # Usage:
-#   ./ros2-network-summary.sh [--csv [filename]] [--debug]
+#   ./ros2-network-summary.bash [--csv [filename]] [--debug]
 #
 # Disclaimer:
 #   This script was vibe-coded using Gemini and manually tweaked by Christian Brice.
