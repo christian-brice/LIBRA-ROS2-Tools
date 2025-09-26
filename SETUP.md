@@ -9,18 +9,18 @@ The instructions in this file assume an Ubuntu 22.04 machine, so all ROS-related
 
 ## Table of Contents
 
-- [Basic Packages](#basic-packages)
+- [1. Basic Packages](#1-basic-packages)
     - [*VS Code Extensions*](#vs-code-extensions)
-- [ROS 2 Installation](#ros-2-installation)
-- [RTAB-Map (SLAM) Installation](#rtab-map-slam-installation)
-- [Git Submodules](#git-submodules)
+- [2. ROS 2 Installation](#2-ros-2-installation)
+- [3. RTAB-Map (SLAM) Installation](#3-rtab-map-slam-installation)
+- [4. Git Submodules](#4-git-submodules)
     - [*Intel® RealSense™ ROS2 Wrapper*](#intel-realsense-ros2-wrapper)
     - [*LightWare LIDAR© ROS2 Wrapper*](#lightware-lidar-ros2-wrapper)
-- [Setting Device Aliases](#setting-device-aliases)
+- [5. Setting Device Aliases](#5-setting-device-aliases)
     - [*Sensors*](#sensors)
     - [*Arduinos*](#arduinos)
 
-## Basic Packages
+## 1. Basic Packages
 
 Update the APT package lists and ensure your system is up to date.
 
@@ -45,7 +45,7 @@ The following are recommendations &ndash; they aren't required to run the projec
 - **Markdown Preview Enhanced** ([shd101wyy.markdown-preview-enhanced](https://marketplace.visualstudio.com/items?itemName=shd101wyy.markdown-preview-enhanced)): prettier, more robust Markdown visualizer than the one included with VS Code.
 - **URDF Visualizer** ([morningfrog.urdf-visualizer](https://marketplace.visualstudio.com/items?itemName=morningfrog.urdf-visualizer)): allows you to visualize ROS2 `urdf` and `xacro` files and update them in real-time. Make sure to follow the instructions to set your `urdf-visualizer.packages` path.
 
-## ROS 2 Installation
+## 2. ROS 2 Installation
 
 1. Follow the official ROS 2 install guide for [Ubuntu (deb packages)](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debs.html).
     - If you are behind a proxy, at the "*Now add the ROS 2 GPG key*" step you will have to add the following command-line option: `-x [protocol://][user:password@]proxyhost[:port]` (e.g., `-x http://proxy.noc.titech.ac.jp:3128`).
@@ -71,11 +71,11 @@ The following are recommendations &ndash; they aren't required to run the projec
     sudo apt install -y ros-$ROS_DISTRO-imu-tools ros-$ROS_DISTRO-joint-state-publisher-gui ros-$ROS_DISTRO-xacro ros-$ROS_DISTRO-tf-transformations
     ```
 
-## RTAB-Map (SLAM) Installation
+## 3. RTAB-Map (SLAM) Installation
 
 See [docs/RTAB-MAP.md "Installing RTAB-Map"](docs/RTAB-MAP.md#installing-rtab-map) for instructions.
 
-## Git Submodules
+## 4. Git Submodules
 
 If you did not pull the submodules when you cloned this project, you can do so by executing the following command.
 
@@ -91,7 +91,7 @@ Follow the instructions in the ["Before You Start" section of REALSENSE.md](/doc
 
 Follow the instructions in the ["Before You Start" section of LIDAR.md](/docs/LIDAR.md#before-you-start).
 
-## Setting Device Aliases
+## 5. Setting Device Aliases
 
 For consistency across runs, it's highly recommended that you set path aliases for certain devices. For example: in [rtabmap_sensor_suite.launch.py](/ros2_ws/src/libra/launch/rtabmap_sensor_suite.launch.py), the `lightwarelidar2` node must be launched with a port parameter. Since this may change across devices and dev environments, it's set to `/dev/lidar`.
 
