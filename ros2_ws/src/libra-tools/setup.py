@@ -19,7 +19,7 @@ setup(
     entry_points={
         'console_scripts': [
             # (format: 'executable_name = package_name.path_to_script:main_function')
-            'tip_path_publisher = libra_tools.tip_path_publisher:main',
+            'tip_path_publisher = libra-tools.tip_path_publisher:main',
         ],
     },
 )
