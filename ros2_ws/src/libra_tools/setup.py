@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-package_name = 'libra-tools'
+package_name = 'libra_tools'
 
 setup(
     name=package_name,
@@ -19,7 +19,7 @@ setup(
     entry_points={
         'console_scripts': [
             # (format: 'executable_name = package_name.path_to_script:main_function')
-            'tip_path_publisher = libra-tools.tip_path_publisher:main',
+            'tip_path_publisher = libra_tools.path_publisher:main',
         ],
     },
 )
