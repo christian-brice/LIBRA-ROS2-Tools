@@ -19,6 +19,9 @@ The instructions in this file assume an Ubuntu 22.04 machine, so all ROS-related
 - [5. Setting Device Aliases](#5-setting-device-aliases)
     - [*Sensors*](#sensors)
     - [*Arduinos*](#arduinos)
+- [Optional – Misc. Tools](#optional--misc-tools)
+    - [*Bash Scripts*](#bash-scripts)
+    - [*Python Scripts*](#python-scripts)
 
 ## 1. Basic Packages
 
@@ -128,3 +131,23 @@ SUBSYSTEM=="tty", KERNEL=="ttyACM*", ATTRS{idVendor}=="2341", ATTRS{idProduct}==
 ```txt
 SUBSYSTEM=="tty", KERNEL=="ttyACM*", ATTRS{idVendor}=="2886", ATTRS{idProduct}=="802f", ATTRS{serial}=="055D5A3C5055344A322E3120FF082F39", SYMLINK+="manip"
 ```
+
+## Optional &ndash; Misc. Tools
+
+This section refers to the scripts in the `tools/` directory.
+
+### *Bash Scripts*
+
+No further setup necessary.
+
+### *Python Scripts*
+
+You can install all the necessary packages with the following command.
+
+```bash
+pip install pandas seaborn
+```
+
+Details:
+
+- `compare_network_summaries.py` &ndash; [pandas](https://pandas.pydata.org/), [seaborn](https://seaborn.pydata.org/)
