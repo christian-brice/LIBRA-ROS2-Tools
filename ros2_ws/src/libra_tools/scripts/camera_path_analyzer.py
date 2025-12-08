@@ -331,7 +331,7 @@ class PathAnalyzer:
         ax.text(
             max_xyz[0], center[1], center[2],
             f"X = {dx:.2f} m",
-            color="orange",
+            color="red",
             fontsize=11,
             ha="left",
             va="center"
@@ -339,7 +339,7 @@ class PathAnalyzer:
         ax.text(
             center[0], max_xyz[1], center[2],
             f"Y = {dy:.2f} m",
-            color="orange",
+            color="red",
             fontsize=11,
             ha="center",
             va="bottom"
@@ -347,7 +347,7 @@ class PathAnalyzer:
         ax.text(
             center[0], center[1], max_xyz[2],
             f"Z = {dz:.2f} m",
-            color="orange",
+            color="red",
             fontsize=11,
             ha="center",
             va="bottom"
