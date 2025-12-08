@@ -6,6 +6,9 @@
 #   ros2 run libra_tools path_to_csv
 
 import csv
+import sys
+import os
+
 import rclpy
 from rclpy.node import Node
 
@@ -30,10 +33,12 @@ class PathSaver(Node):
         self.declare_parameter('out_filename', OUT_FILENAME)
 
         self._path_topic = self.get_parameter('path_topic').value
-        self._out_filename = self.get_parameter('out_filename').value
+        out_filename = self.get_parameter('out_filename').value
 
         self.get_logger().info(
-            f"Saving Path data from \"{self._path_topic}\" to {self._out_filename}.csv")
+            f"Saving Path data from \"{self._path_topic}\" to {out_filename}.csv")
+        
+        self._out_filepath = os.path.join(os.getcwd(), out_filename + '.csv')
         
         # Internal properties
         self._received = False
@@ -57,7 +62,7 @@ class PathSaver(Node):
         self._received = True
         self.get_logger().info(f"Received path with {len(msg.poses)} poses")
 
-        with open(self._out_filename, 'w', newline='') as f:
+        with open(self._out_filepath, 'w', newline='') as f:
             writer = csv.writer(f)
             writer.writerow(['x', 'y', 'z', 'qx', 'qy', 'qz', 'qw', 'stamp_sec'])
 
@@ -72,8 +77,9 @@ class PathSaver(Node):
                     t
                 ])
 
-        self.get_logger().info("File saved successfully, exiting")
-        rclpy.shutdown()
+        self.get_logger().info(f"File saved to: {self._out_filepath}")
+        self.get_logger().info("Exiting...")
+        sys.exit(0)
 
 
 def main(args=None):
