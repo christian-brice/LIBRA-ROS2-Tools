@@ -1,17 +1,16 @@
 # Brief:
-#   A simple ROS 2 node that publishes a persistent Path message for a given TF
+#   A simple ROS2 node that publishes a persistent Path message for a given TF
 #   frame. Can be used to, e.g., visualize the tip path of a robotic arm in RViz.
 #
 # Usage:
 #   ros2 run libra_tools path_publisher
 #
 # Changing Parameters at Runtime:
-#   You can change base_frame_id and child_frame_id at runtime via the ROS 2
+#   You can change base_frame_id and child_frame_id at runtime via the ROS2
 #   parameter services. Note that changing these parameters will reset the
 #   current path history.
 #     ros2 param set /tip_path_publisher base_frame_id "map"
 #     ros2 param set /tip_path_publisher child_frame_id "camera_link"
-
 
 import rclpy
 from rclpy.node import Node
@@ -36,8 +35,7 @@ PUB_FREQ = 0.1  # 10 Hz
 
 class PathPublisher(Node):
     """
-    Simple ROS 2 node that publishes a persistent nav_msgs/Path message for the
-    given frame (default: tip) for visualization in RViz.
+    Publishes a persistent nav_msgs/Path message for the given frame.
     """
 
     def __init__(self):
