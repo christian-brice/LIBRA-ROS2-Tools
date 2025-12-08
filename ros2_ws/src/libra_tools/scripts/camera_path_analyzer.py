@@ -29,8 +29,8 @@ class PathAnalyzer:
     """
 
     def __init__(self, csv_file, voxel_size=0.05, rays_per_pose=200):
-        print(f"Running PathAnalyzer on {csv_file}")
-        sleep(0.5)  # allow user to read printout
+        print(f"<< Running PathAnalyzer on {csv_file} >>")
+        sleep(2)  # allow user to read printout
 
         # Known intrinsics
         self._depth_min = CAMERA_MIN_OPERATING_DEPTH_M
