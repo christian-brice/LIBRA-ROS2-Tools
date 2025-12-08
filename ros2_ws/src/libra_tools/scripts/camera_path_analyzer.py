@@ -9,6 +9,8 @@ import pandas as pd
 from scipy.spatial.transform import Rotation as R
 from scipy.spatial import ConvexHull
 
+from matplotlib.lines import Line2D
+from matplotlib.patches import Patch
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
@@ -225,10 +227,10 @@ class PathAnalyzer:
         overlaid on the estimated scanned volume (from voxel hull).
         """
 
-        print("Rendering 3D scan visualization...")
+        print("Rendering 3D visualization...")
 
         if not self._voxels or self._positions is None:
-            print("Rendering 3D scan visualization... ERROR")
+            print("Rendering 3D visualization... ERROR")
             print(f"  Missing voxel and/or position data.")
             return
 
@@ -318,11 +320,34 @@ class PathAnalyzer:
         ax.set_box_aspect((1, 1, 1))
 
         # Plot: Formatting
-        ax.set_title("Estimated Scanned Volume")
+        ax.set_title("Estimated Maximum Scanned Volume")
         ax.set_xlabel("X (m)")
         ax.set_ylabel("Y (m)")
         ax.set_zlabel("Z (m)")
         ax.set_box_aspect([1, 1, 1])
+
+        legend_handles = [
+            Line2D(
+                [0], [0],
+                color="cyan",
+                linewidth=2.0,
+                label="Camera trajectory"
+            ),
+            Line2D(
+                [0], [0],
+                color="blue",
+                linestyle="--",
+                linewidth=3.0,
+                label="Camera trajectory bounding box"
+            ),
+            Patch(
+                facecolor="orange",
+                edgecolor="none",
+                alpha=0.30,
+                label="Estimated max. scanned volume"
+            ),
+        ]
+        ax.legend(handles=legend_handles, loc="upper right")
 
         # Plot: In-graph labelling (est. scanned volume mesh)
         dx, dy, dz = max_xyz - min_xyz
@@ -354,11 +379,12 @@ class PathAnalyzer:
         )
 
         # Generate plot
-        plt.legend()
+        #plt.legend()  # moved to custom legend above
         plt.tight_layout()
-        plt.show()
+        print("Displaying plot (close window to continue)")
+        plt.show()  # NOTE: blocking call
 
-        print("Rendering 3D scan visualization... SUCCESS")
+        print("Rendering 3D visualization... SUCCESS")
 
     def _sample_frustum_rays(self, n):
         """
