@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
 
-import time
+from math import tan, radians
+import os
+from time import sleep, perf_counter
+
 import numpy as np
 import pandas as pd
-from math import tan, radians
 from scipy.spatial.transform import Rotation as R
 from scipy.spatial import ConvexHull
+
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
 
 # Realsense D456 intrinsics
@@ -23,7 +28,10 @@ class PathAnalyzer:
     tip path (nav_msgs/Path recorded into a CSV) with orientation awareness.
     """
 
-    def __init__( self, csv_file="tip_path.csv", voxel_size=0.05, rays_per_pose=200):
+    def __init__(self, csv_file, voxel_size=0.05, rays_per_pose=200):
+        print(f"Running PathAnalyzer on {csv_file}")
+        sleep(0.5)  # allow user to read printout
+
         # Known intrinsics
         self._depth_min = CAMERA_MIN_OPERATING_DEPTH_M
         self._depth_max = CAMERA_MAX_OPERATING_DEPTH_M
@@ -31,7 +39,7 @@ class PathAnalyzer:
         self._fov_v = radians(CAMERA_FOV_V_DEG)
 
         # Params
-        self._csv_filepath = csv_file
+        self._in_csv_filepath = csv_file
         self._voxel_size = voxel_size
         self._rays_per_pose = rays_per_pose
 
@@ -40,43 +48,68 @@ class PathAnalyzer:
         self._rotations = None
         self._voxels = set()
 
-        # Output metrics
+        # Output metrics and filepath(s)
         self._total_path_length = 0.0
         self._workspace_bounds = None
         self._hull_volume = 0.0
         self._scanned_volume = 0.0
         self._scan_redundancy = 0.0
 
+        csv_dir = os.path.dirname(os.path.abspath(self._in_csv_filepath))
+        self._out_ply_filepath = os.path.join(csv_dir, "est_scan_volume.ply")
+
     def run(self):
         """
         Runs the full analysis pipeline.
         """
-        t_start = time.perf_counter()
+        t_start = perf_counter()
 
         self._load_csv()
         self._compute_path_metrics()
         self._compute_bounding_box()
         self._compute_convex_hull()
         self._estimate_scan_volume()
-
+        self._plot_scan_visualization()
         
         print("================================")
         print(f"Trajectory length: {self._total_path_length:.3f} m (w/ {len(self._positions)} samples)")
         print(f"Workspace envelope: X={self._workspace_bounds[0]:.3f} m, Y={self._workspace_bounds[1]:.3f} m, Z={self._workspace_bounds[2]:.3f} m")
         print(f"Volume traversed by camera: {self._hull_volume:.3f} m^3")
-        print(f"Estimated scanned volume: {self._scanned_volume:.3f} m³")
+        print(f"Estimated scanned volume: {self._scanned_volume:.3f} m^3")
+        print(f"  (mesh saved to: {self._out_ply_filepath})")
         print(f"Scan inefficiency (redundancy factor): {self._scan_redundancy:.2f}")
 
+        """
+        NOTE: The following points explain non-trivial metrics.
+          - "Estimated scanned volume":
+              This is an UPPER BOUND and ignores occlusion.
+          - "Scan inefficiency (redundancy factor)":
+              We get this from "R = total rays cast / unique voxels hit", where
+              R>1 means overlapping views (higher = more revisits).
+              Generally, 2-3 views per region is sufficient for quality coverage
+              and anything beyond that adds little geometry (diminishing returns).
+              This can be verified by rearranging the formula to get:
+              "unique voxels hit = total rays cast / R" => "1/R", which gives
+              the fraction of samples that hit new voxels; conversely, "1-(1/R)"
+              gives the fraction of samples that don't provide new spatial info
+              (note that this doesn't mean the redundant samples are useless).
+              In a nutshell: it's a voxelized estimate of sensing redundancy
+              based on Monte-Carlo frustrum sampling.
+        """
+
         print("================================")
-        t_end = time.perf_counter()
+        t_end = perf_counter()
         print(f"Script ran in {t_end - t_start:.3f} s")
 
     def _load_csv(self):
+        """
+        Loads nav_msgs/Path data from a CSV file.
+        """
         print("Loading nav_msgs/Path data from CSV...")
 
         try:
             # Extract positions and orientations
-            df = pd.read_csv(self._csv_filepath)
+            df = pd.read_csv(self._in_csv_filepath)
             self._positions = df[['x', 'y', 'z']].to_numpy()
             quats = df[['qx', 'qy', 'qz', 'qw']].to_numpy()
 
@@ -84,7 +117,7 @@ class PathAnalyzer:
             self._rotations = R.from_quat(quats)
         except FileNotFoundError:
             print("Loading nav_msgs/Path data from CSV... ERROR")
-            print(f"  File not found: {self._csv_filepath}")
+            print(f"  File not found: {self._in_csv_filepath}")
             exit(1)
         except Exception as e:
             print("Loading nav_msgs/Path data from CSV... ERROR")
@@ -94,14 +127,17 @@ class PathAnalyzer:
         print("Loading nav_msgs/Path data from CSV... SUCCESS")
 
     def _compute_path_metrics(self):
-        print("Computing path length and motion statistics...")
+        """
+        Computes total trajectory length based on segment distances.
+        """
+        print("Computing traversed path length...")
 
         # Compute total path length by summing segment lengths
         diffs = np.diff(self._positions, axis=0)
         segment_lengths = np.linalg.norm(diffs, axis=1)
         self._total_path_length = np.sum(segment_lengths)
 
-        print("Computing path length and motion statistics... SUCCESS")
+        print("Computing traversed path length... SUCCESS")
 
     def _compute_bounding_box(self):
         """
@@ -155,6 +191,175 @@ class PathAnalyzer:
 
         print("Estimating orientation-aware scanned volume... SUCCESS")
 
+    def _export_convex_hull_ply(self, points, faces):
+        """
+        Exports a triangular mesh to an ASCII PLY file.
+        """
+        print(f"Saving convex hull mesh...")
+
+        with open(self._out_ply_filepath, "w") as f:
+            # Header
+            f.write("ply\n")
+            f.write("format ascii 1.0\n")
+            f.write(f"element vertex {len(points)}\n")
+            f.write("property float x\n")
+            f.write("property float y\n")
+            f.write("property float z\n")
+            f.write(f"element face {len(faces)}\n")
+            f.write("property list uchar int vertex_indices\n")
+            f.write("end_header\n")
+
+            # Vertices
+            for p in points:
+                f.write(f"{p[0]} {p[1]} {p[2]}\n")
+
+            # Faces (triangles)
+            for tri in faces:
+                f.write(f"3 {tri[0]} {tri[1]} {tri[2]}\n")
+
+        print("Saving convex hull mesh... SUCCESS")
+
+    def _plot_scan_visualization(self):
+        """
+        Generates a visualization of the camera trajectory and its bounding box
+        overlaid on the estimated scanned volume (from voxel hull).
+        """
+
+        print("Rendering 3D scan visualization...")
+
+        if not self._voxels or self._positions is None:
+            print("Rendering 3D scan visualization... ERROR")
+            print(f"  Missing voxel and/or position data.")
+            return
+
+        # Prep: Estimated scanned volume mesh
+        voxels_np = np.array(list(self._voxels), dtype=float)
+        voxel_points = (voxels_np + 0.5) * self._voxel_size
+        hull = ConvexHull(voxel_points)
+        hull_faces = voxel_points[hull.simplices]
+
+        self._export_convex_hull_ply(voxel_points, hull.simplices)  # nice to have
+
+        # Prep: Bounding box overlay
+        min_xyz = self._positions.min(axis=0)
+        max_xyz = self._positions.max(axis=0)
+
+        bbox_edges = [
+            # Bottom
+            [min_xyz, [max_xyz[0], min_xyz[1], min_xyz[2]]],
+            [min_xyz, [min_xyz[0], max_xyz[1], min_xyz[2]]],
+            [[max_xyz[0], max_xyz[1], min_xyz[2]], [max_xyz[0], min_xyz[1], min_xyz[2]]],
+            [[max_xyz[0], max_xyz[1], min_xyz[2]], [min_xyz[0], max_xyz[1], min_xyz[2]]],
+            # Top
+            [[min_xyz[0], min_xyz[1], max_xyz[2]], [max_xyz[0], min_xyz[1], max_xyz[2]]],
+            [[min_xyz[0], min_xyz[1], max_xyz[2]], [min_xyz[0], max_xyz[1], max_xyz[2]]],
+            [max_xyz, [max_xyz[0], min_xyz[1], max_xyz[2]]],
+            [max_xyz, [min_xyz[0], max_xyz[1], max_xyz[2]]],
+            # Walls
+            [min_xyz, [min_xyz[0], min_xyz[1], max_xyz[2]]],
+            [[max_xyz[0], min_xyz[1], min_xyz[2]], [max_xyz[0], min_xyz[1], max_xyz[2]]],
+            [[min_xyz[0], max_xyz[1], min_xyz[2]], [min_xyz[0], max_xyz[1], max_xyz[2]]],
+            [[max_xyz[0], max_xyz[1], min_xyz[2]], max_xyz],
+        ]
+
+        # Initialize 3D plot
+        fig = plt.figure(figsize=(10, 9))
+        ax = fig.add_subplot(111, projection='3d')
+
+        # Plot: Scanned volume mesh
+        mesh = Poly3DCollection(
+            hull_faces,
+            alpha=0.30,
+            facecolor="orange",
+            edgecolor="none"
+        )
+        ax.add_collection3d(mesh)
+
+        # Plot: Bounding box
+        for edge in bbox_edges:
+            edge = np.array(edge)
+            ax.plot(
+                edge[:, 0],
+                edge[:, 1],
+                edge[:, 2],
+                linestyle="--",
+                color="blue",
+                linewidth=3.0,
+                alpha=0.9,
+                zorder=5  # place above mesh
+            )
+
+        # Plot: Camera path
+        ax.plot(
+            self._positions[:, 0],
+            self._positions[:, 1],
+            self._positions[:, 2],
+            color="cyan",
+            linewidth=2.0,
+            label="Camera Path",
+            zorder=10  # place above all elements
+        )
+
+        # Plot: Ensure everything is visible
+        all_points = np.vstack([
+            self._positions,
+            voxel_points
+        ])
+
+        min_xyz = all_points.min(axis=0)
+        max_xyz = all_points.max(axis=0)
+
+        padding = 0.05 * (max_xyz - min_xyz)  # 5% padding
+
+        ax.set_xlim(min_xyz[0] - padding[0], max_xyz[0] + padding[0])
+        ax.set_ylim(min_xyz[1] - padding[1], max_xyz[1] + padding[1])
+        ax.set_zlim(min_xyz[2] - padding[2], max_xyz[2] + padding[2])
+
+        ax.set_box_aspect((1, 1, 1))
+
+        # Plot: Formatting
+        ax.set_title("Estimated Scanned Volume")
+        ax.set_xlabel("X (m)")
+        ax.set_ylabel("Y (m)")
+        ax.set_zlabel("Z (m)")
+        ax.set_box_aspect([1, 1, 1])
+
+        # Plot: In-graph labelling (est. scanned volume mesh)
+        dx, dy, dz = max_xyz - min_xyz
+        center = 0.5 * (min_xyz + max_xyz)
+
+        ax.text(
+            max_xyz[0], center[1], center[2],
+            f"X = {dx:.2f} m",
+            color="orange",
+            fontsize=11,
+            ha="left",
+            va="center"
+        )
+        ax.text(
+            center[0], max_xyz[1], center[2],
+            f"Y = {dy:.2f} m",
+            color="orange",
+            fontsize=11,
+            ha="center",
+            va="bottom"
+        )
+        ax.text(
+            center[0], center[1], max_xyz[2],
+            f"Z = {dz:.2f} m",
+            color="orange",
+            fontsize=11,
+            ha="center",
+            va="bottom"
+        )
+
+        # Generate plot
+        plt.legend()
+        plt.tight_layout()
+        plt.show()
+
+        print("Rendering 3D scan visualization... SUCCESS")
+
     def _sample_frustum_rays(self, n):
         """
         Utility function.
@@ -186,5 +391,5 @@ class PathAnalyzer:
 
 
 if __name__ == "__main__":
-    analyzer = PathAnalyzer()
+    analyzer = PathAnalyzer(csv_file="tip_path.csv")
     analyzer.run()
