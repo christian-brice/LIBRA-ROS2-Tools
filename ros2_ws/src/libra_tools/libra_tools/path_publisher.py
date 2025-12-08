@@ -1,23 +1,38 @@
+# Brief:
+#   A simple ROS 2 node that publishes a persistent Path message for a given TF
+#   frame. Can be used to, e.g., visualize the tip path of a robotic arm in RViz.
+#
+# Usage:
+#   ros2 run libra_tools path_publisher
+#
+# Changing Parameters at Runtime:
+#   You can change base_frame_id and child_frame_id at runtime via the ROS 2
+#   parameter services. Note that changing these parameters will reset the
+#   current path history.
+#     ros2 param set /tip_path_publisher base_frame_id "map"
+#     ros2 param set /tip_path_publisher child_frame_id "camera_link"
+
+
 import rclpy
 from rclpy.node import Node
 from rclpy.time import Time, Duration
+
+from rcl_interfaces.msg import SetParametersResult
 
 import tf2_ros
 from geometry_msgs.msg import PoseStamped
 from nav_msgs.msg import Path
 
-# --- CONFIG ---
 
 # The fixed frame to measure from (usually 'map' or 'odom')
-BASE_FRAME_ID = 'map'
+BASE_FRAME_ID = 'base_link'
 # The frame to track (i.e., the tip)
-TIP_FRAME_ID = 'manip_out_link'
+CHILD_FRAME_ID = 'manip_out_link'
 # Published Path topic (to be consumed by RViz)
 PATH_TOPIC = '/tip_path'
 # Frequency (in seconds) for checking the transform/publishing the path
 PUB_FREQ = 0.1  # 10 Hz
 
-# ---------------------
 
 class PathPublisher(Node):
     """
@@ -27,34 +42,45 @@ class PathPublisher(Node):
 
     def __init__(self):
         super().__init__('tip_path_publisher')
-        self.get_logger().info(f"Starting Tip Path Publisher for frame '{TIP_FRAME_ID}'")
+
+        # Parameters
+        self.declare_parameter('base_frame_id', BASE_FRAME_ID)
+        self.declare_parameter('child_frame_id', CHILD_FRAME_ID)
+
+        self._base_frame_id = self.get_parameter('base_frame_id').get_parameter_value().string_value
+        self._child_frame_id = self.get_parameter('child_frame_id').get_parameter_value().string_value
+
+        self.get_logger().info(f"Starting Path Publisher for transform: {self._base_frame_id} -> {self._child_frame_id}")
+
+        # Enable runtime parameter changes
+        self.add_on_set_parameters_callback(self._on_param_change)
 
         # Initialize TF buffer and listener
-        self.tf_buffer = tf2_ros.Buffer(Duration(seconds=10))
-        self.tf_listener = tf2_ros.TransformListener(self.tf_buffer, self)
+        self._tf_buffer = tf2_ros.Buffer(Duration(seconds=10))
+        self._tf_listener = tf2_ros.TransformListener(self._tf_buffer, self)
 
         # Initialize Path publisher and message
-        self.path_pub = self.create_publisher(Path, PATH_TOPIC, 10)
-        self.path_msg = Path()
-        self.path_msg.header.frame_id = BASE_FRAME_ID
+        self._path_pub = self.create_publisher(Path, PATH_TOPIC, 10)
+        self._path_msg = Path()
+        self._path_msg.header.frame_id = self._base_frame_id
         
         # Create timer for update loop
-        self.timer = self.create_timer(PUB_FREQ, self.update_path)
+        self._timer = self.create_timer(PUB_FREQ, self._update_path)
 
 
-    def update_path(self):
+    def _update_path(self):
         """
         Main loop that looks up the transform, updates the path history, and
         publishes the result.
         """
         # Update timestamp
-        self.path_msg.header.stamp = self.get_clock().now().to_msg()
+        self._path_msg.header.stamp = self.get_clock().now().to_msg()
         
         try:
             # Look up TF (Fixed Frame -> Child Frame)
-            transform = self.tf_buffer.lookup_transform(
-                BASE_FRAME_ID,
-                TIP_FRAME_ID,
+            transform = self._tf_buffer.lookup_transform(
+                self._base_frame_id,
+                self._child_frame_id,
                 Time(), # use latest
                 Duration(seconds=1.0) # timeout
             )
@@ -68,23 +94,43 @@ class PathPublisher(Node):
             current_pose.pose.orientation = transform.transform.rotation
 
             # Append current pose to Path and publish
-            self.path_msg.poses.append(current_pose)
-            self.path_pub.publish(self.path_msg)
+            self._path_msg.poses.append(current_pose)
+            self._path_pub.publish(self._path_msg)
             
         except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException) as e:
             # Handle errors without failing
-            self.get_logger().warn(f"Error looking up {BASE_FRAME_ID} to {TIP_FRAME_ID}: {e}", throttle_duration_sec=1.0)
+            self.get_logger().warn(f"Error looking up {self._base_frame_id} to {self._child_frame_id}: {e}", throttle_duration_sec=1.0)
+
+    def _on_param_change(self, params):
+        """
+        Callback for handling runtime parameter changes.
+        """
+        for param in params:
+            if param.name == 'base_frame_id' and param.type_ == rclpy.Parameter.Type.STRING:
+                self._base_frame_id = param.value
+                self._path_msg.header.frame_id = self._base_frame_id
+                self._path_msg.poses.clear()  # clear existing path
+
+                self.get_logger().info(f"Updated base frame ID to: {self._base_frame_id}")
+
+            elif param.name == 'child_frame_id' and param.type_ == rclpy.Parameter.Type.STRING:
+                self._child_frame_id = param.value
+                self._path_msg.poses.clear()  # clear existing path
+
+                self.get_logger().info(f"Updated child frame ID to: {self._child_frame_id}")
+
+        return SetParametersResult(successful=True)
 
 
 def main(args=None):
     rclpy.init(args=args)
-    tip_path_publisher = PathPublisher()
+    tip__path_publisher = PathPublisher()
     try:
-        rclpy.spin(tip_path_publisher)
+        rclpy.spin(tip__path_publisher)
     except KeyboardInterrupt:
         pass
     finally:
-        tip_path_publisher.destroy_node()
+        tip__path_publisher.destroy_node()
         rclpy.shutdown()
 
 if __name__ == '__main__':
