@@ -3,7 +3,7 @@
 The instructions in this file assume an Ubuntu 22.04 machine, so all ROS-related commands links are for Humble Hawksbill. Choose the version that's right for you.
 
 | Ubuntu Distro | ROS 2 Version | Compatible with<br>RealSense&trade; SDK 2.0? |
-|---|---|---|
+| --- | --- | --- |
 | 22.04 "Jammy" | [Humble](https://docs.ros.org/en/humble/index.html) | yes |
 | 24.04 "Noble" | [Jazzy](https://docs.ros.org/en/jazzy/index.html) | maybe? |
 

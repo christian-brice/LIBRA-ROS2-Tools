@@ -78,8 +78,8 @@ The following is a summary of real-time calibration in RTAB-Map. For more inform
 
 4. Click "File" -> "Depth calibration..." and set the following values. Note that most of these values are also used when exporting 3D clouds, so an asterisk (*) denotes those which are only used in the "Depth calibration..." dialog.
 
-    |||
-    |---|---|
+    | | |
+    | --- | --- |
     | Decimation | 1 |
     | Maximum depth | 3.50 m |
     | Minimum depth | 0.00 m |
@@ -174,11 +174,11 @@ In RTAB-Map Database Viewer (`rtabmap-databaseViewer`), click "File" -> "Update 
 The following settings apply a statistical outlier removal filter based on spatial density.
 
 | Setting | Value | Notes |
-|---|---|---|
+| --- | --- | --- |
 | Search radius | `0.000` m | `0` = No radius-based filtering (default);<br>RealSense D456 provides dense depth data,<br>so `0.050`-`0.100` w/o an IR pattern projector |
-| Minimum neighbors | `5` ||
-| Ceiling filtering height<br>(in map frame) | `0.000` m ||
-| Floor filtering height<br>(in map frame) | `0.000` m ||
+| Minimum neighbors | `5` | |
+| Ceiling filtering height<br>(in map frame) | `0.000` m | |
+| Floor filtering height<br>(in map frame) | `0.000` m | |
 | Footprint width | `0.000` m | Robot width (for removing "self-points") |
 | Footprint length | `0.000` m | Robot length (for removing "self-points") |
 | Footprint height | `0.000` m | Robot height (for removing "self-points") |
@@ -188,7 +188,7 @@ The following settings apply a statistical outlier removal filter based on spati
 The following settings smooth the cloud while retaining as many of the original points as possible. Essentially, upsampling and hole-filling are *NOT* carried out.
 
 | Setting | Value | Notes |
-|---|---|---|
+| --- | --- | --- |
 | MLS search radius | `0.040` m | For determining k-nearest neighbors |
 | Polygonial order | `2` | More accurate modeling of curved surfaces (default) |
 | Upsampling method | `NONE` | `NONE` = Don't increase point density |
@@ -201,8 +201,8 @@ In RTAB-Map, click "Tools" -> "Post-processing..." (the functionality is also av
 - Detect more loop closures (generally gives good results)
 
     | Setting | Value | Notes |
-    |---|---|---|
-    | Cluster radius | `0.30` m | Try `0.20`-`0.50` depending on environment & camera accuracy.|
+    | --- | --- | --- |
+    | Cluster radius | `0.30` m | Try `0.20`-`0.50` depending on environment & camera accuracy. |
     | Cluster angle | `30` degrees | `30` = standard<br>For detecting loop closures from different angles |
     | Iterations | `10` | Recommend `5`-`10` for noisy data or large environments |
     | Intra-session | Checked | Within the same session (i.e., only one map) |
@@ -211,16 +211,16 @@ In RTAB-Map, click "Tools" -> "Post-processing..." (the functionality is also av
 - Refine links with ICP (requires laser scans)
 
     | Setting | Value | Notes |
-    |---|---|---|
+    | --- | --- | --- |
     | Refine neighbor links | **UNTESTED** | ICP must be enabled globally |
     | Refine loop closure links | Checked | Additionally uses 3D geometry to refine loop closures |
 
 - Sparse Bundle Adjustment (SBA)
 
     | Setting | Value | Notes |
-    |---|---|---|
+    | --- | --- | --- |
     | Type | `g2o` | [g2o](https://github.com/RainerKuemmerle/g2o) = very fast & good enough for RealSense<br>([Ceres](http://ceres-solver.org/) = more robust, but need to build from source) |
-    | Iterations | `20` | Higher = better convergence on complex maps<br>(`5`-`10` = standard)|
+    | Iterations | `20` | Higher = better convergence on complex maps<br>(`5`-`10` = standard) |
 
 If the resulting point cloud is worse, it may be due to SBA. To revert post-processing, click "Edit" -> "Download graph only". Select "Global map optimized".
 

@@ -22,7 +22,7 @@ sudo apt install ros-$ROS_DISTRO-camera-calibration
 Generate a calibration pattern using [calib.io's Pattern Generator](https://calib.io/pages/camera-calibration-pattern-generator) with the following settings. **Make sure your print is NOT scaled!**
 
 | Field | Value |
-|---|---|
+| --- | --- |
 | Target Type | Checkerboard |
 | Board Width x Height | 297 x 210 mm (A4 size) |
 | Rows x Columns | 8 x 10 |

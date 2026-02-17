@@ -243,7 +243,7 @@ ros2 topic list
 The RMS of the Z-Error (spatial noise).
 
 | Term | Description | Units |
-|---|---|---|
+| --- | --- | --- |
 | $Z_{i}$ | Depth range of $i$-th pixel | mm |
 | $Z_{pi}$ | Depth of $Z_{i}$ projection onto plane fit | mm |
 
@@ -258,7 +258,7 @@ $$
 The subpixel accuracy.
 
 | Term | Description | Units |
-|---|---|---|
+| --- | --- | --- |
 | $Z_{i}$ | Depth range of $i$-th pixel | mm |
 | $Z_{pi}$ | Depth of $Z_{i}$ projection onto plane fit | mm |
 | $BL$ | Optical baseline | mm |

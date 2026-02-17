@@ -25,7 +25,7 @@ Project link: <https://github.com/christian-brice/LIBRA-ROS2-Tools>
 ## Requirements
 
 | | Minimum | Recommended |
-|---|---|---|
+| --- | --- | --- |
 | **Operating System** | Ubuntu 22.04.4<br>(Jammy) | Ubuntu 22.04.4<br>(Jammy) |
 | **ROS 2** | Humble Hawksbill<br>(EOL: 2027/5) | Humble Hawksbill<br>(EOL: 2027/5) |
 | **Intel&reg; RealSense&trade;<br>Depth Camera** | Any D400-series | D456 |
